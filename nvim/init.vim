@@ -46,8 +46,7 @@
 	Plug 'haya14busa/incsearch.vim' " Vim Tree
 
 	"" Syntax
-	Plug 'sheerun/vim-polyglot'
-	" Plug 'alexjperkins/vim-keanu-syntax'
+	Plug 'alexjperkins/vim-keanu-syntax'
 
 	"" Python
 	Plug 'vim-scripts/indentpython.vim'

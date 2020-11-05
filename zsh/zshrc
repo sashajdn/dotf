@@ -95,13 +95,13 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 
 ### --- Aliases --- ###
 # Load aliases if exist
-[ -f "$HOME/keanu/zsh/aliasrc" ] && source "$HOME/keanu/zsh/aliasrc"
+[ -f "$HOME/dotf/zsh/aliasrc" ] && source "$HOME/dotf/zsh/aliasrc"
 [ -f "$HOME/.aliasrc" ] && source "$HOME/.aliasrc"
 
 ### --- Environment --- ###
-[ -f "$HOME/keanu/environments/keanu.env" ] && source "$HOME/keanu/environments/keanu.env"
-[ -f "$HOME/keanu/zsh/zshenv" ] && source "$HOME/keanu/zsh/zshenv"
-[ -f "$HOME/keanu/.env" ] && source "$HOME/keanu/.env"
+[ -f "$HOME/dotf/environments/dotf.env" ] && source "$HOME/dotf/environments/dotf.env"
+[ -f "$HOME/dotf/zsh/zshenv" ] && source "$HOME/dotf/zsh/zshenv"
+[ -f "$HOME/dotf/.env" ] && source "$HOME/dotf/.env"
 
 ### --- Kubernetes --- ###
 source <(kubectl completion zsh)

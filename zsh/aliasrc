@@ -1,10 +1,9 @@
-### --- Keanu Alias File --- ###
+### --- Dotf Alias File --- ###
 
 ### Aliases
 
 ### Docker
 alias dc='docker-compose'
-
 
 ## Git
 alias gs='git status'
@@ -15,27 +14,22 @@ alias gpl='git pull'
 alias gpo='git push origin'
 alias gc='git commit'
 
-
 ## Kubernetes
 alias kc='kubectl'
 alias mk='minikube'
-
 
 ### Keanu
 alias todo='$EDITOR $TODOPATH'
 alias learn='$EDITOR $TOLEARNPATH'
 alias toread='$EDITOR $TOREADPATH'
-alias wiki='cd $KEANU_WIKI && ls -a'
-alias repos='cd $KEANU_REPOS && ls -a'
-alias verv='cd $VERVPATH && ls -a'
-alias goals='$EDITOR $KEANU_GOALS'
-alias finances='$EDITOR $KEANU_FINANCES'
-alias timetable='$EDITOR $KEANU_TIMETABLE'
-
+alias wiki='cd $DOTF_WIKI && ls -a'
+alias repos='cd $DOTF_REPOS && ls -a'
+alias goals='$EDITOR $DOTF_GOALS'
+alias finances='$EDITOR $DOTF_FINANCES'
+alias timetable='$EDITOR $DOTF_TIMETABLE'
 
 ### Python
 alias pyinitd='find . -type d -exec touch {}/__init__.py \;'  # creates `__init__.py` in all dirs
-
 
 ## Shell Commands
 alias ls='ls --color=auto'
@@ -43,16 +37,13 @@ alias la='ls -a'
 alias ll='ls -l'
 alias lla='ls -la'
 
-
 ## Spotify
-alias spt='$HOME/keanu/spotify-tui/launch.sh'
-
+alias spt='$HOME/dotf/spotify-tui/launch.sh'
 
 ### Suffix Aliases
 alias -s pdf='zathura &!'
 alias -s {md}=$EDITOR
 alias -s py=python
-
 
 ### NeoVim 
 alias vi="nvim"
@@ -63,7 +54,6 @@ alias nv="nvim"
 ### Vim
 alias v2="vim"
 alias vim2="vim"
-
 
 ### Zathura
 alias zath='zathura'

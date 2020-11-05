@@ -1,16 +1,14 @@
-### --- Keanu ZSH ENV --- ###
+### --- DOTF ZSH ENV --- ###
 
 export EDITOR="nvim"
 
 export READER="zathura"
 export VISUAL=$EDITOR
 export CODEEDITOR=$EDITOR
-export TERMINAL="urxvt"
+export TERMINAL="urxvt" # move to alacritty
 export BROWSER="chromium"
-export VIMBROWSER="firefox"
 export OPENER="xdg-open"
-export WM="i3"
-export WALLPAPER="$(echo $HOME/keanu/wallpapers/default.jpg)"
+export WALLPAPER="$HOME/keanu/wallpapers/default.jpg"
 
 
 ### Python ###
@@ -37,19 +35,14 @@ export LESS_TERMCAP_me=$(tput sgr0)  ## End bold, blinking, standout & underline
 
 
 ### Misc ###
-export KEANU_REPOS="$HOME/repos"
-export KEANU_WIKI="$KEANU_REPOS/wiki"
-export KEANU_FINANCES="$HOME/repos/wiki/personal/finances.md"	
-export KEANU_TIMETABLE="$HOME/repos/wiki/personal/timetable.md"	
-export KEANU_GOALS="$HOME/repos/wiki/personal/goals.md"	
+export DOTF_REPOS="$HOME/repos"
+export DOTF_WIKI="$DOTF_REPOS/wiki"
+export DOTF_FINANCES="$HOME/repos/wiki/personal/finances.md"	
+export DOTF_TIMETABLE="$HOME/repos/wiki/personal/timetable.md"	
+export DOTF_GOALS="$HOME/repos/wiki/personal/goals.md"	
 export TODOPATH="$HOME/repos/wiki/personal/todo.md"
 export TOLEARNPATH="$HOME/repos/wiki/personal/tolearn.md"
 export TOREADPATH="$HOME/repos/wiki/personal/toread.md"
 
 export WIKIPATH="$HOME/repos/wiki/"
 export VERVPATH="$HOME/verv/"
-
-
-### Kraken Pi ###
-export KPCIP=192.168.1.255/24
-export KCDURL="http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
