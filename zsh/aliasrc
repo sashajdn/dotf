@@ -29,6 +29,7 @@ alias finances='$EDITOR $DOTF_FINANCES'
 alias timetable='$EDITOR $DOTF_TIMETABLE'
 
 ### Python
+alias py='ipython'
 alias pyinitd='find . -type d -exec touch {}/__init__.py \;'  # creates `__init__.py` in all dirs
 
 ## Shell Commands

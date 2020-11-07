@@ -47,5 +47,8 @@ brew install neovim
 ### Vim
 brew install vim
 
+### Yarn
+brew install yarn
+
 ### Zsh
 brew install zsh

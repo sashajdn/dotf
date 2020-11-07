@@ -110,11 +110,12 @@ complete -F __start_kubectl kc
 ### --- BAT --- ###
 export BAT_THEME="ansi-dark"
 
-
 ### --- FZF --- ###
 source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
 
+### --- Functions --- ###
+[ -f "$HOME/dotf/zsh/zshfuncs" ] && source "$HOME/dotf/zsh/zshfuncs"
 
 ### --- Syntax highlighting (should be last) --- ###
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null

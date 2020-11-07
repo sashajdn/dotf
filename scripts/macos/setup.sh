@@ -13,14 +13,14 @@ function check_or_create_config() {
 
 	CONFIG_DIR="$HOME/.config"
 
-	if [ ! -d CONFIG_DIR ]; then
-		mkdir CONFIG_DIR
+	if [ ! -d $CONFIG_DIR ]; then
+		mkdir $CONFIG_DIR
 	fi
 }
 
 function check_or_create_repos() {
-	if [ ! -d REPO_DIR ]; then
-		mkdir REPO_DIR
+	if [ ! -d $REPO_DIR ]; then
+		mkdir $REPO_DIR
 	fi
 }
 
@@ -29,11 +29,11 @@ check_or_create_config
 check_or_create_repos
 
 ### Zsh
-ln -sf $DOTF/zsh/.zshrc $HOME/.zshrc
-ln -sf $DOTF/zsh/.zprofile $HOME/.zprofile
+ln -sf $DOTF/zsh/zshrc $HOME/.zshrc
+ln -sf $DOTF/zsh/zprofile $HOME/.zprofile
 
 ### Nvim
-ln -sf $DOTF/nvim/init.vim $DOTF/.config/nvim/init.vim
+ln -sf $DOTF/nvim/init.vim $HOME/.config/nvim/init.vim
 ln -sf $DOTF/config/nvim $HOME/.config/nvim
 
 nvim -c PlugInstall
@@ -60,3 +60,4 @@ ln -sf $DOTF/vim/vimrc $HOME/.vimrc
 
 ### Repos
 git clone $REPO_DIR git@github.com:alexjperkins/wiki.git
+
