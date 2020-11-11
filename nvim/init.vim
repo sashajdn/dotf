@@ -1,7 +1,6 @@
-""" --- Keanu NeoVimRC 
+""" --- Dotf NeoVimRC 
 
 """ --- Leader
-	nnoremap <SPACE> <Nop>
 	let mapleader =" "
 
 
@@ -11,7 +10,6 @@
 	"" Airline
 	Plug 'vim-airline/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
-	Plug 'airblade/vim-rooter'
 
 	"" ALE
 	Plug 'dense-analysis/ale'
@@ -52,7 +50,7 @@
 	Plug 'vim-scripts/indentpython.vim'
 	Plug 'psf/black', { 'branch': 'stable' }
 
-	"" Tree
+	"" NERDTree
 	Plug 'scrooloose/nerdtree'
 
 	"" Theme
