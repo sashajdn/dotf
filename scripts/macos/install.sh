@@ -27,7 +27,7 @@ brew install ripgrep
 brew install git
 
 ### Go
-brew install go
+# brew install go
 
 ### Python
 brew install python
@@ -45,10 +45,10 @@ brew install node
 brew install neovim
 
 ### Vim
-brew install vim
+# brew install vim
 
 ### Yarn
-brew install yarn
+# brew install yarn
 
 ### Zsh
 brew install zsh

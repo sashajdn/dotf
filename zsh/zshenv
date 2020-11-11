@@ -9,6 +9,11 @@ export TERMINAL="urxvt" # move to alacritty
 export BROWSER="chromium"
 export OPENER="xdg-open"
 export WALLPAPER="$HOME/keanu/wallpapers/default.jpg"
+export XDG_CONFIG_HOME=$HOME/.config
+
+
+### Dotf ###
+export DOTF_PATH=$HOME/dotf
 
 
 ### Python ###
@@ -16,8 +21,8 @@ export PATH=$PATH:$HOME/.local/bin
 
 
 ### Go ###
-export GOPATH=/home/alexjperkins/go
-export GOBIN=/home/alexjperkins/go/bin
+export GOPATH=$HOME
+export GOBIN=$HOME/bin
 export PATH=$PATH:$GOBIN
 
 

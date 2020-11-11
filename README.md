@@ -7,7 +7,7 @@
 $ ./scripts/arch/install.sh && ./scripts/arch/setup.sh
 ```
 
-## MacOS Linux Install
+## MacOS Install
 
 ```
 $ ./scripts/macos/install.sh && ./scripts/macos/setup.sh

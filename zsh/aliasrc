@@ -5,6 +5,9 @@
 ### Docker
 alias dc='docker-compose'
 
+### Dotf
+alias dotf='cd $DOTF_PATH'
+
 ## Git
 alias gs='git status'
 alias gl='git log --graph --abbrev-commit --decorate'
@@ -33,7 +36,7 @@ alias py='ipython'
 alias pyinitd='find . -type d -exec touch {}/__init__.py \;'  # creates `__init__.py` in all dirs
 
 ## Shell Commands
-alias ls='ls --color=auto'
+alias ls='ls'
 alias la='ls -a'
 alias ll='ls -l'
 alias lla='ls -la'

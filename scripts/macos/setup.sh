@@ -49,11 +49,11 @@ ln -sf $DOTF/config/neofetch $HOME/.config/neofetch
 ln -sf $DOTF/config/coc $HOME/.config/coc
 
 ### Spotify
-ln -sf $DOTF/config/spotifyd $HOME/.config/spotifyd
-ln -sf $DOTF/config/spotify-tui $HOME/.config/spotify-tui
+# ln -sf $DOTF/config/spotifyd $HOME/.config/spotifyd
+# ln -sf $DOTF/config/spotify-tui $HOME/.config/spotify-tui
 
 ### Zathura
-ln -sf $DOTF/config/zathura $HOME/.config/zathura
+# ln -sf $DOTF/config/zathura $HOME/.config/zathura
 
 ### Vim
 ln -sf $DOTF/vim/vimrc $HOME/.vimrc
