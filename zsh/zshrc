@@ -2,7 +2,8 @@
 
 
 ## neofetch
-neofetch
+
+neofetch --backend 'iterm2' --source $HOME/dotf/config/neofetch/terminal.png
 
 ## Enable colours
 autoload -U colors && colors
@@ -111,11 +112,17 @@ complete -F __start_kubectl kc
 export BAT_THEME="ansi-dark"
 
 ### --- FZF --- ###
-source /usr/share/fzf/completion.zsh
-source /usr/share/fzf/key-bindings.zsh
+# source /usr/share/fzf/completion.zsh
+# source /usr/share/fzf/key-bindings.zsh
+
+# TODO: macos only
+source ~/.fzf.zsh
 
 ### --- Functions --- ###
 [ -f "$HOME/dotf/zsh/zshfuncs" ] && source "$HOME/dotf/zsh/zshfuncs"
+
+### --- External ZSHRC --- ###
+[ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
 
 ### --- Syntax highlighting (should be last) --- ###
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null

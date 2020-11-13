@@ -61,3 +61,6 @@ ln -sf $DOTF/vim/vimrc $HOME/.vimrc
 ### Repos
 git clone $REPO_DIR git@github.com:alexjperkins/wiki.git
 
+### FZF
+/usr/local/opt/fzf/install
+

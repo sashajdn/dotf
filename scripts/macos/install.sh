@@ -14,8 +14,11 @@ function check_or_install_brew() {
 check_or_install_brew
 brew update
 
-### Alacritty
-brew cask install alacritty
+### kitty
+brew cask install kitty
+
+### Bat
+brew install bat
 
 ### Cava
 
