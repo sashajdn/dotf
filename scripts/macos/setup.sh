@@ -24,9 +24,19 @@ function check_or_create_repos() {
 	fi
 }
 
+function check_or_create_zsh_history {
+	if [ ! -d $HOME/.cache/zsh ]; then
+		mkdir -p $HOME/.cache/zsh
+	fi
+
+	touch $HOME/.cache/zsh/history
+
+}
+
 
 check_or_create_config
 check_or_create_repos
+check_or_create_zsh_history
 
 ### Zsh
 ln -sf $DOTF/zsh/zshrc $HOME/.zshrc

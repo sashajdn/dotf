@@ -14,13 +14,13 @@ function check_or_install_brew() {
 check_or_install_brew
 brew update
 
-### kitty
-brew cask install kitty
-
 ### Bat
 brew install bat
 
 ### Cava
+
+### Exa
+brew install exa
 
 ### FZF
 brew install fzf
@@ -31,6 +31,9 @@ brew install git
 
 ### Go
 # brew install go
+
+### GoTop
+brew install gotop
 
 ### Python
 brew install python
@@ -48,10 +51,11 @@ brew install node
 brew install neovim
 
 ### Vim
-# brew install vim
+brew install vim
 
 ### Yarn
 # brew install yarn
 
 ### Zsh
 brew install zsh
+brew install zsh-syntax-highlighting

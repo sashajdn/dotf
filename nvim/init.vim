@@ -22,6 +22,7 @@
 	Plug 'norcalli/nvim-colorizer.lua'
 
 	"" I3
+	" TODO: Move to Arch Linux only
 	Plug 'PotatoesMaster/i3-vim-syntax'
 	
 	"" FZF
@@ -153,15 +154,25 @@
 
 
 	"" Terminal
+
 	tnoremap <C-E> <C-\><C-N>
 	au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 
+	" Zsh
+
 	function! OpenTerminal()
-		split term://zsh
-		resize 10
+		vsplit term://zsh
 	endfunction
 
 	nnoremap <C-T> :call OpenTerminal()<CR>
+
+	" GoTop
+
+	function! OpenGoTop()
+		vsplit term://gotop
+	endfunction
+
+	nnoremap <C-I> :call OpenGoTop()<CR>
 
 
 	"" Vim
@@ -208,9 +219,6 @@
 	    let &t_EI.="\<Esc>[1 q"
 	    let &t_te.="\<Esc>[0 q"
 	endif
-
-
-""" --- Groups
 
 
 """ --- Airline
