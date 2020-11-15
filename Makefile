@@ -6,4 +6,3 @@ macos:
 arch:
 	@echo "Installing arch linux dotfiles..."
 	./scripts/arch/install.sh && ./scripts/arch/setup.sh
-

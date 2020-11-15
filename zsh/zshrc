@@ -1,7 +1,42 @@
-### --- Keanu ZSH config --- ###
+### --- DotF Zsh config --- ###
 
 
-## neofetch
+### --- OS --- ###
+function SET_AND_EXPORT_MACOS() {
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+		IS_MACOS=1
+	fi
+	export IS_MACOS
+}
+
+function SET_NEOFETCH() {
+	if [[ "$IS_MACOS" == "1" ]]; then
+		alias neofetch="neofetch --backend 'iterm2' --source $HOME/dotf/config/neofetch/terminal.png"
+	fi
+
+}
+
+IS_MACOS=0
+SET_AND_EXPORT_MACOS
+SET_NEOFETCH
+
+
+### --- OPTS --- ###
+
+## Shortcuts
+setopt AUTO_CD
+
+## History
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+setopt INC_APPEND_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+
+
+### --- Neofetch --- ###
 neofetch
 
 ## Enable colours
@@ -16,8 +51,9 @@ precmd() { vcs_info }
 ## Format VCS info
 zstyle ':vcs_info:git:*' formats '%b'
 
+
 ### --- Prompt --- ###
-# Prompt
+
 setopt PROMPT_SUBST
 NEWLINE=$'\n'
 PROMPT='[%B%F{169}%n%f%b%B%F{38}@%f%b%F{169}%M%f %B%F{38}${PWD/#$HOME/~}%f%b] %B%F{1}${vcs_info_msg_0_}%f%b${NEWLINE}%B%F{38}$%f%b '
@@ -25,19 +61,19 @@ PROMPT='[%B%F{169}%n%f%b%B%F{38}@%f%b%F{169}%M%f %B%F{38}${PWD/#$HOME/~}%f%b] %B
 
 ### --- History --- ###
 ## History in cache directory
-HISTSIZE=10000
-SAVEHIST=10000
+SAVEHIST=5000
+HISTSIZE=2000
 HISTFILE=~/.cache/zsh/history
 
+
 ### --- Completion --- ###
-## Basic auto/tab complete, gives tab completion menu
+
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
 compinit
 _comp_options+=(globdots)  # include hidden files
 
-### --- LS Colours --- ###
 
 ### --- Vi --- ###
 ## Vi Mode
@@ -93,29 +129,48 @@ bindkey -s '^o' 'lfcd\n'
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
+
 ### --- Aliases --- ###
-# Load aliases if exist
 [ -f "$HOME/dotf/zsh/aliasrc" ] && source "$HOME/dotf/zsh/aliasrc"
 [ -f "$HOME/.aliasrc" ] && source "$HOME/.aliasrc"
+
 
 ### --- Environment --- ###
 [ -f "$HOME/dotf/environments/dotf.env" ] && source "$HOME/dotf/environments/dotf.env"
 [ -f "$HOME/dotf/zsh/zshenv" ] && source "$HOME/dotf/zsh/zshenv"
 [ -f "$HOME/dotf/.env" ] && source "$HOME/dotf/.env"
 
+
 ### --- Kubernetes --- ###
 source <(kubectl completion zsh)
 complete -F __start_kubectl kc
 
+
 ### --- BAT --- ###
 export BAT_THEME="ansi-dark"
 
+
 ### --- FZF --- ###
-source /usr/share/fzf/completion.zsh
-source /usr/share/fzf/key-bindings.zsh
+if [[ "$IS_MACOS" == 1 ]]; then
+	[ -f "$HOME/.fzf.zsh" ] && source ~/.fzf.zsh
+else
+	source /usr/share/fzf/completion.zsh
+	source /usr/share/fzf/key-bindings.zsh
+fi
+
 
 ### --- Functions --- ###
 [ -f "$HOME/dotf/zsh/zshfuncs" ] && source "$HOME/dotf/zsh/zshfuncs"
 
+
+### --- External --- ###
+[ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
+[ -f "$HOME/.ealiasrc" ] && source "$HOME/.ealiasrc"
+
+
 ### --- Syntax highlighting (should be last) --- ###
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null
+if [[ "$IS_MACOS" == "1" ]]; then
+	source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null
+else
+	source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null  (ARCH only)
+fi
