@@ -2,8 +2,17 @@
 	"languageserver": {
 		"golang": {
 			"command": "gopls",
+			"args": ["serve", "-debug", ""],
 			"filetypes": ["go"],
-			"rootPatterns": ["go.mod", "main.go"]
+			"rootPatterns": ["main.go", "go.mod", "*.go"],
+			"requireRootPattern": true,
+			"ignoredRootPaths": ["/Users/alexperkins/src/github.com/monzo/wearedev/"]
+		},
+		"proto" : {
+			"filetypes": ["proto"],
+			"rootPatterns": ["*.proto"],
+			"requireRootPattern": true
+
 		}
 	},
 
@@ -20,4 +29,3 @@
 	"python.linting.flake8Enabled": true,
 	"python.formatting.blackPath": "black"
 }
-
