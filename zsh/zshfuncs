@@ -3,3 +3,9 @@ cd()
 	builtin cd $@
 	ls
 }
+
+gtouch()
+{
+	touch "$@.go" && \
+		touch "$@_test.go"
+}
