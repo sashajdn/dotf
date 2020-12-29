@@ -6,6 +6,8 @@ cd()
 
 gtouch()
 {
-	touch "$@.go" && \
-		touch "$@_test.go"
+	f="$@.go"
+	tf="$@_test.go"
+	echo "package ${PWD##*/}" >> $f  &&\
+		echo "package ${PWD##*/}" >> $tf
 }
