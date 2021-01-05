@@ -1,0 +1,16 @@
+#!/bin/bash
+
+IPS=$(hostname -i | grep -oP '192\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+IFS=' '
+BREAK="****************"
+
+read -ra ADDR <<< "$IPS"
+
+function scan() {
+	for i in "${ADDR[@]}"; do
+		echo "Scanning IP -> $i"
+		echo "$BREAK"
+		sudo nmap -sn "$i/24"
+	done
+}
+scan

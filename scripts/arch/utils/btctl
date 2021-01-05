@@ -1,0 +1,18 @@
+#!/bin/bash
+
+MAC="CC:C5:0A:87:30:DD"
+
+while test $# != 0
+do
+	case "$1" in
+		--off)
+			echo "disconnect $MAC" | bluetoothctl ;;
+		--on)
+			echo "connect $MAC" | bluetoothctl ;;
+		-s)
+			echo "show $MAC" | bluetoothctl ;;
+		-p)
+			echo "paired-devices" | bluetoothctl ;;
+	esac
+	shift
+done
