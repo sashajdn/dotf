@@ -35,6 +35,9 @@ brew install git
 ### GoTop
 brew install gotop
 
+### LF
+brew install lf
+
 ### Python
 brew install python
 
