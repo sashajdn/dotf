@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ADDR="www.google.com"
+
+while test $# != 0
+do
+	case "$1" in
+		*)
+			echo "Pinging $ADDR..."
+			ping "$ADDR"
+	esac
+	shift
+done
+
+if [ $# == 0 ]
+then
+	echo "Pinging $ADDR..."
+	ping "$ADDR"
+fi
