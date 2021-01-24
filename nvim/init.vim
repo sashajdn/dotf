@@ -1,5 +1,7 @@
 """ --- Dotf NeoVimRC 
 
+	set t_Co=256
+
 """ --- Leader
 	let mapleader =" "
 

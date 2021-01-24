@@ -45,6 +45,7 @@ ln -sf $DOTF/zsh/zprofile $HOME/.zprofile
 ### Nvim
 ln -sf $DOTF/nvim/init.vim $HOME/.config/nvim/init.vim
 ln -sf $DOTF/config/nvim $HOME/.config/nvim
+ln -sf $DOTF/config/nvim $HOME/.config/nvimpager
 
 nvim -c PlugInstall
 nvim -c CocInstall coc-graphql coc-json coc-python coc-tsserver coc-yaml
@@ -54,6 +55,9 @@ ln -sf $DOTF/config/cava $HOME/.config/cava
 
 ### Neofetch
 ln -sf $DOTF/config/neofetch $HOME/.config/neofetch
+
+### LF
+ln -sf $DOTF/config/lf/ $HOME/.config/lf
 
 ### CoC
 ln -sf $DOTF/config/coc $HOME/.config/coc
