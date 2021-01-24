@@ -1,5 +1,7 @@
 """ --- Dotf NeoVimRC 
 
+	set t_Co=256
+
 """ --- Leader
 	let mapleader =" "
 
@@ -113,6 +115,7 @@
 	nmap <silent> <Leader>gt <Plug>(coc-type-definition)
 	nmap <silent> <Leader>gi <Plug>(coc-implementation)
 	nmap <silent> <Leader>gr <Plug>(coc-references)
+	nmap <silent> <Leader>rn <Plug>(coc-rename)
 
 	" Tab Completion
 	inoremap <silent><expr> <TAB>
@@ -154,7 +157,6 @@
 
 
 	"" Terminal
-
 	tnoremap <C-E> <C-\><C-N>
 	au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 
@@ -172,8 +174,7 @@
 		vsplit term://gotop
 	endfunction
 
-	nnoremap <C-I> :call OpenGoTop()<CR>
-
+	nnoremap <C-S> :call OpenGoTop()<CR>
 
 	"" Vim
 	nnoremap S :%s//g<Left><Left>

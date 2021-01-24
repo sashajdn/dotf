@@ -1,0 +1,8 @@
+### --- DOTF LFRC --- ###
+
+set preview true
+set previewer "~/.config/lf/preview"
+set hidden true
+set color256 true
+set drawbox true
+set ignorecase true

@@ -29,11 +29,20 @@ brew install ripgrep
 ### Git
 brew install git
 
+### Glow
+brew install glow
+
 ### Go
 # brew install go
 
 ### GoTop
 brew install gotop
+
+### LF
+brew install lf
+
+### Pandoc
+brew install pandoc
 
 ### Python
 brew install python

@@ -1,0 +1,1 @@
+/Users/alexperkins/dotf/config/nvim/init.vim

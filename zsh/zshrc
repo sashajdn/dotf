@@ -166,6 +166,8 @@ fi
 ### --- External --- ###
 [ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
 [ -f "$HOME/.ealiasrc" ] && source "$HOME/.ealiasrc"
+[ -f "$HOME/.ezshenv" ] && source "$HOME/.ezshenv"
+[ -f "$HOME/.ezshfuncs" ] && source "$HOME/.ezshfuncs"
 
 
 ### --- Syntax highlighting (should be last) --- ###
