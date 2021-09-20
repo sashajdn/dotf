@@ -25,8 +25,11 @@ alias gl='git log --graph --abbrev-commit --decorate'
 alias gch='git checkout'
 alias ga='git add'
 alias gpl='git pull'
-alias gpo='git push origin'
 alias gc='git commit'
+alias gu='git checkout master && git pull && git checkout - && git merge master'
+alias gb='git branch | grep \* | cut -c 3-200'
+alias gpo='git push origin'
+alias gpoc='gpo $(gb)'
 
 ## Kubernetes
 alias kc='kubectl'

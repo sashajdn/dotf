@@ -8,61 +8,44 @@
 
 """ --- Plugin Manager
 	call plug#begin('~/.vim/plugged')
-
 	"" Airline
 	Plug 'vim-airline/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
-
 	"" ALE
 	Plug 'dense-analysis/ale'
-
 	"" CoC
-	Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+	Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 	Plug 'pappasam/coc-jedi', {'do': 'yarn install --frozen-lockfile && yarn build'}
-
 	"" Colorizer
 	Plug 'norcalli/nvim-colorizer.lua'
-
 	"" I3
 	" TODO: Move to Arch Linux only
 	Plug 'PotatoesMaster/i3-vim-syntax'
-	
 	"" FZF
 	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 	Plug 'junegunn/fzf.vim'
-
 	"" Go
 	Plug 'fatih/vim-go'
-
 	"" Golden Ratio
 	Plug 'roman/golden-ratio'
-
 	"" GOYO
 	Plug 'junegunn/goyo.vim'
-
 	" Haskell
 	Plug 'neovimhaskell/haskell-vim'
-
 	"" Highlighting
 	Plug 'haya14busa/incsearch.vim' " Vim Tree
-
 	"" Syntax
 	Plug 'alexjperkins/vim-keanu-syntax'
-
 	"" Python
 	Plug 'vim-scripts/indentpython.vim'
 	Plug 'psf/black', { 'branch': 'stable' }
-
 	"" NERDTree
 	Plug 'scrooloose/nerdtree'
-
 	"" Theme
 	Plug 'liuchengxu/space-vim-theme'
 	Plug 'ghifarit53/tokyonight-vim'
-
 	"" Typescript
-	Plug 'leafgarland/typescript-vim'
-
+	"" Plug 'leafgarland/typescript-vim'
 	call plug#end()
 
 
@@ -77,7 +60,6 @@
 	set scrolloff=8
 	set splitbelow splitright
 	set noshowmode
-
 	set hidden
 	set cmdheight=2
 	set updatetime=50
@@ -100,7 +82,6 @@
 
 
 """ --- Mappings
-
 	"" Base
 	vnoremap <Leader>p "_dp
 
@@ -161,7 +142,6 @@
 	au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 
 	" Zsh
-
 	function! OpenTerminal()
 		vsplit term://zsh
 	endfunction
@@ -169,7 +149,6 @@
 	nnoremap <C-T> :call OpenTerminal()<CR>
 
 	" GoTop
-
 	function! OpenGoTop()
 		vsplit term://gotop
 	endfunction
@@ -189,6 +168,9 @@
 	nnoremap <Leader>j :wincmd j<CR>
 	nnoremap <Leader>k :wincmd k<CR>
 	nnoremap <Leader>l :wincmd l<CR>
+
+	"" Tmp (MacOS)
+	noremap <Leader>q <c-v>
 
 
 """ --- Backups & Undo
@@ -244,14 +226,10 @@
 
 	let g:ale_linters = {
 	\	'python': ['pylint', 'flake8', 'isort', 'black', 'mypy'],
-	\	'javascript': ['eslint'],
-	\	'typescript': ['eslint']
 	\}
 
 	let g:ale_fixers = {
 	\	'python': ['black'],
-	\	'javascript': ['eslint'],
-	\	'typescript': ['eslint'],
 	\	'scss': ['prettier'],
 	\	'html': ['prettier'],
 	\}
@@ -279,6 +257,10 @@
 
 """ --- Goyo
 	noremap <Leader>gy :Goyo \| set linebreak<CR>
+
+
+""" --- Javascript
+	autocmd Filetype *.js setlocal ts=2 sw=2 sts=2
 
 
 """ --- NerdTree

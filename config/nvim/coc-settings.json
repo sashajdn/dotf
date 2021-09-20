@@ -4,16 +4,22 @@
 			"command": "gopls",
 			"args": ["serve", "-debug", ""],
 			"filetypes": ["go"],
-			"rootPatterns": ["main.go", "go.mod", "*.go"],
+			"rootPatterns": ["main.go", "*.go"],
 			"requireRootPattern": true,
 			"ignoredRootPaths": ["/Users/alexperkins/src/github.com/monzo/wearedev/"]
 		},
-		"proto" : {
+		"proto": {
 			"filetypes": ["proto"],
 			"rootPatterns": ["*.proto"],
 			"requireRootPattern": true
 
 		}
+	},
+
+	"diagnostic-lanaguageserver.filetypes": {
+		"sh": "shellcheck",
+		"javascript": "eslint",
+		"javascript.jsx": "eslint"
 	},
 
 	"yaml.schemas": {
