@@ -4,17 +4,19 @@
 if [[ "$IS_MACOS" == "1" ]]; then
 	export LSCOLORS="fxgxhxdacxDaDaxbadacex"
 	export CLICOLOR=1
+	export TERMINAL="alacritty" # move to alacritty
+	export BROWSER="chrome"
 else
 	export OPENER="xdg-open"
 	export TERMINAL="urxvt" # move to alacritty
 	export READER="zathura"
 	export WALLPAPER="$HOME/keanu/wallpapers/default.jpg"
+	export BROWSER="chromium"
 fi
 
 export EDITOR="nvim"
 export VISUAL=$EDITOR
 export CODEEDITOR=$EDITOR
-export BROWSER="chromium"
 export XDG_CONFIG_HOME=$HOME/.config
 
 

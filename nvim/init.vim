@@ -1,5 +1,4 @@
 """ --- Dotf NeoVimRC 
-
 	set t_Co=256
 
 """ --- Leader
@@ -45,6 +44,7 @@
 	Plug 'liuchengxu/space-vim-theme'
 	Plug 'ghifarit53/tokyonight-vim'
 	"" Typescript
+	Plug 'jparise/vim-graphql'
 	"" Plug 'leafgarland/typescript-vim'
 	call plug#end()
 

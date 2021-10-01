@@ -6,3 +6,14 @@ set hidden true
 set color256 true
 set drawbox true
 set ignorecase true
+
+# Custom Functions
+cmd open ${{
+    case $(file --mime-type "$f" -bL) in
+        text/*|application/json) $EDITOR "$f";;
+	inode/*) $EDITOR "$f";;
+        *) xdg-open "$f" ;;
+    esac
+}}
+
+map <enter> open
