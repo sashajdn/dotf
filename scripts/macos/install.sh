@@ -14,6 +14,9 @@ function check_or_install_brew() {
 check_or_install_brew
 brew update
 
+### Alacritty 
+brew install alacritty
+
 ### Bat
 brew install bat
 
