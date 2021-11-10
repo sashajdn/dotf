@@ -39,28 +39,28 @@ check_or_create_repos
 check_or_create_zsh_history
 
 ### Zsh
-ln -sf $DOTF/zsh/zshrc $HOME/.zshrc
-ln -sf $DOTF/zsh/zprofile $HOME/.zprofile
+ln -sf $HOME/.zshrc $DOTF/zsh/zshrc 
+ln -sf $HOME/.zprofile $DOTF/zsh/zprofile 
 
 ### Nvim
-ln -sf $DOTF/nvim/init.vim $HOME/.config/nvim/init.vim
-ln -sf $DOTF/config/nvim $HOME/.config/nvim
-ln -sf $DOTF/config/nvim $HOME/.config/nvimpager
+ln -sf $HOME/.config/nvim/init.vim $DOTF/nvim/init.vim 
+ln -sf $HOME/.config/nvim $DOTF/config/nvim 
+ln -sf $HOME/.config/nvimpager $DOTF/config/nvim 
 
 nvim -c PlugInstall
 nvim -c CocInstall coc-graphql coc-json coc-python coc-tsserver coc-yaml
 
 ### Cava
-ln -sf $DOTF/config/cava $HOME/.config/cava
+ln -sf $HOME/.config/cava $DOTF/config/cava 
 
 ### Neofetch
-ln -sf $DOTF/config/neofetch $HOME/.config/neofetch
+ln -sf $HOME/.config/neofetch $DOTF/config/neofetch 
 
 ### LF
-ln -sf $DOTF/config/lf/ $HOME/.config/lf
+ln -sf $HOME/.config/lf $DOTF/config/lf/ 
 
 ### CoC
-ln -sf $DOTF/config/coc $HOME/.config/coc
+ln -sf $HOME/.config/coc $DOTF/config/coc 
 
 ### Spotify
 # ln -sf $DOTF/config/spotifyd $HOME/.config/spotifyd
@@ -70,11 +70,10 @@ ln -sf $DOTF/config/coc $HOME/.config/coc
 # ln -sf $DOTF/config/zathura $HOME/.config/zathura
 
 ### Vim
-ln -sf $DOTF/vim/vimrc $HOME/.vimrc
+ln -sf $HOME/.vimrc $DOTF/vim/vimrc 
 
 ### Repos
 git clone $REPO_DIR git@github.com:alexjperkins/wiki.git
 
 ### FZF
 /usr/local/opt/fzf/install
-
