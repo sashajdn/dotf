@@ -14,6 +14,9 @@ function check_or_install_brew() {
 check_or_install_brew
 brew update
 
+### Alacritty 
+brew install alacritty
+
 ### Bat
 brew install bat
 
@@ -40,7 +43,6 @@ brew install gotop
 
 ### LF
 brew install lf
-
 ### Pandoc
 brew install pandoc
 
@@ -54,13 +56,16 @@ brew cask install docker
 brew install neofetch
 
 ### Node
-brew install node
+# brew install node
 
 ### Nvim
 brew install neovim
 
 ### Vim
 brew install vim
+
+### Tmux
+brew install tmux
 
 ### Yarn
 # brew install yarn

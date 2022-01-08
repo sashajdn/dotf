@@ -1,8 +1,10 @@
 #!/bin/bash
 
 case "$1" in
-	*.go|*.py|*.js|*.ts|*.jsx|*.tsx)
-		nvimpager "$1" ;;
+	*.go|*.py|*.js|*.ts|*.jsx|*.tsx|*.sql|*.hs)
+		bat --color=always --style=numbers --theme=TwoDark $@;;
 	*.md)
 		glow -s dark "$1" ;;
+	*)
+		bat --color=always --style=numbers --theme=TwoDark $@;;
 esac

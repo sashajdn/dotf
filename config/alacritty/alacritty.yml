@@ -1,0 +1,32 @@
+env:
+  TERM: alacritty
+
+window:
+  padding: 
+    x: 2
+    y: 2
+
+scrolling:
+  history: 10000
+  multiplier: 10
+
+draw_bold_text_with_bright_colors: true
+
+font:
+  size: 14.0
+  use_thin_strokes: true
+
+selection:
+  semantic_escape_char: ",│`|:\"' ()[]{}<>\t"
+  save_to_clipboard: true
+
+background_opacity: 0.9
+
+live_config_reload: true
+
+key_bindings:
+  - { key: N, mods: Control, action: SpawnNewInstance }
+  - { key: V, mods: Control|Shift, action: Paste }
+  - { key: C, mods: Control|Shift, action: Copy }
+  - { key: Plus, mods: Control, action: IncreaseFontSize }
+  - { key: Minus, mods: Control, action: DecreaseFontSize }
