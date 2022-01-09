@@ -119,7 +119,7 @@
 
 	"" FZF
 	nnoremap <silent> <C-f> <Esc><Esc>:Files!<CR>
-	inoremap <silent> <C-f> <Esc><Esc>:BLines!<CR>
+	inoremap <silent> <C-b> <Esc><Esc>:BLines!<CR>
 	nnoremap <silent> <C-g> <Esc><Esc>:Rg!<CR>
 
 

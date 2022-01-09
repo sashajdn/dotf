@@ -1,1 +1,1 @@
-/Users/alexperkins/dotf/nvim/init.vim
+/home/alexjperkins/dotf/nvim/init.vim
