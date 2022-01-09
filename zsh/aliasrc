@@ -31,6 +31,7 @@ alias gpoc='gpo $(gb)'
 ## Zettelkasten
 alias o='obsidian &!'
 alias lq='logseq &!'
+alias mm='cd $HOME/repos/megamind'
 
 ## Kubernetes
 alias kc='kubectl'
