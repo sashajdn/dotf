@@ -41,5 +41,8 @@ ln -sf $DOTF/config/coc $HOME/.config/coc
 ln -sf $DOTF/config/spotifyd $HOME/.config/spotifyd
 ln -sf $DOTF/config/spotify-tui $HOME/.config/spotify-tui
 
+## TMUX
+ln -sf $DOTF/config/tmuxp/ $HOME/.config/tmuxp
+
 # ZATHURA
 ln -sf $DOTF/config/zathura $HOME/.config/zathura

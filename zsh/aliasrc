@@ -57,6 +57,7 @@ alias nv="nvim"
 
 ### Tmux
 alias t='tmux'
+alias tpd='tmuxp load default'
 
 ### Vim
 alias v2="vim"
