@@ -66,6 +66,7 @@ brew install vim
 
 ### Tmux
 brew install tmux
+brew install tmuxp
 
 ### Yarn
 # brew install yarn

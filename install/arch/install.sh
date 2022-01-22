@@ -23,6 +23,7 @@ sudo pacman -S neovim
 
 ## Tmux install.
 sudo pacman -S tmux
+# pip install --user python
 
 ## ZSH install.
 sudo pacman -S zsh zsh-syntax-highlighting
@@ -45,3 +46,5 @@ sudo pacman -S neofetch
 ## Docker install.
 
 ## GoTop install.
+
+## Python & Pip
