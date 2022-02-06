@@ -1,5 +1,4 @@
 session_name: 2-pane-dev
-start_directory: ./
 windows:
   - window_name: code 
     layout: f705,307x52,0,0{243x52,0,0,0,63x52,244,0,1}
