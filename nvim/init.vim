@@ -53,6 +53,7 @@
 	set background=dark
 	set nocompatible
 	set encoding=utf-8
+	set number
 	set relativenumber
 	set noswapfile
 	set cursorline
@@ -80,6 +81,14 @@
 
 	let g:incsearch#auto_nohlsearch = 1
 
+""" --- Colour Scheme
+	colorscheme space_vim_theme
+
+	" Transparent background
+	hi Normal     ctermbg=NONE guibg=NONE
+	hi LineNr     ctermbg=NONE guibg=NONE
+	hi SignColumn ctermbg=NONE guibg=NONE
+	hi VertSplit  ctermbg=NONE
 
 """ --- Mappings
 	"" Base
@@ -120,8 +129,12 @@
 	"" FZF
 	nnoremap <silent> <C-f> <Esc><Esc>:Files!<CR>
 	inoremap <silent> <C-b> <Esc><Esc>:BLines!<CR>
-	nnoremap <silent> <C-g> <Esc><Esc>:Rg!<CR>
+	nnoremap <silent> <C-g> <Esc><Esc>:GFiles!<CR>
+	"" TODO: rg
 
+	" Quicklist nav
+	nnoremap <C-j> :cnext<CR>
+	nnoremap <C-j> :cnext<CR>
 
 	"" GOYO
 	noremap <Leader>gy :Goyo \| set linebreak<CR>
@@ -161,13 +174,25 @@
 	nnoremap <silent> <Leader>V :split<CR>
 	nnoremap <silent> <Leader>v :vsplit<CR>
 
+	" Shift
 	vnoremap < <gv
 	vnoremap > >gv	
 
+	" Split navigation.
 	nnoremap <Leader>h :wincmd h<CR>
 	nnoremap <Leader>j :wincmd j<CR>
 	nnoremap <Leader>k :wincmd k<CR>
 	nnoremap <Leader>l :wincmd l<CR>
+
+	" Navigate / move lines in visualmode
+	vnoremap J :m '>+1<CR>gv=gv
+	vnoremap K :m '<-2<CR>gv=gv
+
+	" Quit all windows except current.
+	nnoremap <Leader>o :wincmd o<CR>
+
+	" Source config file
+	nnoremap <Leader><CR> :so ~/.config/nvim/init.vim<CR>
 
 	"" Tmp (MacOS)
 	noremap <Leader>q <c-v>
@@ -239,7 +264,8 @@
 
 
 """ --- FZF
-	let $FZF_DEFAULT_OPTS="--ansi --layout reverse --margin=1,4 --preview 'bat --color=always'"
+	" let $FZF_DEFAULT_OPTS="--ansi --layout reverse --margin=1,4 --preview 'bat --color=always'"
+	let $FZF_PREVIEW_COMMAND="COLORTERM=truecolor bat --style=numbers --color=always {}"
 
 
 """ --- Go
@@ -285,13 +311,3 @@
 
 """ --- Colorizer
 	" luafile $HOME/.config/nvim/lua/plug-colorizer.lua
-
-
-""" --- Colour Scheme
-	colorscheme space_vim_theme
-
-	" Transparent background
-	hi Normal     ctermbg=NONE guibg=NONE
-	hi LineNr     ctermbg=NONE guibg=NONE
-	hi SignColumn ctermbg=NONE guibg=NONE
-	hi VertSplit  ctermbg=NONE
