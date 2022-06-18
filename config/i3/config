@@ -91,12 +91,12 @@ for_window [class="^.*"] border pixel 2
 bindsym $mod+y exec --no-startup-id urxvt -e  bash -c "$HOME/keanu/bin/i3cmds/floatpy"
  
 ### --- Workspaces --- ###
-set $ws1 "Swallowtail"
-set $ws2 "Terminals"
-set $ws3 "Charts"
-set $ws4 Exchanges"
-set $ws5 "Chrome"
-set $ws6 "Spotify"
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
@@ -167,8 +167,8 @@ bindsym $mod+Shift+p exec import $HOME/Pictures/screenshots/$(date  +"%Y-%m-%d-%
 
 
 ### --- i3gaps --- ###
-gaps inner 10
-gaps outer 10
+gaps inner 15
+gaps outer 15
 
 ### --- Polybar --- ###
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
@@ -177,4 +177,4 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id feh --bg-scale ~/.wallpapers/default.jpg
 
 ### --- Monitors --- ###
-exec_always --no-startup-id $HOME/keanu/bin/i3cmds/xrandr_monitor.sh
+exec_always --no-startup-id $HOME/dotf/bin/i3cmds/xrandr_monitor.sh

@@ -8,6 +8,7 @@ gtouch()
 {
 	f="$1.go"
 	tf="$@_test.go"
-	echo "package ${PWD##*/}" >> $f  &&\
-		echo "package ${PWD##*/}" >> $tf
+	package=$(echo $(PWD##*/)| sed 's/-//g')
+	echo "package $package" >> $f  &&\
+	echo "package $package" >> $tf
 }
