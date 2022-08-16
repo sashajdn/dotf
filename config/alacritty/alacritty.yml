@@ -20,7 +20,7 @@ selection:
   semantic_escape_char: ",│`|:\"' ()[]{}<>\t"
   save_to_clipboard: true
 
-background_opacity: 0.9
+window.opacity: 0.9
 
 live_config_reload: true
 
