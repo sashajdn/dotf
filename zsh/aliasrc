@@ -16,6 +16,9 @@ alias dc='docker-compose'
 ## Dotf
 alias dotf='cd $DOTF_PATH'
 
+## Repos
+alias repos='cd $HOME/repos'
+
 ## Git
 alias gs='git status'
 alias gl='git log --graph --abbrev-commit --decorate'
@@ -34,7 +37,7 @@ alias lq='logseq &!'
 alias mm='cd $HOME/repos/megamind'
 
 ## Kubernetes
-alias kc='kubectl'
+alias kc='k'
 alias mk='minikube'
 
 ### Python
