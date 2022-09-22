@@ -4,11 +4,33 @@ cd()
 	ls
 }
 
+### --- golang --- ###
+
+# vg: is a vim opener for gofiles, the idea is that with go the application code and test code are in the same package
+#     therefore, we can open both the application code and test code with one command.
+vg()
+{
+	filename="$(echo $1 | sed 's/.go//g')"
+
+	file="${filename}.go"
+	testfile="${filename}_test.go"
+
+	nvim -O $file $testfile
+}
+
+# gtouch: creates the correct file structure with the correct package name for application and test code given
+#         a file name.
 gtouch()
 {
-	f="$1.go"
-	tf="$@_test.go"
-	package=$(echo $(PWD##*/)| sed 's/-//g')
-	echo "package $package" >> $f  &&\
-	echo "package $package" >> $tf
+	filename="$(echo $1 | sed 's/.go//g')"
+
+	file="${filename}.go"
+	testfile="${filename}_test.go"
+
+	package=$(echo ${PWD##*/} | sed 's/-//g')
+
+	echo "package $package" >> $file  &&\
+	echo "package $package" >> $testfile
+
+	vg $filename
 }
