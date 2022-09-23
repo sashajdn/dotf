@@ -37,8 +37,8 @@ alias lq='logseq &!'
 alias mm='cd $HOME/repos/megamind'
 
 ## Kubernetes
-alias kc='k'
-alias mk='minikube'
+alias k='kubectl'
+alias km='minikube'
 
 ### Python
 alias py='ipython'
