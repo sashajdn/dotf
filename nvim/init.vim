@@ -43,9 +43,11 @@
 	"" Theme
 	Plug 'liuchengxu/space-vim-theme'
 	Plug 'ghifarit53/tokyonight-vim'
+	Plug 'shaunsingh/oxocarbon.nvim', { 'do': './install.sh' }
 	"" Typescript
 	Plug 'jparise/vim-graphql'
 	"" Plug 'leafgarland/typescript-vim'
+
 	call plug#end()
 
 
@@ -80,15 +82,6 @@
 	autocmd Filetype * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 	let g:incsearch#auto_nohlsearch = 1
-
-""" --- Colour Scheme
-	colorscheme space_vim_theme
-
-	" Transparent background
-	hi Normal     ctermbg=NONE guibg=NONE
-	hi LineNr     ctermbg=NONE guibg=NONE
-	hi SignColumn ctermbg=NONE guibg=NONE
-	hi VertSplit  ctermbg=NONE
 
 """ --- Mappings
 	"" Base
@@ -317,6 +310,15 @@
 
 	let g:python_highlight_func_calls = 0
 
+""" --- Colour Scheme
+	colorscheme oxocarbon
+
+	" Transparent background
+	hi Normal     ctermbg=NONE guibg=NONE
+	hi LineNr     ctermbg=NONE guibg=NONE
+	hi SignColumn ctermbg=NONE guibg=NONE
+	hi VertSplit  ctermbg=NONE
+
 
 """ --- Colorizer
-	" luafile $HOME/.config/nvim/lua/plug-colorizer.lua
+	lua require'colorizer'.setup()
