@@ -57,6 +57,7 @@ alias vi="nvim"
 alias vim="nvim"
 alias v="nvim"
 alias nv="nvim"
+alias vl="nvim -u $HOME/dotf/nvim-lua/init.lua"
 
 ### Tmux
 alias t='tmux'
