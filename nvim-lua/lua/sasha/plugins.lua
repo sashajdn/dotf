@@ -23,9 +23,15 @@ return require('packer').startup(function()
     use 'nvim-lua/popup.nvim'
     use 'nvim-lua/plenary.nvim'
 
+    -- LSP.
+    use("neovim/nvim-lspconfig") -- LSP configuration.
+    use("onsails/lspkind-nvim") -- Pictograms.
+    use("nvim-lua/lsp_extensions.nvim") -- LSP Lua extensions.
+    use("glepnir/lspsaga.nvim") -- Further LSP extensions.
+
     -- Completion.
     use("hrsh7th/nvim-cmp") -- The completion plugin.
-    use('neovim/nvim-lspconfig') -- The completion for lsp.
+    use("hrsh7th/cmp-nvim-lsp") -- LSP completions .
     use("hrsh7th/cmp-buffer") -- Buffer completions.
     use("hrsh7th/cmp-path") -- Path completions.
     use("hrsh7th/cmp-cmdline") -- Commandline completions.
@@ -37,6 +43,7 @@ return require('packer').startup(function()
     use('saadparwaiz1/cmp_luasnip') -- Snippet completions.
     use('rafamadriz/friendly-snippets') -- Snippet collection.
 
+
     -- Themes.
 	use 'B4mbus/oxocarbon-lua.nvim'
 
@@ -45,4 +52,7 @@ return require('packer').startup(function()
 
     -- Golden ratio.
     use 'roman/golden-ratio'
+
+    -- Undo.
+    use("mbbill/undotree")
 end)
