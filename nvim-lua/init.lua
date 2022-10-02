@@ -1,4 +1,5 @@
 require("sasha.options")
+require("sasha.remap")
 require("sasha.functions")
 require("sasha.plugins")
 require("sasha.cmp")
