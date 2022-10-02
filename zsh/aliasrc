@@ -55,7 +55,7 @@ alias -s py=python
 ### NeoVim 
 alias vi="nvim"
 alias vim="nvim"
-alias v="nvim"
+alias v="nvim -u $HOME/dotf/nvim/init.vim"
 alias nv="nvim"
 alias vl="nvim -u $HOME/dotf/nvim-lua/init.lua"
 
