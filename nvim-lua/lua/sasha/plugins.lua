@@ -17,7 +17,7 @@ packer.init {
 
 return require('packer').startup(function()
     -- Neovim package manager.
-	use 'wbthomason/packer.nvim'
+    use 'wbthomason/packer.nvim'
 
     -- Defaults & Boilerplate.
     use 'nvim-lua/popup.nvim'
@@ -59,10 +59,10 @@ return require('packer').startup(function()
     use("nvim-telescope/telescope.nvim")
 
     -- Themes.
-	use 'B4mbus/oxocarbon-lua.nvim'
+    use 'B4mbus/oxocarbon-lua.nvim'
 
 	-- Colorizer.
-	use 'norcalli/nvim-colorizer.lua'
+    use 'norcalli/nvim-colorizer.lua'
 
     -- Golden ratio.
     use 'roman/golden-ratio'
