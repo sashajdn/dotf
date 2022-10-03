@@ -7,14 +7,14 @@ function check_or_install_brew() {
 		/bin/bash -c \
 			"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	fi
-	
+
 }
 
 ### Brew
 check_or_install_brew
 brew update
 
-### Alacritty 
+### Alacritty
 brew install alacritty
 
 ### Bat
@@ -60,6 +60,7 @@ brew install neofetch
 
 ### Nvim
 brew install neovim
+brew install tree-sitter
 
 ### Vim
 brew install vim
