@@ -23,6 +23,7 @@ cmp.setup({
     -- Sources of which to pull from, sorted by priority.
     sources = {
         -- { name = "cmp_tabnine" }, TODO
+        { name = "nvim_lsp"},
         { name = "luasnip" },
         { name = "buffer" },
         { name = "path" },

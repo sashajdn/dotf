@@ -43,6 +43,10 @@ return require('packer').startup(function()
     use('saadparwaiz1/cmp_luasnip') -- Snippet completions.
     use('rafamadriz/friendly-snippets') -- Snippet collection.
 
+    -- Treesitter.
+    use("nvim-treesitter/nvim-treesitter", {
+        run = ":TSUpdate"
+    })
 
     -- Themes.
 	use 'B4mbus/oxocarbon-lua.nvim'
