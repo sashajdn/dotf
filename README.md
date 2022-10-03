@@ -4,18 +4,18 @@
 
 ### Dependencies
 
-Neovim
+- Neovim
     - Treesitter
     - Telescope
     - LSP
     - CMP
-Tmux
-Zsh
+- Tmux
+- Zsh
 
 ### Getting started
 
-IDE: `$ v`
-Tmux: `$ t`
+- IDE: `$ v`
+- Tmux: `$ t`
 
 ### Visuals
 
