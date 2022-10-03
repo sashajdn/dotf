@@ -1,1 +1,0 @@
-/Users/sasha/dotf/nvim/init.vim
