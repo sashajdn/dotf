@@ -32,6 +32,8 @@ cmp.setup({
     -- Keymappings.
     mapping = {
         ["<CR>"] = cmp.mapping.confirm { select = true },
+
+        -- Move down in the selection.
         ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
                 cmp.select_next_item()
@@ -43,7 +45,32 @@ cmp.setup({
             "i",
             "s",
         }),
+        ["<Down>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_next_item()
+            elseif luasnip() then
+                luasnip.expand()
+            else fallback()
+            end
+        end, {
+            "i",
+            "s",
+        }),
+
+        -- Move up in the selection.
         ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, {
+            "i",
+            "s",
+        }),
+        ["<Up>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
                 cmp.select_prev_item()
             elseif luasnip.jumpable(-1) then

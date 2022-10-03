@@ -30,3 +30,10 @@ autocmd({"BufWritePre"}, {
     pattern = "*",
     command = "%s/\\s\\+$//e",
 })
+
+-- Stops inserting comments after entering a newline with the previous line commented.
+autocmd("BufEnter", {
+    callback = function()
+        vim.opt.formatoptions= vim.opt.formatoptions - { "c", "r", "o" }
+    end
+})

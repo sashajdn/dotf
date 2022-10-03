@@ -23,6 +23,12 @@ return require('packer').startup(function()
     use 'nvim-lua/popup.nvim'
     use 'nvim-lua/plenary.nvim'
 
+    -- Devicons.
+    use({
+        'nvim-lualine/lualine.nvim',
+        requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+    })
+
     -- LSP.
     use("neovim/nvim-lspconfig") -- LSP configuration.
     use("onsails/lspkind-nvim") -- Pictograms.
@@ -47,6 +53,10 @@ return require('packer').startup(function()
     use("nvim-treesitter/nvim-treesitter", {
         run = ":TSUpdate"
     })
+    use("nvim-treesitter/playground")
+
+    -- Telescope.
+    use("nvim-telescope/telescope.nvim")
 
     -- Themes.
 	use 'B4mbus/oxocarbon-lua.nvim'
@@ -59,4 +69,7 @@ return require('packer').startup(function()
 
     -- Undo.
     use("mbbill/undotree")
+
+    -- Git.
+    use ("ThePrimeagen/git-worktree.nvim")
 end)

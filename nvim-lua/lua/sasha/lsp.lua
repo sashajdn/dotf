@@ -15,6 +15,7 @@ local Remap = require("sasha.keymap")
 local nnoremap = Remap.nnoremap
 local inoremap = Remap.inoremap
 
+
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
@@ -38,6 +39,9 @@ end
 
 -- Typescript.
 lspconfig.tsserver.setup(config())
+
+-- Python.
+lspconfig.pyright.setup(config())
 
 -- Golang.
 lspconfig.gopls.setup(config({

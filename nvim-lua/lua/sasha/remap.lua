@@ -10,6 +10,9 @@ local xnoremap = Remap.xnoremap
 -- Filetree
 nnoremap("<leader>t", "<cmd>Lex 30<CR>") -- open filetree in left hand buffer.
 
+-- Undotree
+nnoremap("<leader>u", "<cmd>UndotreeShow<CR>")
+
 -- Push pasted over words (etc) so unnamed register, to keep current in clipboard.
 vnoremap("<leader>p",  "\"_dp")
 

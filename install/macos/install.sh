@@ -48,6 +48,7 @@ brew install pandoc
 
 ### Python
 brew install python
+brew install pyright
 
 ### Docker
 brew cask install docker
@@ -68,6 +69,9 @@ brew install vim
 ### Tmux
 brew install tmux
 brew install tmuxp
+
+### Lua
+brew install lua-language-server
 
 ### Yarn
 # brew install yarn

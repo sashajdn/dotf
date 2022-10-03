@@ -52,10 +52,10 @@ alias -s pdf='zathura &!'
 alias -s {md}=$EDITOR
 alias -s py=python
 
-### NeoVim 
+### NeoVim
 alias vi="nvim"
 alias vim="nvim"
-alias v="nvim -u $HOME/dotf/nvim/init.vim"
+alias v="nvim -u $HOME/dotf/nvim-lua/init.lua"
 alias nv="nvim"
 alias vl="nvim -u $HOME/dotf/nvim-lua/init.lua"
 

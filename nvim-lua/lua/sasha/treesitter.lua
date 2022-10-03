@@ -5,6 +5,7 @@ end
 
 treesitter_config.setup{
     ensure_installed = "all",
+    ignore_install = { "phpdoc" }, -- This is marked as experimental & is failing.
     sync_install = false,
     auto_install = true,
     highlight = {
