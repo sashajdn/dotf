@@ -1,4 +1,5 @@
 vim.opt.termguicolors = true
+vim.opt.clipboard = "unnamedplus"
 
 vim.opt.nu = true
 vim.opt.relativenumber = true -- sets relativenumber, relative line number, with the current being the true line number
@@ -27,7 +28,7 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.cmdheight = 2 -- gives more space for displaying messages.
+vim.opt.cmdheight = 1 -- gives more space for displaying messages.
 
 vim.opt.updatetime = 50 -- default is 4000ms
 
