@@ -25,7 +25,7 @@ local function config(_config)
         on_attach = function()
             -- LSP keymappings.
             nnoremap("<leader>gd", function() vim.lsp.buf.definition() end)
-            inoremap("<leader>gh", function() vim.lsp.buf.signature_help() end)
+            -- inoremap("<leader>gh", function() vim.lsp.buf.signature_help() end)
             nnoremap("<leader>gr", function() vim.lsp.buf.references() end)
             nnoremap("<leader>rn", function() vim.lsp.buf.rename() end)
 

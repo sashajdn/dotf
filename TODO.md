@@ -1,0 +1,4 @@
+- next / previous cycle not correct on highlight, jumps to the first in the buffer and not the closet.
+- language format on save.
+- rust analyzer broken
+- copying broken, failing to yank text to the same clipboard (DONE)
