@@ -2,3 +2,10 @@
 - language format on save.
 - rust analyzer broken
 - copying broken, failing to yank text to the same clipboard (DONE)
+- transparent mode broken for any newly created buffers expect the buffer currently selected.
+- Fuzzy find over dotfiles
+- Setu[ telescope keybindings
+- Go impl LSP
+- Go to type def LSP shortcut.
+- Harpoon but for directories
+- Search dotfiles with command for telescope.k
