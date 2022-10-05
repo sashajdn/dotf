@@ -24,15 +24,17 @@ local function config(_config)
         capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities()),
         on_attach = function()
             -- LSP keymappings.
+            nnoremap("<leader>gh", function() vim.lsp.buf.hover() end)
             nnoremap("<leader>gd", function() vim.lsp.buf.definition() end)
-            -- inoremap("<leader>gh", function() vim.lsp.buf.signature_help() end)
+            nnoremap("<leader>gt", function() vim.lsp.buf.type_definition() end)
             nnoremap("<leader>gr", function() vim.lsp.buf.references() end)
+            nnoremap("<leader>gi", function() vim.lsp.buf.implementation() end)
             nnoremap("<leader>rn", function() vim.lsp.buf.rename() end)
 
             -- Diagnostic keymappings.
-            nnoremap("<leader>gf", function() vim.diagnostic.open_float() end)
-            nnoremap("<leader>gn", function() vim.diagnostic.goto_next() end)
-            nnoremap("<leader>gN", function() vim.diagnostic.goto_prev() end)
+            nnoremap("<leader>df", function() vim.diagnostic.open_float() end)
+            nnoremap("<leader>dn", function() vim.diagnostic.goto_next() end)
+            nnoremap("<leader>dp", function() vim.diagnostic.goto_prev() end)
         end,
     }, _config or {})
 end
@@ -46,6 +48,7 @@ lspconfig.pyright.setup(config())
 -- Golang.
 lspconfig.gopls.setup(config({
     cmd = { "gopls", "serve" },
+    filetypes = {"go", "gomod" },
     settings = {
         gopls = {
             analyses = {
