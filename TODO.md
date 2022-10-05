@@ -1,5 +1,5 @@
 - next / previous cycle not correct on highlight, jumps to the first in the buffer and not the closet.
-- language format on save.
+- language format on save (DONE: golang).
 - rust analyzer broken
 - copying broken, failing to yank text to the same clipboard (DONE)
 - transparent mode broken for any newly created buffers expect the buffer currently selected.
@@ -9,3 +9,4 @@
 - Go to type def LSP shortcut.
 - Harpoon but for directories
 - Search dotfiles with command for telescope.k
+- Add linter for golang
