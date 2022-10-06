@@ -1,12 +1,36 @@
-vim.g.oxocarbon_lua_keep_terminal = true
-vim.g.oxocarbon_lua_transparent = true
-vim.g.oxocarbon_lua_alternative_telescope = true
+function Transparency()
+    vim.g.oxocarbon_lua_keep_terminal = true
+    vim.g.oxocarbon_lua_transparent = true
+    vim.g.oxocarbon_lua_alternative_telescope = true
 
-vim.opt.background = "dark"
+    vim.opt.background = "dark"
 
-vim.cmd("colorscheme oxocarbon-lua")
+    vim.cmd("colorscheme oxocarbon-lua")
 
-vim.cmd("hi Normal ctermbg=NONE guibg=NONE")
-vim.cmd("hi LineNr ctermbg=NONE guibg=NONE")
-vim.cmd("hi SignColumn ctermbg=NONE guibg=NONE")
-vim.cmd("hi VertSplit ctermbg=NONE")
+    local hl = function(what, opts)
+        vim.api.nvim_set_hl(0, what, opts)
+    end
+
+    hl("SignColumn", {
+        bg = "none",
+    })
+
+    hl("CursorLineNR", {
+        bg = "None"
+    })
+
+    -- hl("Normal", {
+    --   bg = "none"
+    -- })
+
+    hl("LineNr", {
+        fg = "#5eacd3"
+    })
+
+    hl("netrwDir", {
+        fg = "#5eacd3"
+    })
+
+end
+
+Transparency()
