@@ -6,6 +6,14 @@ end
 local Remap = require("sasha.keymap")
 local nnoremap = Remap.nnoremap
 
+local function search_dotfiles()
+    builtin.git_files({
+        prompt_title = "< DotF >",
+        cwd = "$HOME/dotf",
+        hidden = true,
+    })
+end
+
 -- Default.
 nnoremap("<leader>ft", "<cmd>Telescope")
 
@@ -25,4 +33,8 @@ end)
 
 nnoremap("<leader>fh", function()
     builtin.help_tags()
+end)
+
+nnoremap("<leader>fd", function()
+    search_dotfiles()
 end)
