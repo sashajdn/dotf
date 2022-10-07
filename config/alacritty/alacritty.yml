@@ -2,10 +2,10 @@ env:
   TERM: alacritty
 
 window:
-  padding: 
+  padding:
     x: 2
     y: 2
-  opacity: 0.9
+  opacity: 0.5
 
 
 scrolling:

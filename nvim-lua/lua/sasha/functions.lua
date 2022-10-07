@@ -18,10 +18,10 @@ autocmd('TextYankPost', {
 
 -- Rust schenanigans.
 autocmd({"BufEnter", "BufWinEnter", "TabEnter"}, {
-    group = SashaGroup,
+    -- group = SashaGroup,
     pattern = "*.rs",
     callback = function()
-        require("lsp_extensions").inlay_hints{}
+        require("lsp_extensions")
     end,
 })
 

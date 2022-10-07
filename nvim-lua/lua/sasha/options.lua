@@ -37,3 +37,6 @@ vim.opt.shortmess:append("c")
 vim.opt.colorcolumn = "120"
 
 vim.g.mapleader = " "
+
+-- Don't pass messages to |ins-completion-menu|
+vim.opt.shortmess:append("c")

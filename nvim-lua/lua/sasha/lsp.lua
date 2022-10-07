@@ -59,7 +59,9 @@ lspconfig.gopls.setup(config({
     }
 }))
 
+-- Golang linter.
+lspconfig.golangci_lint_ls.setup(config())
+
 -- Rust.
-lspconfig.rust_analyzer.setup(config({
-    cmd = { "rustup", "run", "nightly", "rust-analyzer" },
-}))
+lspconfig.rust_analyzer.setup(config())
+
