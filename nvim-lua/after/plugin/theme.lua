@@ -16,21 +16,29 @@ function Transparency()
     })
 
     hl("CursorLineNR", {
-        bg = "None"
+        bg = "none"
     })
 
-    -- hl("Normal", {
-    --   bg = "none"
-    -- })
+    hl("Normal", {
+        bg = "none"
+    })
+
+    hl("NormalNC", {
+        bg = "none"
+    })
+
+    hl("VertSplit", {
+        bg = "none",
+        fg = "#262626"
+    })
 
     hl("LineNr", {
-        fg = "#5eacd3"
+        fg = "#78a9ff"
     })
 
     hl("netrwDir", {
-        fg = "#5eacd3"
+        fg = "#78a9ff"
     })
-
 end
 
 Transparency()

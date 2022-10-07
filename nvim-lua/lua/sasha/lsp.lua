@@ -26,6 +26,7 @@ local function config(_config)
             -- LSP keymappings.
             nnoremap("<leader>gh", function() vim.lsp.buf.hover() end)
             nnoremap("<leader>gd", function() vim.lsp.buf.definition() end)
+            nnoremap("<leader>gw", function() vim.lsp.buf.workspace_symbol() end)
             nnoremap("<leader>gt", function() vim.lsp.buf.type_definition() end)
             nnoremap("<leader>gr", function() vim.lsp.buf.references() end)
             nnoremap("<leader>gi", function() vim.lsp.buf.implementation() end)
@@ -59,7 +60,11 @@ lspconfig.gopls.setup(config({
     }
 }))
 
+-- Golang linter.
+lspconfig.golangci_lint_ls.setup(config())
+
 -- Rust.
-lspconfig.rust_analyzer.setup(config({
-    cmd = { "rustup", "run", "nightly", "rust-analyzer" },
-}))
+lspconfig.rust_analyzer.setup(config())
+
+-- Solidity.
+lspconfig.solang.setup(config())

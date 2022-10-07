@@ -1,12 +1,20 @@
 - next / previous cycle not correct on highlight, jumps to the first in the buffer and not the closet.
 - language format on save (DONE: golang).
-- rust analyzer broken
 - copying broken, failing to yank text to the same clipboard (DONE)
-- transparent mode broken for any newly created buffers expect the buffer currently selected.
-- Fuzzy find over dotfiles
-- Setu[ telescope keybindings
-- Go impl LSP
-- Go to type def LSP shortcut.
-- Harpoon but for directories
-- Search dotfiles with command for telescope.k
-- Add linter for golang
+- transparent mode broken for any newly created buffers expect the buffer currently selected. (DONE)
+- Fuzzy find over dotfiles (DONE)
+- Setu[ telescope keybindings (DONE)
+- Go impl LSP (DONE)
+- Go to type def LSP shortcut. (DONE).
+- Harpoon but for directories.
+- Search dotfiles with command for telescope (DONE).
+- Add linter for golang (DONE).
+- Harpoon (DONE).
+- Move all keybindings to (`after/`).
+- Find Git plugin.
+- File Tree plugin.
+- Luasnip tab fix when nothing under cursor.
+- rust analyzer broken.
+- lua LSP setup.
+- ruby LSP setup.
+- CMP setup.

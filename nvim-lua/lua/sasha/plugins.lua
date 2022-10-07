@@ -59,17 +59,23 @@ return require('packer').startup(function()
     use("nvim-telescope/telescope.nvim")
 
     -- Themes.
-    use 'B4mbus/oxocarbon-lua.nvim'
+    use('sashajdn/oxocarbon.nvim')
 
 	-- Colorizer.
-    use 'norcalli/nvim-colorizer.lua'
+    use('norcalli/nvim-colorizer.lua')
 
     -- Golden ratio.
-    use 'roman/golden-ratio'
+    use('roman/golden-ratio')
 
     -- Undo.
     use("mbbill/undotree")
 
     -- Git.
     use ("ThePrimeagen/git-worktree.nvim")
+
+    -- Harpoon.
+    use ("ThePrimeagen/harpoon")
+
+    -- Rust.
+    use("simrat39/rust-tools.nvim")
 end)
