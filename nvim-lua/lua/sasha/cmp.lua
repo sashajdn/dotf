@@ -12,6 +12,15 @@ end
 
 require("luasnip/loaders/from_vscode").lazy_load()
 
+local lspkind = require("lspkind")
+
+local source_mapping = {
+    nvim_lsp = "[LSP]",
+    buffer = "[BUF]",
+    nvim_lua = "[LUA]",
+    path = "[PATH]",
+}
+
 cmp.setup({
     -- Setup.
     snippet = {
@@ -95,5 +104,14 @@ cmp.setup({
         documentation = {
           border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
         },
+    },
+
+    formatting = {
+        format = function(entry, vim_item)
+            -- vim_item.kind = lspkind.presets.default[vim_item.kind]
+            local menu = source_mapping[entry.source.name]
+            vim_item.menu = menu
+            return vim_item
+        end,
     },
 })

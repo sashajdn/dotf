@@ -36,10 +36,14 @@ brew install git
 brew install glow
 
 ### Go
-# brew install go
+brew install go
+brew install golangci-lint
 
 ### GoTop
 brew install gotop
+
+### Rust.
+brew install rust-analyzer
 
 ### LF
 brew install lf
