@@ -103,7 +103,7 @@ function zle-keymap-select {
 }
 zle -N zle-keymap-select
 zle-line-init(){
-	zle -K viins  # instantiate `vi insert` as keymap 
+	zle -K viins  # instantiate `vi insert` as keymap
 	echo -ne '\e[5 q'
 }
 zle -N zle-line-init
@@ -116,7 +116,7 @@ preexec() { echo -ne '\e[5 q' ;}  # Use beam cursor for each new prompt
 lfcd () {
 	tmp="$(mktemp)"
 	lf -last-dir-path="$tmp" "$@"
-	if [ -f "$tmp" ]; then 
+	if [ -f "$tmp" ]; then
 		dir="$(cat "$tmp")"
 		rm -f "$tmp"
 		[ -d "$dir" ] && [ "$dir" !="$(pwd)" ] && cd "$dir"
@@ -161,6 +161,8 @@ fi
 ### --- Functions --- ###
 [ -f "$HOME/dotf/zsh/zshfuncs" ] && source "$HOME/dotf/zsh/zshfuncs"
 
+### --- Keybindings --- ###
+bindkey -s ^f "tmux-sessionizer\n"
 
 ### --- External --- ###
 [ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
