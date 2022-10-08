@@ -19,3 +19,5 @@
 - Git branches piped into FZF
 - Tmux copying from terminal
 - Pipe golang test functions to run lua plugin or even with tmux split.
+- Telescope: LSP symbols
+- Install bin scripts to global path
