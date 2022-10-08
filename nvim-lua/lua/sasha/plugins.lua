@@ -60,6 +60,7 @@ return require('packer').startup(function()
 
     -- Themes.
     use('sashajdn/oxocarbon.nvim')
+    use('liuchengxu/space-vim-theme')
 
 	-- Colorizer.
     use('norcalli/nvim-colorizer.lua')
@@ -75,7 +76,4 @@ return require('packer').startup(function()
 
     -- Harpoon.
     use ("ThePrimeagen/harpoon")
-
-    -- Rust.
-    use("simrat39/rust-tools.nvim")
 end)

@@ -1,15 +1,6 @@
 - next / previous cycle not correct on highlight, jumps to the first in the buffer and not the closet.
-- language format on save (DONE: golang).
-- copying broken, failing to yank text to the same clipboard (DONE)
-- transparent mode broken for any newly created buffers expect the buffer currently selected. (DONE)
-- Fuzzy find over dotfiles (DONE)
-- Setu[ telescope keybindings (DONE)
-- Go impl LSP (DONE)
-- Go to type def LSP shortcut. (DONE).
 - Harpoon but for directories.
-- Search dotfiles with command for telescope (DONE).
-- Add linter for golang (DONE).
-- Harpoon (DONE).
+- Harpoon keybindings.
 - Move all keybindings to (`after/`).
 - Find Git plugin.
 - File Tree plugin.
@@ -18,3 +9,13 @@
 - lua LSP setup.
 - ruby LSP setup.
 - CMP setup.
+- Update Alacritty theme
+- Update current line colour from white
+- Check Stow for dotfile management.
+- Lua plugin to open current line in git web browser.
+- Tmux Sessionizer.
+- Tmux CheatSheet.
+- Tmux python scratchpad.
+- Git branches piped into FZF
+- Tmux copying from terminal
+- Pipe golang test functions to run lua plugin or even with tmux split.

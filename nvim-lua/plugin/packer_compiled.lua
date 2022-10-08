@@ -200,6 +200,11 @@ _G.packer_plugins = {
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/popup.nvim",
     url = "https://github.com/nvim-lua/popup.nvim"
   },
+  ["space-vim-theme"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/space-vim-theme",
+    url = "https://github.com/liuchengxu/space-vim-theme"
+  },
   ["telescope.nvim"] = {
     loaded = true,
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/telescope.nvim",

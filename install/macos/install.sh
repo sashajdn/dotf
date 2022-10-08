@@ -28,6 +28,7 @@ brew install exa
 ### FZF
 brew install fzf
 brew install ripgrep
+$(brew --prefix)/opt/fzf/install # keybinding
 
 ### Git
 brew install git
