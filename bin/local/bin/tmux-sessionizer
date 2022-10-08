@@ -7,7 +7,8 @@ REPOS_DIR="$HOME/repos"
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find $DOTF_DIR $REPOS_DIR -mindepth 1 -maxdepth 1 -type d | fzf)
+    repos_selected=$(find $REPOS_DIR -mindepth 1 -maxdepth 1 -type d)
+    selected=$(echo $DOTF_DIR $repos_selected | tr ' ' '\n' | fzf)
 fi
 
 if [[ -z $selected ]]; then
