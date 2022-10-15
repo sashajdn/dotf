@@ -1,10 +1,12 @@
+### --- *nix --- ###
+
 cd()
 {
 	builtin cd $@
 	ls
 }
 
-### --- golang --- ###
+### --- Golang --- ###
 
 # vg: is a vim opener for gofiles, the idea is that with go the application code and test code are in the same package
 #     therefore, we can open both the application code and test code with one command.
@@ -33,4 +35,16 @@ gtouch()
 	echo "package $package" >> $testfile
 
 	vg $filename
+}
+
+
+### --- Git --- ###
+gb()
+{
+    if ! command -v fzf &> /dev/null
+    then
+        git branch
+    else
+        git branch | fzf
+    fi
 }

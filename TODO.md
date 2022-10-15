@@ -1,6 +1,5 @@
 - next / previous cycle not correct on highlight, jumps to the first in the buffer and not the closet.
 - Harpoon but for directories.
-- Harpoon keybindings.
 - Move all keybindings to (`after/`).
 - Find Git plugin.
 - File Tree plugin.
@@ -9,11 +8,11 @@
 - lua LSP setup.
 - ruby LSP setup.
 - CMP setup.
-- Update Alacritty theme
+- Update Alacritty theme.
 - Update current line colour from white
 - Check Stow for dotfile management.
 - Lua plugin to open current line in git web browser.
-- Tmux Sessionizer.
+- Tmux Sessionizer (DONE)
 - Tmux CheatSheet.
 - Tmux python scratchpad.
 - Git branches piped into FZF

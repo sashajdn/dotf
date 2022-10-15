@@ -27,9 +27,9 @@ alias ga='git add'
 alias gpl='git pull'
 alias gc='git commit'
 alias gu='git checkout master && git pull && git checkout - && git merge master'
-alias gb='git branch | grep \* | cut -c 3-200'
+alias gbc='git branch | grep \* | cut -c 3-200'
 alias gpo='git push origin'
-alias gpoc='gpo $(gb)'
+alias gpoc='gpo $(gbc)'
 
 ## Zettelkasten
 alias o='obsidian &!'
