@@ -48,3 +48,14 @@ gb()
         git branch | fzf
     fi
 }
+
+### --- Git --- ###
+gbc()
+{
+    if ! command -v fzf &> /dev/null
+    then
+        git branch
+    else
+       git checkout $(git branch | fzf)
+    fi
+}
