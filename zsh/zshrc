@@ -163,6 +163,7 @@ fi
 
 ### --- Keybindings --- ###
 bindkey -s ^f "tmux-sessionizer\n"
+bindkey -s ^g "gbc"
 
 ### --- External --- ###
 [ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
