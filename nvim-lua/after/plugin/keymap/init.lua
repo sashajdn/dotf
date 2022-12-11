@@ -15,5 +15,7 @@ nnoremap("N", "Nzzzv")
 nnoremap("<C-d>", "<C-d>zz") -- Center cursor after moving half a page down.
 nnoremap("<C-u>", "<C-u>zz") -- Center cursor after moving half a page up.
 
+nnoremap("<leader>cd", "<cmd>cd %:p:h<CR><cmd>pwd<CR>") -- Set current working directory to that of the viewed file.
+
 -- Tmux.
 nnoremap("<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
