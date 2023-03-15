@@ -59,8 +59,8 @@ return require('packer').startup(function()
     use("nvim-telescope/telescope.nvim")
 
     -- Themes.
-    use('nyoom-engineering/oxocarbon.nvim')
-    use('liuchengxu/space-vim-theme')
+    use('sashajdn/oxocarbon.nvim')
+    -- use('liuchengxu/space-vim-theme')
 
 	-- Colorizer.
     use('norcalli/nvim-colorizer.lua')
@@ -77,4 +77,12 @@ return require('packer').startup(function()
 
     -- Harpoon.
     use ("ThePrimeagen/harpoon")
+
+    -- ChatGPT.
+    use("MunifTanjim/nui.nvim")
+    use ("jackMort/ChatGPT.nvim")
+
+    -- Noice.
+    use("folke/noice.nvim")
+
 end)
