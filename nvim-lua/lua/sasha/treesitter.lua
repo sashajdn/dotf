@@ -3,6 +3,8 @@ if not status_ok then
     return
 end
 
+require("nvim-treesitter.configs")
+
 treesitter_config.setup{
     ensure_installed = "all",
     ignore_install = { "phpdoc" }, -- This is marked as experimental & is failing.

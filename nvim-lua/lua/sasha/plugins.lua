@@ -60,7 +60,7 @@ return require('packer').startup(function()
 
     -- Themes.
     use('sashajdn/oxocarbon.nvim')
-    use('liuchengxu/space-vim-theme')
+    -- use('liuchengxu/space-vim-theme')
 
 	-- Colorizer.
     use('norcalli/nvim-colorizer.lua')
@@ -73,7 +73,16 @@ return require('packer').startup(function()
 
     -- Git.
     use ("ThePrimeagen/git-worktree.nvim")
+    use ("lewis6991/gitsigns.nvim")
 
     -- Harpoon.
     use ("ThePrimeagen/harpoon")
+
+    -- ChatGPT.
+    use("MunifTanjim/nui.nvim")
+    use ("jackMort/ChatGPT.nvim")
+
+    -- Noice.
+    use("folke/noice.nvim")
+
 end)

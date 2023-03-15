@@ -15,7 +15,7 @@ local function search_dotfiles()
 end
 
 -- Default.
-nnoremap("<leader>ft", "<cmd>Telescope")
+nnoremap("<leader>ft", "<cmd>Telescope<CR>")
 
 -- Telescope file fuzzy finding.
 -- <leader>f
