@@ -59,7 +59,7 @@ return require('packer').startup(function()
     use("nvim-telescope/telescope.nvim")
 
     -- Themes.
-    use('sashajdn/oxocarbon.nvim')
+    use('nyoom-engineering/oxocarbon.nvim')
     use('liuchengxu/space-vim-theme')
 
 	-- Colorizer.
@@ -73,6 +73,7 @@ return require('packer').startup(function()
 
     -- Git.
     use ("ThePrimeagen/git-worktree.nvim")
+    use ("lewis6991/gitsigns.nvim")
 
     -- Harpoon.
     use ("ThePrimeagen/harpoon")

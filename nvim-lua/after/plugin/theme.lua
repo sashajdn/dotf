@@ -5,7 +5,7 @@ function Transparency()
 
     vim.opt.background = "dark"
 
-    vim.cmd("colorscheme oxocarbon-lua")
+    vim.cmd("colorscheme oxocarbon")
 
     local hl = function(what, opts)
         vim.api.nvim_set_hl(0, what, opts)
