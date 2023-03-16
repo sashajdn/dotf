@@ -20,6 +20,9 @@
 
 4. Check out new primeagen stuff.
 
+5. LSP
+  - Transparent windows
+
 5. Git plugin
   - git diff
 
