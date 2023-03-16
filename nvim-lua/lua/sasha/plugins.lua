@@ -60,10 +60,7 @@ return require('packer').startup(function()
     use("xiyaowong/telescope-emoji.nvim")
 
     -- Themes.
-    use({
-        'sashajdn/oxocarbon.nvim',
-        branch = "feat/new-fixup"
-    })
+    use('sashajdn/oxocarbon.nvim')
     -- use('liuchengxu/space-vim-theme')
 
 	-- Colorizer.
