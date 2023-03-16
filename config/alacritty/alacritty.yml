@@ -1,12 +1,18 @@
 env:
   TERM: alacritty
 
+colors:
+  primary:
+    background: '#040d24'
+
 window:
   padding:
     x: 2
     y: 2
-  opacity: 0.6
+  opacity: 0.7
 
+background:
+  color: #040d24
 
 scrolling:
   history: 10000
