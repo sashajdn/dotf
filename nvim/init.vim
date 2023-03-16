@@ -1,4 +1,4 @@
-""" --- Dotf NeoVimRC 
+""" --- Dotf NeoVimRC
 	set t_Co=256
 
 """ --- Leader
@@ -169,7 +169,7 @@
 
 	" Shift
 	vnoremap < <gv
-	vnoremap > >gv	
+	vnoremap > >gv
 
 	" Split navigation.
 	nnoremap <Leader>h :wincmd h<CR>

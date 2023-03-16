@@ -59,7 +59,10 @@ return require('packer').startup(function()
     use("nvim-telescope/telescope.nvim")
 
     -- Themes.
-    use('sashajdn/oxocarbon.nvim')
+    use({
+        'sashajdn/oxocarbon.nvim',
+        branch = "feat/new-fixup"
+    })
     -- use('liuchengxu/space-vim-theme')
 
 	-- Colorizer.

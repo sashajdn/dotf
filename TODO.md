@@ -20,3 +20,5 @@
 - Pipe golang test functions to run lua plugin or even with tmux split.
 - Telescope: LSP symbols
 - Install bin scripts to global path
+- Theme colours
+- NOICE cmd prompt & colours
