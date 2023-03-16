@@ -16,6 +16,9 @@ if [[ -z $selected ]]; then
 fi
 
 selected_name=$(basename "$selected" | tr . _)
+selected_code_window="${selected_name}_code"
+selected_term_window="${selected_name}_term"
+
 tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] &&  [[ -z $tmux_running ]]; then
@@ -24,7 +27,11 @@ if [[ -z $TMUX ]] &&  [[ -z $tmux_running ]]; then
 fi
 
 if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -ds $selected_name -c $selected
+    # Create session.
+    tmux new-session -ds $selected_name -c $selected -n $selected_term_window
+
+    # Create code window.
+    tmux new-window -n $selected_code_window -t $selected_name -c $selected $EDITOR .
 fi
 
 tmux switch-client -t $selected_name

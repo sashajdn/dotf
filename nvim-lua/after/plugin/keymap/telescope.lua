@@ -38,3 +38,5 @@ end)
 nnoremap("<leader>fd", function()
     search_dotfiles()
 end)
+
+nnoremap("<leader>e", "<cmd>Telescope emoji<CR>")

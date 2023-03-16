@@ -8,6 +8,7 @@ local actions = require("telescope.actions")
 telescope.load_extension("git_worktree")
 telescope.load_extension("harpoon")
 telescope.load_extension("noice")
+telescope.load_extension("emoji")
 
 telescope.setup({
     defaults = {
@@ -30,6 +31,17 @@ telescope.setup({
                 ["<C-u>"] = actions.preview_scrolling_up,
                 ["<C-d"] = actions.preview_scrolling_down,
             },
+        },
+    },
+    extensions = {
+        emoji = {
+            action = function(emoji)
+                -- set register "*" to emoji value
+                -- vim.fn.setreg("*", emoji.value)
+
+                -- insert emoji when picked
+                vim.api.nvim_put({ emoji.value }, 'c', false, true)
+            end,
         },
     },
 })

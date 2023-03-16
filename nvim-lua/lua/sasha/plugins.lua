@@ -57,6 +57,7 @@ return require('packer').startup(function()
 
     -- Telescope.
     use("nvim-telescope/telescope.nvim")
+    use("xiyaowong/telescope-emoji.nvim")
 
     -- Themes.
     use({
