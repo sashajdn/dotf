@@ -59,3 +59,29 @@ gbc()
        git checkout $(git branch | fzf)
     fi
 }
+
+### --- Diary --- ###
+diary()
+{
+    DAY="$(date +'%a' | awk '{print tolower($0)}')"
+    YEAR="$(date +'%Y')"
+    MONTH="$(date +'%m')"
+    TODAY="$(date +'%Y_%m_%d')"
+
+    if [ ! -d $HOME/wiki/diary/$YEAR/$MONTH ];
+    then
+        mkdir -p $HOME/wiki/diary/$YEAR/$MONTH
+    fi
+
+    FILENAME=$HOME/wiki/diary/$YEAR/$MONTH/${DAY}_${TODAY}.md
+
+    if [ ! -f $FILENAME ]
+    then
+        touch $FILENAME
+
+        echo "# Diary: $(echo $DAY $TODAY | sed 's/_/ /g')\n" >> $FILENAME
+        cat $HOME/wiki/templates/$(echo $WIKI_DIARY_TEMPLATE) | envsubst >> $FILENAME
+    fi
+
+    $EDITOR $FILENAME
+}
