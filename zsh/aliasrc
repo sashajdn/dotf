@@ -66,5 +66,8 @@ alias tpd='tmuxp load default'
 alias v2="vim"
 alias vim2="vim"
 
+### Wiki.
+alias wiki="nvim $WIKI"
+
 ### Zathura
 alias zath='zathura'

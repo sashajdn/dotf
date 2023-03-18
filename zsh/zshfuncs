@@ -59,3 +59,20 @@ gbc()
        git checkout $(git branch | fzf)
     fi
 }
+
+### --- Diary --- ###
+diary()
+{
+    TODAY="$(date +'%Y_%m_%d')"
+    FILENAME=$HOME/wiki/diary/$TODAY.md
+
+    if [ ! -f $FILENAME ]
+    then
+        touch $FILENAME
+
+        echo "# Diary: $(echo $TODAY | sed 's/_/ /g')\n" >> $FILENAME
+        cat $HOME/wiki/templates/$(echo $WIKI_DIARY_TEMPLATE) | envsubst >> $FILENAME
+    fi
+
+    $EDITOR $FILENAME
+}

@@ -46,14 +46,17 @@ export LESS_TERMCAP_se=$(tput rmso; tput sgr0)
 export LESS_TERMCAP_us=$(tput smul; tput bold; tput setaf 6)  ## cyan
 export LESS_TERMCAP_me=$(tput sgr0)  ## End bold, blinking, standout & underline
 
+### WIKI.
+export WIKI=$HOME/repos/wiki
+export WIKI_DIARY_TEMPLATE="diary_0_1.md"
 
 ### Misc ###
 export DOTF_REPOS="$HOME/repos"
 export DOTF_WIKI="$DOTF_REPOS/wiki"
 export WIKIPATH="$HOME/repos/wiki/"
-export DOTF_FINANCES="$HOME/repos/wiki/personal/finances.md"	
-export DOTF_TIMETABLE="$HOME/repos/wiki/personal/timetable.md"	
-export DOTF_GOALS="$HOME/repos/wiki/personal/goals.md"	
+export DOTF_FINANCES="$HOME/repos/wiki/personal/finances.md"
+export DOTF_TIMETABLE="$HOME/repos/wiki/personal/timetable.md"
+export DOTF_GOALS="$HOME/repos/wiki/personal/goals.md"
 export TODOPATH="$HOME/repos/wiki/personal/todo.md"
 export TOLEARNPATH="$HOME/repos/wiki/personal/tolearn.md"
 export TOREADPATH="$HOME/repos/wiki/personal/toread.md"
