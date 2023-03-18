@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 DOTF_DIR="$HOME/dotf"
+WIKI_DIR="$HOME/wiki"
 REPOS_DIR="$HOME/repos"
 
 # Thank you @ThePrimaegen
@@ -8,7 +9,7 @@ if [[ $# -eq 1 ]]; then
     selected=$1
 else
     repos_selected=$(find $REPOS_DIR -mindepth 1 -maxdepth 1 -type d)
-    selected=$(echo $DOTF_DIR $repos_selected | tr ' ' '\n' | fzf)
+    selected=$(echo $WIKI_DIR $DOTF_DIR $repos_selected | tr ' ' '\n' | fzf)
 fi
 
 if [[ -z $selected ]]; then

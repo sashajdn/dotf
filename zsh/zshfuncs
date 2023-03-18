@@ -63,14 +63,23 @@ gbc()
 ### --- Diary --- ###
 diary()
 {
+    DAY="$(date +'%a' | awk '{print tolower($0)}')"
+    YEAR="$(date +'%Y')"
+    MONTH="$(date +'%m')"
     TODAY="$(date +'%Y_%m_%d')"
-    FILENAME=$HOME/wiki/diary/$TODAY.md
+
+    if [ ! -d $HOME/wiki/diary/$YEAR/$MONTH ];
+    then
+        mkdir -p $HOME/wiki/diary/$YEAR/$MONTH
+    fi
+
+    FILENAME=$HOME/wiki/diary/$YEAR/$MONTH/${DAY}_${TODAY}.md
 
     if [ ! -f $FILENAME ]
     then
         touch $FILENAME
 
-        echo "# Diary: $(echo $TODAY | sed 's/_/ /g')\n" >> $FILENAME
+        echo "# Diary: $(echo $DAY $TODAY | sed 's/_/ /g')\n" >> $FILENAME
         cat $HOME/wiki/templates/$(echo $WIKI_DIARY_TEMPLATE) | envsubst >> $FILENAME
     fi
 
