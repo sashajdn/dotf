@@ -8,12 +8,19 @@ local nnoremap = Remap.nnoremap
 
 local function search_dotfiles()
     builtin.git_files({
-        prompt_title = "< DotF >",
+        prompt_title = "< DotF 💻 >",
         cwd = "$HOME/dotf",
         hidden = true,
     })
 end
 
+local function search_wiki()
+    builtin.git_files({
+        prompt_title = "< Wiki 📚 >",
+        cwd = "$WIKI",
+        hidden = true,
+    })
+end
 -- Default.
 nnoremap("<leader>ft", "<cmd>Telescope<CR>")
 
@@ -37,6 +44,10 @@ end)
 
 nnoremap("<leader>fd", function()
     search_dotfiles()
+end)
+
+nnoremap("<leader>fw", function()
+    search_wiki()
 end)
 
 nnoremap("<leader>e", "<cmd>Telescope emoji<CR>")

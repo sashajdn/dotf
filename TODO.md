@@ -1,13 +1,13 @@
 1. Sort of tmux
- - Theme.
+ - Theme. ✅
 - Keybindings ✅
  - Bash & iPython scratchpads.
  - Splits & controlling size of splits easily.
- - Maximise / minimize split.
+ - Maximise / minimize split. ✅
  - Create new window & attach to session.
  - Fix copy mode.
 
-2. Sort out zs
+2. Sort out zsh
  - Prompt.
  - Prompt hinting.
  - Theme.
@@ -21,7 +21,12 @@
 4. Check out new primeagen stuff.
 
 5. LSP
-  - Transparent windows
+  - Transparent windows ✅
+  - ruff-lsp setup python
+  - rust setup
+  - c++
+  - frontend setup.
+
 
 5. Git plugin
   - git diff
@@ -36,8 +41,8 @@
   - Minimize / maximise split.
 
 10. Wiki
+  - Use obsidian / or Markdown?  ✅
 
-  - Use obsidian / or Markdown?
 
 
 - next / previous cycle not correct on highlight, jumps to the first in the buffer and not the closet.
