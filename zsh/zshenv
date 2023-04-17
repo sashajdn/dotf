@@ -47,8 +47,9 @@ export LESS_TERMCAP_us=$(tput smul; tput bold; tput setaf 6)  ## cyan
 export LESS_TERMCAP_me=$(tput sgr0)  ## End bold, blinking, standout & underline
 
 ### WIKI.
-export WIKI=$HOME/repos/wiki
+export WIKI=$HOME/wiki
 export WIKI_DIARY_TEMPLATE="diary_0_1.md"
+export WIKI_JOURNAL_TEMPLATE="journal_0_1.md"
 
 ### Misc ###
 export DOTF_REPOS="$HOME/repos"

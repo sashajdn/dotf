@@ -85,3 +85,29 @@ diary()
 
     $EDITOR $FILENAME
 }
+
+### --- Journal --- ###
+journal()
+{
+    DAY="$(date +'%a' | awk '{print tolower($0)}')"
+    YEAR="$(date +'%Y')"
+    MONTH="$(date +'%m')"
+    TODAY="$(date +'%Y_%m_%d')"
+
+    if [ ! -d $HOME/wiki/journal/$YEAR/$MONTH ];
+    then
+        mkdir -p $HOME/wiki/journal/$YEAR/$MONTH
+    fi
+
+    FILENAME=$HOME/wiki/journal/$YEAR/$MONTH/${DAY}_${TODAY}.md
+
+    if [ ! -f $FILENAME ]
+    then
+        touch $FILENAME
+
+        echo "# Journal: $(echo $DAY $TODAY | sed 's/_/ /g')\n" >> $FILENAME
+        cat $HOME/wiki/templates/$(echo $WIKI_JOURNAL_TEMPLATE) | envsubst >> $FILENAME
+    fi
+
+    $EDITOR $FILENAME
+}

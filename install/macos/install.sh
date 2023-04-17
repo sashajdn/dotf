@@ -51,10 +51,6 @@ brew install lf
 ### Pandoc
 brew install pandoc
 
-### Python
-brew install python
-brew install pyright
-
 ### Docker
 brew cask install docker
 
