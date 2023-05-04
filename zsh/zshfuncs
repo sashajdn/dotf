@@ -111,3 +111,26 @@ journal()
 
     $EDITOR $FILENAME
 }
+
+### --- Trips --- ###
+trip()
+{
+    if [ ! -d $HOME/wiki/trips ];
+    then
+        mkdir $HOME/wiki/trips
+    fi
+
+    FORMAT="$(echo $WIKI_CURRENT_TRIP | sed 's/ //g' | sed 's/,/_/g' |  awk '{print tolower($0)}')"
+    FILENAME=$HOME/wiki/trips/$FORMAT.md
+
+    if [ ! -f $FILENAME ]
+    then
+        touch $FILENAME
+
+        echo "# Trip: $WIKI_CURRENT_TRIP $WIKI_CURRENT_TRIP_EMOJI \n" >> $FILENAME
+        cat $HOME/wiki/templates/$(echo $WIKI_TRIP_TEMPLATE) | envsubst >> $FILENAME
+    fi
+
+
+    $EDITOR $FILENAME
+}

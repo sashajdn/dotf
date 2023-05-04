@@ -39,6 +39,7 @@
 
 9. Neovim
   - Minimize / maximise split.
+  - Comments off/on line
 
 10. Wiki
   - Use obsidian / or Markdown?  ✅
