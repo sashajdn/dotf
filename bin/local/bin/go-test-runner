@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Get all Go test files in the current directory and its subdirectories
+test_files=$(find . -name "*_test.go" -type f)
+
+# Exit if no files are found.
+if  [[ -z $test_files ]]; then
+    echo "🙅 No golang test files found!"
+    exit 1
+fi
+
+# Extract the test function names from the files, including Test.
+test_names=$(grep -o '^func Test\w*' $test_files | cut -d ":" -f2- | sed 's/^func //')
+
+# Use fzf to select a test function
+selected_test=$(echo "$test_names" | fzf)
+
+if [[ -z $selected_test ]]; then
+    echo "⚠️ No test selected!"
+    exit 1
+fi
+
+echo "🏃 Running test: \`$selected_test\` ..."
+
+# Run the selected test
+go test -run $selected_test
