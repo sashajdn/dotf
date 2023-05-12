@@ -134,3 +134,9 @@ trip()
 
     $EDITOR $FILENAME
 }
+
+### --- Ping --- ###
+pg()
+{
+    ping www.google.com
+}
