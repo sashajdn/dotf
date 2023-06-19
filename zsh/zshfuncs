@@ -135,6 +135,53 @@ trip()
     $EDITOR $FILENAME
 }
 
+### --- Location --- ###
+loc()
+{
+    if [ ! -d $HOME/wiki/location];
+    then
+        mkdir $HOME/wiki/location
+    fi
+
+    YEAR="$(date +'%Y')"
+    FILENAME=$HOME/wiki/location/$YEAR.md
+
+    if [ ! -f $FILENAME ]
+    then
+        touch $FILENAME
+
+        echo "# Location: $(echo $YEAR)\n" >> $FILENAME
+        cat $HOME/wiki/templates/$(echo $WIKI_LOCATION_TEMPLATE) | envsubst >> $FILENAME
+    fi
+
+    $EDITOR $FILENAME
+}
+
+### --- Language --- ###
+lang()
+{
+    DAY="$(date +'%a' | awk '{print tolower($0)}')"
+    YEAR="$(date +'%Y')"
+    MONTH="$(date +'%m')"
+    TODAY="$(date +'%Y_%m_%d')"
+
+    if [ ! -d $HOME/wiki/lang/$WIKI_LANG/$YEAR/$MONTH ];
+    then
+        mkdir -p $HOME/wiki/lang/$WIKI_LANG/$YEAR/$MONTH
+    fi
+
+    FILENAME=$HOME/wiki/lang/$WIKI_LANG/$YEAR/$MONTH/${DAY}_${TODAY}.md
+
+    if [ ! -f $FILENAME ]
+    then
+        touch $FILENAME
+
+        echo "# Lang Journal: $(echo $DAY $TODAY | sed 's/_/ /g')\n" >> $FILENAME
+    fi
+
+    $EDITOR $FILENAME
+}
+
 ### --- Ping --- ###
 pg()
 {

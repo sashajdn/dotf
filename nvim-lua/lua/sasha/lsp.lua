@@ -71,3 +71,6 @@ lspconfig.rust_analyzer.setup(config())
 
 -- Solidity.
 lspconfig.solang.setup(config())
+
+-- cplusplus.
+lspconfig.clangd.setup(config())
