@@ -59,7 +59,7 @@ return require('packer').startup(function()
     use("nvim-telescope/telescope.nvim")
     use("xiyaowong/telescope-emoji.nvim")
 
-    -- Themes.
+    -- Themesk.
     use('sashajdn/oxocarbon.nvim')
     -- use('liuchengxu/space-vim-theme')
 
@@ -86,4 +86,8 @@ return require('packer').startup(function()
     -- Noice.
     use("folke/noice.nvim")
 
+    -- DAP.
+    use("mfussenegger/nvim-dap")
+    use("leoluz/nvim-dap-go")
+    use("nvim-telescope/telescope-dap.nvim")
 end)

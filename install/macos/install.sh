@@ -39,6 +39,7 @@ brew install glow
 ### Go
 brew install go
 brew install golangci-lint
+go install github.com/go-delve/delve/cmd/dlv@latest
 
 ### GoTop
 brew install gotop
