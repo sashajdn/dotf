@@ -3,14 +3,14 @@ env:
 
 colors:
   primary:
-    background: '#2e151d'
-
+    background: '#1c1c1c'
+    # background: '#2e151d'
 
 window:
   padding:
     x: 2
     y: 2
-  opacity: 0.6
+  opacity: 0.72
 
 background:
   color: #040d24
