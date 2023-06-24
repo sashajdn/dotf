@@ -86,4 +86,21 @@ return require('packer').startup(function()
     -- Noice.
     use("folke/noice.nvim")
 
+    -- DAP.
+    use("mfussenegger/nvim-dap")
+    use("leoluz/nvim-dap-go", {
+        ft = "go",
+        dependencies = "mfussenegger/nvim-dap",
+    })
+    use("nvim-telescope/telescope-dap.nvim")
+    use("rcarriga/nvim-dap-ui")
+
+    -- Go.
+    use("olexsmir/gopher.nvim", {
+        ft = "go",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-treesitter/nvim-treesitter",
+        },
+    })
 end)

@@ -1,6 +1,4 @@
-#!/bin/bash
-
-function check_or_install_brew() {
+#!/bin/bashmins check_or_install_brew() {
 	if ! command -v brew &> /dev/null
 	then
 		echo "Installing brew..."
@@ -39,6 +37,12 @@ brew install glow
 ### Go
 brew install go
 brew install golangci-lint
+
+go install github.com/go-delve/delve/cmd/dlv@latest
+
+### From https://github.com/go-delve/delve/tree/master/Documentation/installation
+sudo /usr/sbin/DevToolsSecurity -enable && sudo dscl . append /Groups/_developer GroupMembership $(whoami)
+
 
 ### GoTop
 brew install gotop

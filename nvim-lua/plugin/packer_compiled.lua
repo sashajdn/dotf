@@ -74,6 +74,11 @@ end
 time([[try_loadstring definition]], false)
 time([[Defining packer_plugins]], true)
 _G.packer_plugins = {
+  ["ChatGPT.nvim"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/ChatGPT.nvim",
+    url = "https://github.com/jackMort/ChatGPT.nvim"
+  },
   LuaSnip = {
     loaded = true,
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/LuaSnip",
@@ -119,6 +124,11 @@ _G.packer_plugins = {
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/git-worktree.nvim",
     url = "https://github.com/ThePrimeagen/git-worktree.nvim"
   },
+  ["gitsigns.nvim"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/gitsigns.nvim",
+    url = "https://github.com/lewis6991/gitsigns.nvim"
+  },
   ["golden-ratio"] = {
     loaded = true,
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/golden-ratio",
@@ -149,6 +159,16 @@ _G.packer_plugins = {
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/lualine.nvim",
     url = "https://github.com/nvim-lualine/lualine.nvim"
   },
+  ["noice.nvim"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/noice.nvim",
+    url = "https://github.com/folke/noice.nvim"
+  },
+  ["nui.nvim"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/nui.nvim",
+    url = "https://github.com/MunifTanjim/nui.nvim"
+  },
   ["nvim-cmp"] = {
     loaded = true,
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/nvim-cmp",
@@ -158,6 +178,16 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/nvim-colorizer.lua",
     url = "https://github.com/norcalli/nvim-colorizer.lua"
+  },
+  ["nvim-dap"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/nvim-dap",
+    url = "https://github.com/mfussenegger/nvim-dap"
+  },
+  ["nvim-dap-go"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/nvim-dap-go",
+    url = "https://github.com/leoluz/nvim-dap-go"
   },
   ["nvim-lspconfig"] = {
     loaded = true,
@@ -200,10 +230,15 @@ _G.packer_plugins = {
     path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/popup.nvim",
     url = "https://github.com/nvim-lua/popup.nvim"
   },
-  ["space-vim-theme"] = {
+  ["telescope-dap.nvim"] = {
     loaded = true,
-    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/space-vim-theme",
-    url = "https://github.com/liuchengxu/space-vim-theme"
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/telescope-dap.nvim",
+    url = "https://github.com/nvim-telescope/telescope-dap.nvim"
+  },
+  ["telescope-emoji.nvim"] = {
+    loaded = true,
+    path = "/Users/sasha/.local/share/nvim/site/pack/packer/start/telescope-emoji.nvim",
+    url = "https://github.com/xiyaowong/telescope-emoji.nvim"
   },
   ["telescope.nvim"] = {
     loaded = true,

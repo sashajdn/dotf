@@ -60,7 +60,7 @@ autocmd("BufWritePre", {
 autocmd("BufWritePre", {
     pattern = "*.go",
     callback = function()
-        vim.lsp.buf.formatting()
+        vim.lsp.buf.format()
     end,
 })
 
