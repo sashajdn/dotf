@@ -87,13 +87,16 @@ return require('packer').startup(function()
     use("folke/noice.nvim")
 
     -- DAP.
+    use('folke/neodev.nvim')
     use("mfussenegger/nvim-dap")
     use("leoluz/nvim-dap-go", {
         ft = "go",
         dependencies = "mfussenegger/nvim-dap",
     })
     use("nvim-telescope/telescope-dap.nvim")
-    use("rcarriga/nvim-dap-ui")
+    use("rcarriga/nvim-dap-ui", {
+        dependencies = "mfussenegger/nvim-dap",
+    })
 
     -- Go.
     use("olexsmir/gopher.nvim", {
