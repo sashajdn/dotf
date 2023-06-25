@@ -84,3 +84,7 @@ brew install lua-language-server
 ### Zsh
 brew install zsh
 brew install zsh-syntax-highlighting
+
+### C++
+brew install llvm
+export PATH="$PATH:$(brew --prefix llvm)/bin"
