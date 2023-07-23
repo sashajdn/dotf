@@ -49,7 +49,9 @@ export LESS_TERMCAP_me=$(tput sgr0)  ## End bold, blinking, standout & underline
 ### WIKI.
 export WIKI=$HOME/wiki
 export WIKI_DIARY_TEMPLATE="diary_0_1.md"
-export WIKI_JOURNAL_TEMPLATE="journal_0_1.md"
+export WIKI_JOURNAL_TEMPLATE="journal_0_2.md"
+export WIKI_TODO_DAILY_TEMPLATE="todo_daily_0_1.md"
+export WIKI_TODO_WEEKLY_TEMPLATE="todo_weekly_0_1.md"
 
 ### Misc ###
 export DOTF_REPOS="$HOME/repos"
