@@ -187,3 +187,62 @@ pg()
 {
     ping www.google.com
 }
+
+### --- TODO --- ###
+todo()
+{
+    if [ $# -eq 0 ]; then
+        todo -w
+    fi
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -d)
+                local template=$WIKI/templates/$WIKI_TODO_DAILY_TEMPLATE
+
+                local date_format="%d_%m_%Y"
+                local current_date=$(date +$date_format)
+
+                local year=$(date +%Y)
+                local month=$(date +%m)
+
+                local directory_path=$WIKI/todo/daily/$year/$month
+                mkdir -p $directory_path
+
+                local file_path=$directory_path/$current_date.md
+                if [ ! -f $file_path ]; then
+                    touch $file_path
+
+                    echo "# TODO DAILY: $current_date" >> $file_path
+                    echo "" >> $file_path
+                    cat $template | envsubst >> $file_path
+                fi
+
+                $EDITOR $file_path
+                ;;
+            *)
+                local template=$WIKI/templates/$WIKI_TODO_WEEKLY_TEMPLATE
+
+                local year=$(date +%Y)
+
+                local directory_path=$WIKI/todo/weekly/$year
+                mkdir -p $directory_path
+
+                local week_number=$(date +%U)
+
+                local file_path=$directory_path/$week_number.md
+
+                if [ ! -f $file_path ]; then
+                    touch $file_path
+
+                    echo "# TODO WEEKLY: $week_number" >> $file_path
+                    echo "" >> $file_path
+                    cat $template | envsubst >> $file_path
+                fi
+
+                $EDITOR $file_path
+                ;;
+        esac
+        shift
+    done
+}

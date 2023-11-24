@@ -36,9 +36,12 @@ alias o='obsidian &!'
 alias lq='logseq &!'
 alias mm='cd $HOME/repos/megamind'
 
-## Kubernetes
-alias k='kubectl'
-alias km='minikube'
+## Kubernetes.
+alias k='kubectl --kubeconfig $HOME/.kube/birdper.ch.config'
+alias km='kubectl --kubeconfig $HOME/.kube/birdper.ch.minikube.config'
+
+## Minikube.
+alias mk='minikube'
 
 ### Python
 alias py='ipython'
