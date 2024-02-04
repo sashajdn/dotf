@@ -60,6 +60,19 @@ gbc()
     fi
 }
 
+gr()
+{
+    local git_root
+    git_root=$(git rev-parse --show-toplevel 2> /dev/null)
+
+    if [[ -n "$git_root" ]]; then
+        # If git_root is not empty, cd into the git root directory
+        cd "$git_root" || return
+    else
+        # noop
+    fi
+}
+
 ### --- Diary --- ###
 diary()
 {
@@ -188,6 +201,20 @@ pg()
     ping www.google.com
 }
 
+### --- Buylist --- ###
+buylist()
+{
+    F=$HOME/wiki/finances/buylist.md
+
+    if [ ! -f $F ]
+    then
+        touch $F
+        echo "# Buylist 🤑" > $F
+    fi
+
+    $EDITOR $F
+}
+
 ### --- TODO --- ###
 todo()
 {
@@ -220,6 +247,28 @@ todo()
 
                 $EDITOR $file_path
                 ;;
+            -e)
+                local template=$WIKI/templates/$WIKI_TODO_ENG_WEEKLY_TEMPLATE
+
+                local year=$(date +%Y)
+
+                local directory_path=$WIKI/todo/eng/weekly/$year
+                mkdir -p $directory_path
+
+                local week_number=$(date +%U)
+
+                local file_path=$directory_path/$week_number.md
+
+                if [ ! -f $file_path ]; then
+                    touch $file_path
+
+                    echo "# 🤖 TODO ENG WEEKLY: $week_number" >> $file_path
+                    echo "" >> $file_path
+                    cat $template | envsubst >> $file_path
+                fi
+
+                $EDITOR $file_path
+                ;;
             *)
                 local template=$WIKI/templates/$WIKI_TODO_WEEKLY_TEMPLATE
 
@@ -235,7 +284,7 @@ todo()
                 if [ ! -f $file_path ]; then
                     touch $file_path
 
-                    echo "# TODO WEEKLY: $week_number" >> $file_path
+                    echo "# 📒 TODO WEEKLY: $week_number" >> $file_path
                     echo "" >> $file_path
                     cat $template | envsubst >> $file_path
                 fi
