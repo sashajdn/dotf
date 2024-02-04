@@ -132,13 +132,22 @@ return require('packer').startup(function()
         },
     })
 
+    -- Rust.
+    use("rust-lang/rust.vim", {
+        ft = "rust",
+        init = function()
+            vim.g.rustfmt_autosave = 1
+        end
+    })
+
     -- Plugin manager.
     use("williamboman/mason.nvim", {
         opts = {
             ensure_installed = {
                 "clangd",
                 "clang-format",
-                "codelldb"
+                "codelldb",
+                "rust-analyzer"
             }
         }
     })
