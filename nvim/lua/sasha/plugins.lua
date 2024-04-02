@@ -31,7 +31,7 @@ return require('packer').startup(function()
 
     -- LSP.
     use("neovim/nvim-lspconfig") -- LSP configuration.
-    use("onsails/lspkind-nvim") -- Pictograms.
+    use("onsails/lspkind.nvim") -- Pictograms.
     use("nvim-lua/lsp_extensions.nvim") -- LSP Lua extensions.
     use("glepnir/lspsaga.nvim") -- Further LSP extensions.
 
@@ -133,11 +133,11 @@ return require('packer').startup(function()
     })
 
     -- Rust.
-    use("rust-lang/rust.vim", {
+    use('simrat39/rust-tools.nvim', {
         ft = "rust",
-        init = function()
-            vim.g.rustfmt_autosave = 1
-        end
+        dependencies = {
+            'neovim/nvim-lspconfig',
+        },
     })
 
     -- Plugin manager.
@@ -147,7 +147,8 @@ return require('packer').startup(function()
                 "clangd",
                 "clang-format",
                 "codelldb",
-                "rust-analyzer"
+                "rust-analyzer",
+                "gopls",
             }
         }
     })

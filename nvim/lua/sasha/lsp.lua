@@ -11,6 +11,7 @@ if not lspkind_status_ok then
     return
 end
 
+
 local util = require("lspconfig/util")
 
 local Remap = require("sasha.keymap")
@@ -72,7 +73,34 @@ lspconfig.gopls.setup(config({
 -- lspconfig.golangci_lint_ls.setup(config())
 
 -- Rust.
-lspconfig.rust_analyzer.setup(config())
+local rust_ok, rt = pcall(require, "rust-tools")
+if rust_ok then
+    rt.setup({
+        server = {
+            on_attach = function(_, bufnr)
+                -- LSP keymappings.
+                nnoremap("<leader>gh", function() vim.lsp.buf.hover() end)
+                nnoremap("<leader>gd", function() vim.lsp.buf.definition() end)
+                nnoremap("<leader>gw", function() vim.lsp.buf.workspace_symbol() end)
+                nnoremap("<leader>gt", function() vim.lsp.buf.type_definition() end)
+                nnoremap("<leader>gr", function() vim.lsp.buf.references() end)
+                nnoremap("<leader>gi", function() vim.lsp.buf.implementation() end)
+                nnoremap("<leader>rn", function() vim.lsp.buf.rename() end)
+
+                -- Diagnostic keymappings.
+                nnoremap("<leader>df", function() vim.diagnostic.open_float() end)
+                nnoremap("<leader>dn", function() vim.diagnostic.goto_next() end)
+                nnoremap("<leader>dp", function() vim.diagnostic.goto_prev() end)
+
+                -- Hover actions
+                vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+                -- Code action groups
+                vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+            end,
+        },
+    })
+end
+
 
 -- Solidity.
 lspconfig.solang.setup(config())
