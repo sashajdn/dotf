@@ -11,6 +11,8 @@ if not lspkind_status_ok then
     return
 end
 
+local util = require("lspconfig/util")
+
 local Remap = require("sasha.keymap")
 local nnoremap = Remap.nnoremap
 local inoremap = Remap.inoremap
@@ -52,19 +54,22 @@ lspconfig.pyright.setup(config())
 -- Golang.
 lspconfig.gopls.setup(config({
     cmd = { "gopls", "serve" },
-    filetypes = {"go", "gomod" },
+    filetypes = { "go", "gomod", "gowork", "gotmpl" },
+    root_dir = util.root_pattern("go.work","go.mod", ".git"),
     settings = {
         gopls = {
+            completeUnimported = true,
+            usePlaceholders = true,
             analyses = {
                 unusedparams = true,
             },
             staticcheck = true,
-        }
-    }
+        },
+    },
 }))
 
 -- Golang linter.
-lspconfig.golangci_lint_ls.setup(config())
+-- lspconfig.golangci_lint_ls.setup(config())
 
 -- Rust.
 lspconfig.rust_analyzer.setup(config())
