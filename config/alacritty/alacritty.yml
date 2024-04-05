@@ -49,6 +49,9 @@ font:
   size: 14.0
   use_thin_strokes: true
 
+  normal:
+    family: "MesloLGS NF"
+
 selection:
   semantic_escape_char: ",│`|:\"' ()[]{}<>\t"
   save_to_clipboard: true
