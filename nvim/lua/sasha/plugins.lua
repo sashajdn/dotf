@@ -6,6 +6,10 @@ if not status_ok then
     return
 end
 
+local function is_copilot_enabled()
+    return os.getenv("DOTF_COPILOT_ENABLED") == "1"
+end
+
 -- Set to use a pop window as opposed to a buffer.
 packer.init {
     display = {
@@ -149,7 +153,31 @@ return require('packer').startup(function()
                 "codelldb",
                 "rust-analyzer",
                 "gopls",
+                "nodejs",
             }
         }
     })
+
+    -- Copilot
+    if is_copilot_enabled() then
+        use {
+          "zbirenbaum/copilot.lua",
+          cmd = "Copilot",
+          event = "VimEnter",
+          config = function()
+              require("copilot").setup({
+                  suggestion = { enabled = true },
+                  panel = { enabled = true }
+              })
+          end
+        }
+
+        use {
+            "zbirenbaum/copilot-cmp",
+            after = { "copilot.lua" },
+            config = function ()
+                require("copilot_cmp").setup()
+            end
+        }
+    end
 end)
