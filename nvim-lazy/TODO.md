@@ -17,3 +17,10 @@
 
 [] Treesitter
     [] Incremental selection keybinding
+
+[] Nvim autopairs
+    [] Rust `|`, `'` etc
+
+[] Surround
+    []  Change doesn't work (e.g `cs'`)
+  
