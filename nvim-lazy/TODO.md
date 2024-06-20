@@ -1,5 +1,14 @@
 # Dotf: TODO
 
+[] Options / keymaps
+    [] moving between splits
+    [] moving between tabs
+    [] options & keymaps from orig setup
+
+[] Markdown
+    [] syntax highlighting not working
+    [] indenting not working
+
 [] nvim-tree
     [] make transparent
 
@@ -17,6 +26,7 @@
 
 [] Treesitter
     [] Incremental selection keybinding
+    [] Occasionally not working
 
 [] Nvim autopairs
     [] Rust `|`, `'` etc
