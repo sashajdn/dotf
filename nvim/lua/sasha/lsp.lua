@@ -22,7 +22,11 @@ local inoremap = Remap.inoremap
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-local function config(_config)
+local function config(server_name, _config)
+    local servers_format_on_save_enabled = {
+        rust_analyzer = true,
+    }
+
     return vim.tbl_deep_extend("force", {
         capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities()),
         on_attach = function()
@@ -39,6 +43,14 @@ local function config(_config)
             nnoremap("<leader>df", function() vim.diagnostic.open_float() end)
             nnoremap("<leader>dn", function() vim.diagnostic.goto_next() end)
             nnoremap("<leader>dp", function() vim.diagnostic.goto_prev() end)
+            if servers_format_on_save_enabled[server_name] then
+                vim.api.nvim_create_autocmd("BufWritePre", {
+                    buffer = bufnr,
+                    callback = function()
+                        vim.lsp.buf.format({ bufnr = bufnr })
+                    end,
+                })
+            end
         end,
     }, _config or {})
 end
@@ -73,34 +85,29 @@ lspconfig.gopls.setup(config({
 -- lspconfig.golangci_lint_ls.setup(config())
 
 -- Rust.
-local rust_ok, rt = pcall(require, "rust-tools")
-if rust_ok then
-    rt.setup({
-        server = {
-            on_attach = function(_, bufnr)
-                -- LSP keymappings.
-                nnoremap("<leader>gh", function() vim.lsp.buf.hover() end)
-                nnoremap("<leader>gd", function() vim.lsp.buf.definition() end)
-                nnoremap("<leader>gw", function() vim.lsp.buf.workspace_symbol() end)
-                nnoremap("<leader>gt", function() vim.lsp.buf.type_definition() end)
-                nnoremap("<leader>gr", function() vim.lsp.buf.references() end)
-                nnoremap("<leader>gi", function() vim.lsp.buf.implementation() end)
-                nnoremap("<leader>rn", function() vim.lsp.buf.rename() end)
-
-                -- Diagnostic keymappings.
-                nnoremap("<leader>df", function() vim.diagnostic.open_float() end)
-                nnoremap("<leader>dn", function() vim.diagnostic.goto_next() end)
-                nnoremap("<leader>dp", function() vim.diagnostic.goto_prev() end)
-
-                -- Hover actions
-                vim.keymap.set("n", "<leader>a", rt.hover_actions.hover_actions, { buffer = bufnr })
-                -- Code action groups
-                vim.keymap.set("n", "<leader>la", rt.code_action_group.code_action_group, { buffer = bufnr })
-            end,
+lspconfig.rust_analyzer.setup(config({
+    flags = flags,
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = {
+        ['rust-analyzer'] = {
+            cargo = {
+                allFeatures = true,
+            },
+            checkOnSave = {
+                allFeatures = true,
+                command = 'clippy',
+            },
+            procMacro = {
+                ignored = {
+                    ['async-trait'] = { 'async_trait' },
+                    ['napi-derive'] = { 'napi' },
+                    ['async-recursion'] = { 'async_recursion' },
+                },
+            },
         },
-    })
-end
-
+    },
+}))
 
 -- Solidity.
 lspconfig.solang.setup(config())
