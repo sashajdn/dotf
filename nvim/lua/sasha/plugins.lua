@@ -6,6 +6,10 @@ if not status_ok then
     return
 end
 
+local function is_copilot_enabled()
+    return os.getenv("DOTF_COPILOT_ENABLED") == "1"
+end
+
 -- Set to use a pop window as opposed to a buffer.
 packer.init {
     display = {
@@ -31,7 +35,7 @@ return require('packer').startup(function()
 
     -- LSP.
     use("neovim/nvim-lspconfig") -- LSP configuration.
-    use("onsails/lspkind-nvim") -- Pictograms.
+    use("onsails/lspkind.nvim") -- Pictograms.
     use("nvim-lua/lsp_extensions.nvim") -- LSP Lua extensions.
     use("glepnir/lspsaga.nvim") -- Further LSP extensions.
 
@@ -133,11 +137,11 @@ return require('packer').startup(function()
     })
 
     -- Rust.
-    use("rust-lang/rust.vim", {
+    use('simrat39/rust-tools.nvim', {
         ft = "rust",
-        init = function()
-            vim.g.rustfmt_autosave = 1
-        end
+        dependencies = {
+            'neovim/nvim-lspconfig',
+        },
     })
 
     -- Plugin manager.
@@ -147,8 +151,33 @@ return require('packer').startup(function()
                 "clangd",
                 "clang-format",
                 "codelldb",
-                "rust-analyzer"
+                "rust-analyzer",
+                "gopls",
+                "nodejs",
             }
         }
     })
+
+    -- Copilot
+    if is_copilot_enabled() then
+        use {
+          "zbirenbaum/copilot.lua",
+          cmd = "Copilot",
+          event = "VimEnter",
+          config = function()
+              require("copilot").setup({
+                  suggestion = { enabled = true },
+                  panel = { enabled = true }
+              })
+          end
+        }
+
+        use {
+            "zbirenbaum/copilot-cmp",
+            after = { "copilot.lua" },
+            config = function ()
+                require("copilot_cmp").setup()
+            end
+        }
+    end
 end)

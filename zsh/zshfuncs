@@ -49,7 +49,6 @@ gb()
     fi
 }
 
-### --- Git --- ###
 gbc()
 {
     if ! command -v fzf &> /dev/null
@@ -72,6 +71,7 @@ gr()
         # noop
     fi
 }
+
 
 ### --- Diary --- ###
 diary()
@@ -294,4 +294,10 @@ todo()
         esac
         shift
     done
+}
+
+goals()
+{
+    local year=$(date +%Y)
+    $EDITOR $HOME/wiki/planning/$year/goals.md
 }

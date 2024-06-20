@@ -11,6 +11,9 @@ if not lspkind_status_ok then
     return
 end
 
+
+local util = require("lspconfig/util")
+
 local Remap = require("sasha.keymap")
 local nnoremap = Remap.nnoremap
 local inoremap = Remap.inoremap
@@ -19,7 +22,11 @@ local inoremap = Remap.inoremap
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-local function config(_config)
+local function config(server_name, _config)
+    local servers_format_on_save_enabled = {
+        rust_analyzer = true,
+    }
+
     return vim.tbl_deep_extend("force", {
         capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities()),
         on_attach = function()
@@ -36,6 +43,14 @@ local function config(_config)
             nnoremap("<leader>df", function() vim.diagnostic.open_float() end)
             nnoremap("<leader>dn", function() vim.diagnostic.goto_next() end)
             nnoremap("<leader>dp", function() vim.diagnostic.goto_prev() end)
+            if servers_format_on_save_enabled[server_name] then
+                vim.api.nvim_create_autocmd("BufWritePre", {
+                    buffer = bufnr,
+                    callback = function()
+                        vim.lsp.buf.format({ bufnr = bufnr })
+                    end,
+                })
+            end
         end,
     }, _config or {})
 end
@@ -52,22 +67,47 @@ lspconfig.pyright.setup(config())
 -- Golang.
 lspconfig.gopls.setup(config({
     cmd = { "gopls", "serve" },
-    filetypes = {"go", "gomod" },
+    filetypes = { "go", "gomod", "gowork", "gotmpl" },
+    root_dir = util.root_pattern("go.work","go.mod", ".git"),
     settings = {
         gopls = {
+            completeUnimported = true,
+            usePlaceholders = false,
             analyses = {
                 unusedparams = true,
             },
             staticcheck = true,
-        }
-    }
+        },
+    },
 }))
 
 -- Golang linter.
-lspconfig.golangci_lint_ls.setup(config())
+-- lspconfig.golangci_lint_ls.setup(config())
 
 -- Rust.
-lspconfig.rust_analyzer.setup(config())
+lspconfig.rust_analyzer.setup(config({
+    flags = flags,
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = {
+        ['rust-analyzer'] = {
+            cargo = {
+                allFeatures = true,
+            },
+            checkOnSave = {
+                allFeatures = true,
+                command = 'clippy',
+            },
+            procMacro = {
+                ignored = {
+                    ['async-trait'] = { 'async_trait' },
+                    ['napi-derive'] = { 'napi' },
+                    ['async-recursion'] = { 'async_recursion' },
+                },
+            },
+        },
+    },
+}))
 
 -- Solidity.
 lspconfig.solang.setup(config())

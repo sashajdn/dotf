@@ -19,9 +19,15 @@ local source_mapping = {
     buffer = "[BUF]",
     nvim_lua = "[LUA]",
     path = "[PATH]",
+    copilot = "[COP]"
 }
 
 cmp.setup({
+    -- TODO: is this correct?
+    -- This is to remove the random slection on pre select.
+    preselect = cmp.PreselectMode.None,
+    completion = { completeopt = "noselect" },
+
     -- Setup.
     snippet = {
         expand = function(args)
@@ -36,6 +42,7 @@ cmp.setup({
         { name = "luasnip" },
         { name = "buffer" },
         { name = "path" },
+        { name = "copilot" },
     },
 
     -- Keymappings.
