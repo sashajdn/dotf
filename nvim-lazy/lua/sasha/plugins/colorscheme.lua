@@ -15,32 +15,32 @@ return {
 
     -- transparency
     hl("SignColumn", {
-        bg = "none",
+      bg = "none",
     })
 
     hl("CursorLineNR", {
-        bg = "none"
+      bg = "none",
     })
 
     hl("Normal", {
-        bg = "none"
+      bg = "none",
     })
 
     hl("NormalNC", {
-        bg = "none"
+      bg = "none",
     })
 
     hl("VertSplit", {
-        bg = "none",
-        fg = "#262626"
+      bg = "none",
+      fg = "#262626",
     })
 
     hl("LineNr", {
-        fg = "#78a9ff"
+      fg = "#78a9ff",
     })
 
     hl("netrwDir", {
-        fg = "#78a9ff"
+      fg = "#78a9ff",
     })
-  end
+  end,
 }
