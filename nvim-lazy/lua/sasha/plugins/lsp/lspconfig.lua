@@ -18,10 +18,10 @@ return {
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("UserLspConfig", {}),
       callback = function(ev)
-        local opts = { buffer = ev.buf, silent = true}
+        local opts = { buffer = ev.buf, silent = true }
 
         opts.desc = "Show LSP references"
-        keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_definitions<CR>", opts)
+        keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_references<CR>", opts)
 
         opts.desc = "Go to declaration"
         keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
@@ -36,7 +36,7 @@ return {
         keymap.set("n", "<leaderr>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
         opts.desc = "See available code actions"
-        keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+        keymap.set({ "n", "v" }, "<leader>ac", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
         opts.desc = "Smart rename"
         keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
@@ -90,6 +90,29 @@ return {
               },
               completion = {
                 callSnippet = "Replace",
+              },
+            },
+          },
+        })
+      end,
+      ["rust_analyzer"] = function()
+        lspconfig.rust_analyzer.setup({
+          settings = {
+            ["rust-analyzer"] = {
+              cargo = {
+                extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
+                extraArgs = { "--profile", "rust-analyzer" },
+              },
+              imports = {
+                granularity = {
+                  group = "crate",
+                },
+                prefix = "self",
+              },
+              completion = {
+                postfix = {
+                  enable = false,
+                },
               },
             },
           },
