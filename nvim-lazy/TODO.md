@@ -33,7 +33,7 @@
 
 [] Surround
     []  Change doesn't work (e.g `cs'`)
-  
+
 [] AI / copilot
     [] implement copilot for personal
     [] implement first mate for work
@@ -41,3 +41,9 @@
 [] Rust Analyzer
     [] Inlays
     [] Auto imports
+
+[] Comments
+    [] Learn how to do
+
+[] CMP
+    [] Ordering
