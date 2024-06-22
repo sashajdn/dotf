@@ -33,7 +33,7 @@ opt.cmdheight = 1
 opt.cursorline = true
 
 -- theme
-opt.termguicolors = true
+-- opt.termguicolors = true
 opt.background = "dark"
 
 -- backspace
