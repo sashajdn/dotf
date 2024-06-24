@@ -1,6 +1,6 @@
 return {
   "akinsho/bufferline.nvim",
-  after = "catppuccin",
+  after = "oxocarbon-lua",
   dependencies = { "nvim-tree/nvim-web-devicons" },
   version = "*",
   opts = {
@@ -10,6 +10,18 @@ return {
     },
   },
   config = function()
-    require("bufferline").setup({})
+    require("bufferline").setup({
+      highlights = {
+        fill = {
+          bg = "none",
+        },
+        background = {
+          bg = "none",
+        },
+        tab = {
+          bg = "none",
+        },
+      },
+    })
   end,
 }

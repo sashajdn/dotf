@@ -7,19 +7,19 @@ return {
 
     -- TODO: we need to configure these colors & make transparent.
     local colors = {
-      blue = "#65D1FF",
-      green = "#3EFFDC",
-      violet = "#FF61EF",
-      yellow = "#FFDA7B",
-      red = "#FF4A4A",
+      blue = "#82cfff",
+      green = "#3ddbd9",
+      violet = "#ff7eb6",
+      yellow = "#f7b188",
+      red = "#ee5396",
       fg = "#c3ccdc",
-      bg = "#112638",
-      inactive_bg = "#2c3043",
+      bg = "none",
+      inactive_bg = "none",
     }
 
     local my_lualine_theme = {
       normal = {
-        a = { bg = colors.blue, fg = colors.bg, gui = "bold" },
+        a = { bg = colors.violet, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
       },
@@ -60,7 +60,7 @@ return {
           {
             lazy_status.updates,
             cond = lazy_status.has_updates,
-            color = { fg = "#ff9e64" },
+            color = { fg = "#f7b188" },
           },
           { "encoding" },
           { "fileformat" },

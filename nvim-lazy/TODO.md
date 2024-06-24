@@ -1,28 +1,28 @@
 # Dotf: TODO
 
 [] Options / keymaps
-    [] moving between splits
-    [] moving between tabs
-    [] options & keymaps from orig setup
+    [x] moving between splits
+    [x] moving between tabs
+    [x] options & keymaps from orig setup
 
 [] Markdown
     [] syntax highlighting not working
     [] indenting not working
 
 [] nvim-tree
-    [] make transparent
+    [x] make transparent
 
 [] keybindings
-    [] move between splits
+    [x] move between splits
 
 [] Telescope
     [] Search dotfiles
     [] Search wiki
-    [] Transparency
+    [x] Transparency
     [] Git project find files
 
 [] Bufferline
-    [] Transparency
+    [x] Transparency
 
 [] Treesitter
     [] Incremental selection keybinding
@@ -47,3 +47,6 @@
 
 [] CMP
     [] Ordering
+
+[] LSP
+    [] cpp

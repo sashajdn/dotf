@@ -17,6 +17,9 @@ opt.autoindent = true -- copy indent from current line when creating a new one
 opt.smartindent = true
 opt.wrap = false
 
+-- swapfile
+opt.swapfile = false
+
 -- undos
 opt.undofile = true
 

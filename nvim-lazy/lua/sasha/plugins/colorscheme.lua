@@ -41,5 +41,29 @@ return {
       bg = "none",
       fg = "#78a9ff",
     })
+
+    hl("StatusLine", {
+      bg = "none",
+    })
+
+    hl("StatusLine", {
+      bg = "none",
+    })
+
+    hl("StatusLineNC", {
+      bg = "none",
+    })
+
+    hl("NvimTreeNormal", {
+      bg = "none",
+    })
+
+    hl("NvimTreeNormalNC", {
+      bg = "none",
+    })
+
+    hl("NvimTreeVertSplit", {
+      bg = "none",
+    })
   end,
 }
