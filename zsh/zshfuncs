@@ -301,3 +301,25 @@ goals()
     local year=$(date +%Y)
     $EDITOR $HOME/wiki/planning/$year/goals.md
 }
+
+# Reinstates the current branch by pulling the latest changes from the origin.
+gbpn()
+{
+  ## TODO: add emojis
+
+  current_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+  echo "current_branch=$current_branch"
+
+  default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/heads/@@' | sed 's/origin/\///g')
+  echo "default_branch=$default_branch"
+
+  echo "refreshing current from from default branch"
+
+  git checkout $default_branch && echo "checkout out to $default_branch" && \
+    git branch -D $current_branch && echo "deleted branch $current_branch" && \
+    git pull && git fetch && echo "pulled & fetched latest from origin" && \
+    git checkout $current_branch && echo "checked out to $current_branch"
+
+  echo ""
+  echo "Done"
+}

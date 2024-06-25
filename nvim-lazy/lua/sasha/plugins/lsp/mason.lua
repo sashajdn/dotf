@@ -31,6 +31,7 @@ return {
         "pyright",
         "gopls",
         "rust_analyzer",
+        "clangd",
       },
     })
 

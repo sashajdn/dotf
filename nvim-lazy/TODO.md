@@ -1,5 +1,4 @@
 # Dotf: TODO
-## Hello
 
 [] Options / keymaps
     [x] moving between splits
@@ -7,7 +6,8 @@
     [x] options & keymaps from orig setup
 
 [] Markdown
-    [] syntax highlighting not working
+    [x] syntax highlighting not working
+        [] add syntax highlighting to colorscheme
     [] indenting not working
 
 [] nvim-tree
@@ -51,13 +51,25 @@
 [] Comments
     [] Learn how to do
 
+[] Theme
+    [] coloured line numbers
+
 [] CMP
     [] Ordering
+    [] Better style
 
 [] LSP
-    [] cpp
     [] python
+
+[] cpp
+    [x] lsp
+    [] formatter
+    [] linter
+    [] Dap?
 
 [] emoji list
 
 [] Harpoon
+
+[] NvimTree
+    [] Transparent background

@@ -113,6 +113,9 @@ return {
           },
         })
       end,
+      ["clangd"] = function()
+        lspconfig.clangd.setup({})
+      end,
       ["rust_analyzer"] = function()
         lspconfig.rust_analyzer.setup({
           settings = {

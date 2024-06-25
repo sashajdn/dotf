@@ -9,7 +9,7 @@ pub fn anagrams_for<'a>(word: &'a str, possible_anagrams: &'a [&str]) -> HashSet
     let mut anagrams: HashSet<&str> = HashSet::new();
     for &anagram in possible_anagrams.iter().filter(|x| x.len() == word.len()) {
         if anagram.to_lowercase() == word.to_lowercase() {
-            continue
+            continue;
         }
 
         let mut sorted_anagram: Vec<char> = anagram.to_lowercase().chars().collect();
@@ -20,5 +20,5 @@ pub fn anagrams_for<'a>(word: &'a str, possible_anagrams: &'a [&str]) -> HashSet
         }
     }
 
-   anagrams
+    anagrams
 }
