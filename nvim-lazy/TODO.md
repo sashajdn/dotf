@@ -5,6 +5,9 @@
     [x] moving between tabs
     [x] options & keymaps from orig setup
 
+[] GOTO
+[] losing positionnof cursor when going to anf fro
+
 [] Markdown
     [x] syntax highlighting not working
         [] add syntax highlighting to colorscheme

@@ -14,6 +14,8 @@ keymap.set("n", "n", "nzzzv") -- keep centered going to next.
 keymap.set("n", "N", "Nzzzv") -- keep centered going to previous.
 keymap.set("n", "<C-u>", "<C-u>zz") -- keep centered moving half a page down.
 keymap.set("n", "<C-d>", "<C-d>zz") -- keep centered moving half a page up.
+keymap.set("n", "<C-o>", "<C-o>zz")
+keymap.set("n", "<C-i>", "<C-i>zz")
 
 -- Window management.
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
