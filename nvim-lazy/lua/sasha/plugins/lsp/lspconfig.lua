@@ -62,6 +62,7 @@ return {
     })
 
     local capabilities = cmp_nvim_lsp.default_capabilities()
+    local util = require("lspconfig/util")
 
     -- Change the Diagnostic symbols in the sign column (gutter)
     -- (not in youtube nvim video)
@@ -91,6 +92,23 @@ return {
               completion = {
                 callSnippet = "Replace",
               },
+            },
+          },
+        })
+      end,
+      ["gopls"] = function()
+        lspconfig.gopls.setup({
+          cmd = { "gopls", "serve" },
+          filetypes = { "go", "gomod", "gowork", "gotmpl" },
+          root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+          settings = {
+            gopls = {
+              completeUnimported = true,
+              usePlaceholders = false,
+              analyses = {
+                unusedparams = true,
+              },
+              staticcheck = true,
             },
           },
         })

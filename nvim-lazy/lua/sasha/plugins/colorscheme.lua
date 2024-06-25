@@ -1,5 +1,6 @@
 return {
   "sashajdn/oxocarbon.nvim",
+  branch = "feat/add-noice-highlight-groups",
   priority = 1000,
   config = function()
     vim.g.oxocarbon_lua_keep_terminal = true
@@ -64,6 +65,26 @@ return {
 
     hl("NvimTreeVertSplit", {
       bg = "none",
+    })
+
+    -- Markdown
+    hl("@markup.heading.1", {
+      fg = "#ff7eb6",
+    })
+    hl("@markup.heading.2", {
+      fg = "#3ddbd9",
+    })
+    hl("@markup.heading.3", {
+      fg = "#f7b188",
+    })
+    hl("@markup.heading.4", {
+      fg = "#be95ff",
+    })
+    hl("@markup.heading.5", {
+      fg = "#82cfff",
+    })
+    hl("@markup.heading.6", {
+      fg = "#ee5396",
     })
   end,
 }

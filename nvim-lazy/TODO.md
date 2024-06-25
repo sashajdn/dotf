@@ -1,4 +1,5 @@
 # Dotf: TODO
+## Hello
 
 [] Options / keymaps
     [x] moving between splits
@@ -16,10 +17,15 @@
     [x] move between splits
 
 [] Telescope
-    [] Search dotfiles
-    [] Search wiki
+    [x] Search dotfiles
+    [x] Search wiki
     [x] Transparency
-    [] Git project find files
+    [x] Git project find files
+    [] Send to quicklist
+    [] Window breaking occasionally
+
+[] Lua line
+    [] Weird ^^^^ fix
 
 [] Bufferline
     [x] Transparency
@@ -50,3 +56,8 @@
 
 [] LSP
     [] cpp
+    [] python
+
+[] emoji list
+
+[] Harpoon

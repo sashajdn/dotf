@@ -25,7 +25,7 @@ return {
         "tsserver",
         "html",
         "cssls",
-        "tailwindcss",
+        "marksman",
         "lua_ls",
         "graphql",
         "pyright",
