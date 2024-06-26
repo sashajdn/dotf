@@ -9,11 +9,11 @@ opt.relativenumber = true
 opt.number = true
 
 -- tabs & indentation
-opt.tabstop = 2
--- opt.softtabstop = 4
-opt.shiftwidth = 2
+opt.tabstop = 4
+opt.softtabstop = 4
+opt.shiftwidth = 4
 opt.expandtab = true -- expand tabs to spaces
-opt.autoindent = true -- copy indent from current line when creating a new one
+-- opt.autoindent = true -- copy indent from current line when creating a new one
 opt.smartindent = true
 opt.wrap = false
 
@@ -48,3 +48,9 @@ opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 -- split windows
 opt.splitright = true
 opt.splitbelow = true
+
+-- Completion
+opt.shortmess:append("c")
+
+-- updates
+opt.updatetime = 50 -- default is 4000ms

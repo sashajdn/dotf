@@ -26,8 +26,8 @@ return {
     require("luasnip.loaders.from_vscode").lazy_load()
 
     cmp.setup({
+      preselect = cmp.PreselectMode.None,
       completion = {
-        preselect = cmp.PreselectMode.Node,
         completeopt = "menu,menuone,preview,noselect",
       },
       snippet = { -- configure how nvim-cmp interacts with snippet engine
@@ -48,12 +48,11 @@ return {
       }),
       -- sources for autocompletion
       sources = cmp.config.sources({
-        { name = "copilot" }, -- copilot
-        { name = "nvim_lsp" },
         { name = "nvim_lsp" },
         { name = "luasnip" }, -- snippets
         { name = "buffer" }, -- text within current buffer
         { name = "path" }, -- file system paths
+        { name = "copilot" }, -- copilot
       }),
       -- confirm opts
       confirm_opts = {

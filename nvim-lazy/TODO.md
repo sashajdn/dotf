@@ -1,5 +1,10 @@
 # Dotf: TODO
 
+[] Navigation
+    [] visual mode down broken
+
+[] indent & spacing
+    [] way off
 [] Options / keymaps
     [x] moving between splits
     [x] moving between tabs
@@ -76,3 +81,7 @@
 
 [] NvimTree
     [] Transparent background
+
+[] Go
+    [x] fmt on save
+    [] snippets are missing
