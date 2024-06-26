@@ -215,6 +215,28 @@ buylist()
     $EDITOR $F
 }
 
+### --- This week I learnt --- ###
+twil()
+{
+    local year=$(date +%Y)
+
+    local directory_path=$WIKI/learning/twil/$year
+    mkdir -p $directory_path
+
+    local week_number=$(date +%V)
+
+    local file_path=$directory_path/$week_number.md
+
+    if [ ! -f $file_path ]; then
+        touch $file_path
+
+        echo "# 🧠 TWIL WEEKLY: $week_number" >> $file_path
+        echo "" >> $file_path
+    fi
+
+    $EDITOR $file_path
+}
+
 ### --- TODO --- ###
 todo()
 {

@@ -41,4 +41,4 @@ keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc =
 keymap.set("v", "<", "<gv") -- keep block selection when indenting
 keymap.set("v", ">", ">gv") -- keep block selecting when indenting
 keymap.set("v", "K", ":m '<-2<CR>gv=gv") -- keep indentation when moving up.
-keymap.set("v", "J", ":m '>+1<CR>gv=g") -- keep indentation when moving down.
+keymap.set("v", "J", ":m '>+1<CR>gv=gv") -- keep indentation when moving down.
