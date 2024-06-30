@@ -20,10 +20,10 @@ func Hello() bool {
 
 1. Tmux
     [] create & manage new windows
-    [] theme to oxy
+    [x] theme to oxy
 
 2. ZSH
-    [] theme to oxy
+    [x] theme to oxy
 
 3. Nvim
     [] modern rust
@@ -36,4 +36,4 @@ func Hello() bool {
     [] clean up & remove all the fluff.
 
 4. What I learned
-    [] Write a bash script that I can add to that writes what I learned per a given week
+    [x] Write a bash script that I can add to that writes what I learned per a given week

@@ -23,6 +23,9 @@ return {
         opts.desc = "Show LSP references"
         keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_references<CR>", opts)
 
+        opts.desc = "Show documentation for what is under cursor"
+        keymap.set("n", "<leader>gh", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+
         opts.desc = "Go to declaration"
         keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
@@ -35,7 +38,6 @@ return {
         opts.desc = "Show LSP type definitions"
         keymap.set("n", "<leaderr>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
-        opts.desc = "See available code actions"
         keymap.set({ "n", "v" }, "<leader>ac", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
         opts.desc = "Smart rename"
@@ -52,9 +54,6 @@ return {
 
         opts.desc = "Go to next diagnostic"
         keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
-
-        opts.desc = "Show documentation for what is under cursor"
-        keymap.set("n", "<leader>dc", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
 
         opts.desc = "Restart LSP"
         keymap.set("n", "<leader>rs", ":LscRestart<CR>", opts) -- mapping to restart lsp if necessary

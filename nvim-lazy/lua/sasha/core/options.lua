@@ -54,3 +54,6 @@ opt.shortmess:append("c")
 
 -- updates
 opt.updatetime = 50 -- default is 4000ms
+
+-- leaves a space when cursor at the end of the buffer
+opt.scrolloff = 8

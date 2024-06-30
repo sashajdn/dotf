@@ -1,7 +1,7 @@
 # Dotf: TODO
 
 [] Navigation
-    [] visual mode down broken
+    [x] visual mode down broken
 
 [] indent & spacing
     [] way off
@@ -10,8 +10,8 @@
     [x] moving between tabs
     [x] options & keymaps from orig setup
 
-[] GOTO
-[] losing positionnof cursor when going to anf fro
+[x] GOTO
+[x] losing position nof cursor when going to anf fro
 
 [] Markdown
     [x] syntax highlighting not working
@@ -80,7 +80,7 @@
 [] Harpoon
 
 [] NvimTree
-    [] Transparent background
+    [x] Transparent background
 
 [] Go
     [x] fmt on save
