@@ -76,9 +76,12 @@
     [] linter
     [] Dap?
 
-[] emoji list
+[x] emoji list
 
 [] Harpoon
+    [x] Install
+    [x] Basic setup
+    [] Telescope
 
 [] NvimTree
     [x] Transparent background
