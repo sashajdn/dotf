@@ -5,10 +5,12 @@ return {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     "nvim-tree/nvim-web-devicons",
+    "xiyaowong/telescope-emoji.nvim",
   },
   config = function()
     local telescope = require("telescope")
     local actions = require("telescope.actions")
+    telescope.load_extension("emoji")
 
     local builtin = require("telescope.builtin")
 
@@ -64,5 +66,6 @@ return {
     keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find TODOs" })
     keymap.set("n", "<leader>fd", search_dotfiles, { desc = "Search dotf" })
     keymap.set("n", "<leader>fw", search_wiki, { desc = "Search Wiki" })
+    keymap.set("n", "<leader>fe", "<cmd>Telescope emoji<cr>", { desc = "Search emoji" })
   end,
 }

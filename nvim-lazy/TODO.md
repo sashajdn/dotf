@@ -30,7 +30,7 @@
     [x] Transparency
     [x] Git project find files
     [] Send to quicklist
-    [] Window breaking occasionally
+    [x] Window breaking occasionally
 
 [] Lua line
     [] Weird ^^^^ fix
@@ -43,7 +43,8 @@
     [] Occasionally not working
 
 [] Nvim autopairs
-    [] Rust `|`, `'` etc
+    [x] Rust `'`
+    [] Rust `|`
 
 [] Surround
     []  Change doesn't work (e.g `cs'`)

@@ -38,6 +38,7 @@ return {
         opts.desc = "Show LSP type definitions"
         keymap.set("n", "<leaderr>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
+        opts.desc = "Show LSP code actions"
         keymap.set({ "n", "v" }, "<leader>ac", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
         opts.desc = "Smart rename"
@@ -100,6 +101,7 @@ return {
           cmd = { "gopls", "serve" },
           filetypes = { "go", "gomod", "gowork", "gotmpl" },
           root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+          capabilities = capabilities,
           settings = {
             gopls = {
               completeUnimported = true,
@@ -117,6 +119,7 @@ return {
       end,
       ["rust_analyzer"] = function()
         lspconfig.rust_analyzer.setup({
+          capabilities = capabilities,
           settings = {
             ["rust-analyzer"] = {
               cargo = {
@@ -130,6 +133,9 @@ return {
                 prefix = "self",
               },
               completion = {
+                autoimport = {
+                  enable = true,
+                },
                 postfix = {
                   enable = false,
                 },
