@@ -22,6 +22,7 @@ return {
     mason_lspconfig.setup({
       -- list of servers for mason to install
       ensure_installed = {
+        "astro",
         "tsserver",
         "html",
         "cssls",
@@ -32,6 +33,7 @@ return {
         "gopls",
         "rust_analyzer",
         "clangd",
+        "zls",
       },
     })
 

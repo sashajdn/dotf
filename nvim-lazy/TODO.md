@@ -89,3 +89,5 @@
 [] Go
     [x] fmt on save
     [] snippets are missing
+
+[] ZSH syntax highlighting

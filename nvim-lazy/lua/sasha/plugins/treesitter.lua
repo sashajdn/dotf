@@ -21,6 +21,7 @@ return {
       },
 
       ensure_installed = {
+        "astro",
         "json",
         "javascript",
         "typescript",
