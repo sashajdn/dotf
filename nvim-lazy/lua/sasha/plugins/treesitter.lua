@@ -44,6 +44,7 @@ return {
         "gomod",
         "gosum",
         "python",
+        "sql",
         "make",
         "cpp",
         "cuda",
