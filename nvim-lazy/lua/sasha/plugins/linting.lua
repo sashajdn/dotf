@@ -24,7 +24,7 @@ return {
 
     local keymap = vim.keymap
 
-    keymap.set("n", "<leader>al", function()
+    keymap.set("n", "<leader>cl", function()
       lint.try_lint()
     end, { desc = "Trigger linting for current file" })
   end,

@@ -23,7 +23,7 @@ return {
 
     local keymap = vim.keymap
 
-    keymap.set({ "n", "v" }, "<leader>af", function()
+    keymap.set({ "n", "v" }, "<leader>cf", function()
       conform.format({
         lsp_fallback = true,
         async = false,
