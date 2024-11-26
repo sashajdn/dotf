@@ -6,8 +6,12 @@ return {
     version = false,
     opts = {
       provider = "openai",
+      auto_suggestions_provider = "openai",
+      claude = {
+        model = "claude-3-5-sonnet-20241022",
+      },
       openai = {
-        model = "gpt-4o-mini",
+        model = "o1-mini",
       },
     },
     build = "make",
