@@ -3,38 +3,37 @@ env:
 
 colors:
   primary:
-    background: '#1c1c1c'
+    background: "#1c1c1c"
     # background: '#2e151d'
 
   cursor:
-    cursor: '#82cfff'
+    cursor: "#82cfff"
 
   normal:
-    black: '#161616'
-    red: '#ff7eb6'
-    green: '#3ddbd9'
-    yellow: '#f0b184'
-    blue: '#be95ff'
-    magenta: '#ee5396'
-    cyan: '#08bdba'
-    white: '#f2f4f8'
+    black: "#161616"
+    red: "#ff7eb6"
+    green: "#3ddbd9"
+    yellow: "#f0b184"
+    blue: "#be95ff"
+    magenta: "#ee5396"
+    cyan: "#08bdba"
+    white: "#f2f4f8"
 
   bright:
-    black: '#161616'
-    red: '#ff7eb6'
-    green: '#08bdba'
-    yellow: '#f0b184'
-    blue: '#be95ff'
-    magenta: '#ee5396'
-    cyan: '#08bdba'
-    white: '#f2f4f8'
-
+    black: "#161616"
+    red: "#ff7eb6"
+    green: "#08bdba"
+    yellow: "#f0b184"
+    blue: "#be95ff"
+    magenta: "#ee5396"
+    cyan: "#08bdba"
+    white: "#f2f4f8"
 
 window:
   padding:
     x: 2
     y: 2
-  opacity: 0.9
+  opacity: 0.75
 
 background:
   color: #040d24
@@ -55,7 +54,6 @@ font:
 selection:
   semantic_escape_char: ",│`|:\"' ()[]{}<>\t"
   save_to_clipboard: true
-
 
 live_config_reload: true
 
