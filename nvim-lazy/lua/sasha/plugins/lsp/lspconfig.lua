@@ -132,6 +132,9 @@ return {
                 },
                 prefix = "self",
               },
+              diagnostics = {
+                refreshSupport = false,
+              },
               completion = {
                 autoimport = {
                   enable = true,

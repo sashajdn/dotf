@@ -33,7 +33,7 @@ window:
   padding:
     x: 2
     y: 2
-  opacity: 0.75
+  opacity: 0.9
 
 background:
   color: #040d24

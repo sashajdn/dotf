@@ -318,10 +318,20 @@ todo()
     done
 }
 
+thoughts()
+{
+    $EDITOR $HOME/wiki/thoughts.md
+}
+
 goals()
 {
     local year=$(date +%Y)
     $EDITOR $HOME/wiki/planning/$year/goals.md
+}
+
+reading()
+{
+    $EDITOR $HOME/wiki/books/to_read.md
 }
 
 # Reinstates the current branch by pulling the latest changes from the origin.

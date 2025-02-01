@@ -10,7 +10,7 @@ return {
         javascriptreact = { "prettier" },
         typescriptreact = { "prettier" },
         json = { "prettier" },
-        yaml = { "prettier" },
+        -- yaml = { "prettier" },
         lua = { "stylua" },
         python = { "isort", "black" },
       },
