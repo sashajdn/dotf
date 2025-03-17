@@ -39,7 +39,7 @@ return {
         keymap.set("n", "<leaderr>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
         opts.desc = "Show LSP code actions"
-        keymap.set({ "n", "v" }, "<leader>ac", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+        keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
         opts.desc = "Smart rename"
         keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
@@ -110,12 +110,33 @@ return {
                 unusedparams = true,
               },
               staticcheck = true,
+              buildFlags = { "-tags=integration" },
             },
           },
         })
       end,
       ["clangd"] = function()
         lspconfig.clangd.setup({})
+      end,
+      ["pyright"] = function()
+        lspconfig.pyright.setup({
+          settings = {
+            python = {
+              pyright = {
+                disableOrganizeImports = true,
+              },
+              analysis = {
+                ignore = { "*" },
+              },
+              pythonPath = "/Users/sasha/Library/Caches/pypoetry/virtualenvs/analysis-QFYxe2qh-py3.13/bin/python",
+              venvPath = "/Users/sasha/Library/Caches/pypoetry/virtualenvs/",
+              venv = "analysis-QFYxe2qh-py3.13",
+            },
+          },
+        })
+      end,
+      ["ruff"] = function()
+        lspconfig.ruff.setup({})
       end,
       ["rust_analyzer"] = function()
         lspconfig.rust_analyzer.setup({
@@ -131,6 +152,9 @@ return {
                   group = "crate",
                 },
                 prefix = "self",
+              },
+              diagnostics = {
+                refreshSupport = false,
               },
               completion = {
                 autoimport = {

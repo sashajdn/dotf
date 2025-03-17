@@ -1,16 +1,12 @@
 #!/bin/bash
 
-
 ROOT=$HOME
 DIR="dotf"
-
 DOTF="$ROOT/$DIR"
 
 REPO_DIR="$ROOT/repos"
 
-
 function check_or_create_config() {
-
 	CONFIG_DIR="$HOME/.config"
 
 	if [ ! -d $CONFIG_DIR ]; then
@@ -30,7 +26,6 @@ function check_or_create_zsh_history {
 	fi
 
 	touch $HOME/.cache/zsh/history
-
 }
 
 
@@ -38,42 +33,25 @@ check_or_create_config
 check_or_create_repos
 check_or_create_zsh_history
 
+### Repos
+git clone $HOME git@github.com:alexjperkins/wiki.git
+git clone $HOME git@github.com:sashajdn/dotf.git
+git clone $HOME git@github.com:sashajdn/gogorithms.git
+git clone $HOME git@github.com:sashajdn/rustgorithms.git
+git clone $HOME git@github.com:sashajdn/roml.git
+git clone $HOME git@github.com:sashajdn/pygos.git
+git clone $HOME git@github.com:sashajdn/orderbook.git
+
 ### Zsh
-ln -sf $HOME/.zshrc $DOTF/zsh/zshrc 
-ln -sf $HOME/.zprofile $DOTF/zsh/zprofile 
+ln -sf $DOTF/zsh/zshrc $HOME/.zshrc
+ln -sf $DOTF/zsh/zprofile $HOME/.zprofile
+
+### Alacritty
+ln -sf $DOTF/config/alacritty $ROOT/.config
 
 ### Nvim
-ln -sf $HOME/.config/nvim/init.vim $DOTF/nvim/init.vim 
-ln -sf $HOME/.config/nvim $DOTF/config/nvim 
-ln -sf $HOME/.config/nvimpager $DOTF/config/nvim 
-
-nvim -c PlugInstall
-nvim -c CocInstall coc-graphql coc-json coc-python coc-tsserver coc-yaml
-
-### Cava
-ln -sf $HOME/.config/cava $DOTF/config/cava 
+ln -sf $DOTF/nvim-lazy $DOTF/config
+ln -sf $DOTF/config/nvim $ROOT/.config
 
 ### Neofetch
-ln -sf $HOME/.config/neofetch $DOTF/config/neofetch 
-
-### LF
-ln -sf $HOME/.config/lf $DOTF/config/lf/ 
-
-### CoC
-ln -sf $HOME/.config/coc $DOTF/config/coc 
-
-### Spotify
-# ln -sf $DOTF/config/spotifyd $HOME/.config/spotifyd
-# ln -sf $DOTF/config/spotify-tui $HOME/.config/spotify-tui
-
-### Zathura
-# ln -sf $DOTF/config/zathura $HOME/.config/zathura
-
-### Vim
-ln -sf $HOME/.vimrc $DOTF/vim/vimrc 
-
-### Repos
-git clone $REPO_DIR git@github.com:alexjperkins/wiki.git
-
-### FZF
-/usr/local/opt/fzf/install
+ln -sf $DOTF/config/neofetch $HOME/.config/neofetch

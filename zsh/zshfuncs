@@ -318,10 +318,20 @@ todo()
     done
 }
 
+thoughts()
+{
+    $EDITOR $HOME/wiki/thoughts.md
+}
+
 goals()
 {
     local year=$(date +%Y)
     $EDITOR $HOME/wiki/planning/$year/goals.md
+}
+
+reading()
+{
+    $EDITOR $HOME/wiki/books/to_read.md
 }
 
 # Reinstates the current branch by pulling the latest changes from the origin.
@@ -344,4 +354,26 @@ gbpn()
 
   echo ""
   echo "Done"
+}
+
+### Project Planning
+proj()
+{
+  command -v minijira >/dev/null 2>&1 || { echo "🚨 minijira not found"; exit 1; }
+
+  if [ $# -eq 0 ]; then
+    minijira
+  else
+    minijira "$1"
+  fi
+}
+
+pb()
+{
+  proj brain
+}
+
+prl()
+{
+  proj replog
 }

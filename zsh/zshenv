@@ -63,3 +63,6 @@ export DOTF_GOALS="$HOME/repos/wiki/personal/goals.md"
 export TODOPATH="$HOME/repos/wiki/personal/todo.md"
 export TOLEARNPATH="$HOME/repos/wiki/personal/tolearn.md"
 export TOREADPATH="$HOME/repos/wiki/personal/toread.md"
+
+### Binaries ###
+export PATH=$PATH:"$HOME/dotf/bin/local/bin/"

@@ -12,37 +12,28 @@
 check_or_install_brew
 brew update
 
+### Git
+echo "🎋 Installing git..."
+brew install git
+echo "✅ Installed git"
+
 ### Alacritty
 brew install alacritty
 
 ### Bat
 brew install bat
 
-### Cava
-
 ### Exa
-brew install exa
+brew install eza
 
 ### FZF
 brew install fzf
 brew install ripgrep
 $(brew --prefix)/opt/fzf/install # keybinding
 
-### Git
-brew install git
-
-### Glow
-brew install glow
-
 ### Go
 brew install go
 brew install golangci-lint
-
-go install github.com/go-delve/delve/cmd/dlv@latest
-
-### From https://github.com/go-delve/delve/tree/master/Documentation/installation
-sudo /usr/sbin/DevToolsSecurity -enable && sudo dscl . append /Groups/_developer GroupMembership $(whoami)
-
 
 ### GoTop
 brew install gotop
@@ -50,26 +41,12 @@ brew install gotop
 ### Rust.
 brew install rust-analyzer
 
-### LF
-brew install lf
-### Pandoc
-brew install pandoc
-
-### Docker
-brew cask install docker
-
 ### Neofetch
 brew install neofetch
-
-### Node
-# brew install node
 
 ### Nvim
 brew install neovim
 brew install tree-sitter
-
-### Vim
-brew install vim
 
 ### Tmux
 brew install tmux
@@ -77,9 +54,6 @@ brew install tmuxp
 
 ### Lua
 brew install lua-language-server
-
-### Yarn
-# brew install yarn
 
 ### Zsh
 brew install zsh

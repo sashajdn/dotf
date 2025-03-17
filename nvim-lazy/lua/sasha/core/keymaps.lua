@@ -36,6 +36,8 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 
 -- Tmux.
 keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "Tmux Sessionizer" })
+-- keymap.set("n", "<C-t>", "<cmd>silent !tmux neww tmux-lhs-terminal<CR>", { desc = "Tmux Toggle LHS Terminal" })
+keymap.set("n", "<C-t>", "<cmd>silent !bash tmux-lhs-terminal<CR>", { desc = "Tmux Toggle LHS Terminal" })
 
 -- Visual mode.
 keymap.set("v", "<", "<gv") -- keep block selection when indenting

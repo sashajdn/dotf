@@ -37,13 +37,16 @@ autocmd({ "LspAttach" }, {
   end,
 })
 
+--- ### Go ### ---
 local GoGroup = augroup("GoGroup", {})
+
 autocmd("BufWritePre", {
   group = GoGroup,
   pattern = "*.go",
   callback = function()
+    -- Organize imports on save.
     local params = vim.lsp.util.make_range_params()
-    params.contex = { only = { " source.organizeImports " } }
+    params.contex = { only = { "source.organizeImports" } }
     local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 300)
     for cid, res in pairs(result or {}) do
       for _, r in pairs(res.result or {}) do
@@ -53,14 +56,31 @@ autocmd("BufWritePre", {
         end
       end
     end
+
+    -- Golang format on save.
+    vim.lsp.buf.format()
   end,
 })
 
--- Golang format on save.
+-- ### Python ### ---
+local PythonGroup = augroup("PythonGroup", {})
+
+--- Format on save.
 autocmd("BufWritePre", {
-  group = GoGroup,
-  pattern = "*.go",
+  group = PythonGroup,
+  pattern = "*.py",
   callback = function()
     vim.lsp.buf.format()
+  end,
+})
+
+autocmd("FileType", {
+  group = PythonGroup,
+  pattern = "python",
+  callback = function()
+    -- vim.bo.tabstop = 2
+    -- vim.bo.softtabstop = 2
+    -- vim.bo.shiftwidth = 2
+    -- vim.bo.expandtab = true
   end,
 })

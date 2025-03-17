@@ -3,13 +3,14 @@
 DOTF_DIR="$HOME/dotf"
 WIKI_DIR="$HOME/wiki"
 REPOS_DIR="$HOME/repos"
+MINIJIRA_CMD=minijira
 
 # Thank you @ThePrimaegen
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    repos_selected=$(find $REPOS_DIR -mindepth 1 -maxdepth 1 -type d)
-    selected=$(echo $WIKI_DIR $DOTF_DIR $repos_selected | tr ' ' '\n' | fzf)
+    repos_selected=$(find "$REPOS_DIR" -mindepth 1 -maxdepth 1 -type d)
+    selected=$(echo "$WIKI_DIR" "$DOTF_DIR" $repos_selected | tr ' ' '\n' | fzf)
 fi
 
 if [[ -z $selected ]]; then
@@ -19,20 +20,29 @@ fi
 selected_name=$(basename "$selected" | tr . _)
 selected_code_window="${selected_name}_code"
 selected_term_window="${selected_name}_term"
+selected_proj_planner_window="${selected_name}_proj_planner"
 
 tmux_running=$(pgrep tmux)
 
-if [[ -z $TMUX ]] &&  [[ -z $tmux_running ]]; then
+if [[ -z "$TMUX" ]] &&  [[ -z "$tmux_running" ]]; then
     tmux new-session -s $selected_name -c $selected
     exit 0
 fi
 
-if ! tmux has-session -t=$selected_name 2> /dev/null; then
+if ! tmux has-session -t="$selected_name" 2> /dev/null; then
     # Create session.
-    tmux new-session -ds $selected_name -c $selected -n $selected_term_window
+    tmux new-session -ds "$selected_name" -c "$selected" -n "$selected_term_window"
 
     # Create code window.
-    tmux new-window -n $selected_code_window -t $selected_name -c $selected $EDITOR .
+    tmux new-window -n "$selected_code_window" -t "$selected_name" -c "$selected" "$EDITOR" .
+
+    # Create adjacent project planner window.
+    if command -v "$MINIJIRA_CMD" >/dev/null 2>&1; then
+        tmux new-window -n "$selected_proj_planner_window" -t "$selected_name" -c "$selected" "minijira $selected_name"
+    else
+        echo "$MINIJIRA_CMD command not found; cannot create project planner window"
+    fi
 fi
 
-tmux switch-client -t $selected_name
+tmux switch-client -t "$selected_name"
+tmux select-window -t "$selected_name:$selected_code_window"

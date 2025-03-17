@@ -11,6 +11,9 @@ return {
     comment.setup({
       -- TSX / JSX specific setup.
       pre_hook = ts_context_commentstring.create_pre_hook(),
+      ignore = function()
+        return "^$" -- Ignore empty lines
+      end,
     })
   end,
 }
