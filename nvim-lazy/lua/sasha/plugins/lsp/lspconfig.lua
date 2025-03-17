@@ -110,12 +110,33 @@ return {
                 unusedparams = true,
               },
               staticcheck = true,
+              buildFlags = { "-tags=integration" },
             },
           },
         })
       end,
       ["clangd"] = function()
         lspconfig.clangd.setup({})
+      end,
+      ["pyright"] = function()
+        lspconfig.pyright.setup({
+          settings = {
+            python = {
+              pyright = {
+                disableOrganizeImports = true,
+              },
+              analysis = {
+                ignore = { "*" },
+              },
+              pythonPath = "/Users/sasha/Library/Caches/pypoetry/virtualenvs/analysis-QFYxe2qh-py3.13/bin/python",
+              venvPath = "/Users/sasha/Library/Caches/pypoetry/virtualenvs/",
+              venv = "analysis-QFYxe2qh-py3.13",
+            },
+          },
+        })
+      end,
+      ["ruff"] = function()
+        lspconfig.ruff.setup({})
       end,
       ["rust_analyzer"] = function()
         lspconfig.rust_analyzer.setup({

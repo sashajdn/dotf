@@ -1,0 +1,75 @@
+#!/bin/bash
+set -euo pipefail
+
+# Directories: Use env vars or defaults
+REPOS_DIR="${REPOS_DIR:-$HOME/repos}"
+WIKI_DIR="${WIKI_DIR:-$HOME/wiki}"
+TEMPLATES_DIR="${TEMPLATE_DIR:-$WIKI_DIR/projects/templates}"
+
+# If no project name is given, use fzf to select one from $REPOS
+if [ "$#" -eq 0 ]; then
+    # List directories in REPOS (skip the REPOS root itself)
+    project_path=$(find "$REPOS_DIR" -maxdepth 1 -type d | tail -n +2 | fzf --prompt="Select project: ")
+    if [ -z "$project_path" ]; then
+        echo "No project selected. Exiting."
+        exit 1
+    fi
+    project_name=$(basename "$project_path")
+else
+    project_name="$1"
+fi
+
+# Planner directory structure for the project
+planner_dir="$WIKI_DIR/projects/planner/$project_name"
+daily_dir="$planner_dir/daily"
+weekly_dir="$planner_dir/weekly"
+
+# Create necessary directories
+mkdir -p "$daily_dir" "$weekly_dir"
+
+# Define file names based on current date
+today=$(date +"%d_%m_%Y")
+day_of_week=$(date +"%a" | tr '[:upper:]' '[:lower:]')   # e.g., mon, tue, etc.
+daily_file="$daily_dir/${day_of_week}_${today}.md"
+week_num=$(date +"%V")  # ISO week number, e.g., 09
+weekly_file="$weekly_dir/${week_num}.md"
+backlog_file="$planner_dir/backlog.md"
+thoughts_file="$planner_dir/thoughts.md"
+
+# Template files (optional)
+daily_template="$TEMPLATES_DIR/daily.md"
+weekly_template="$TEMPLATES_DIR/weekly.md"
+backlog_template="$TEMPLATES_DIR/backlog.md"
+thoughts_template="$TEMPLATES_DIR/thoughts.md"
+
+# Function to create file with header from a template if the file doesn't exist.
+create_file_with_template() {
+    local file="$1"
+    local template="$2"
+    if [ ! -f "$file" ]; then
+        if [ -f "$template" ]; then
+            cp "$template" "$file"
+        else
+            # Default header if no template exists
+            echo "# $(basename "$file" .md)" > "$file"
+        fi
+    fi
+}
+
+# Create the files if they do not exist.
+create_file_with_template "$daily_file" "$daily_template"
+create_file_with_template "$weekly_file" "$weekly_template"
+create_file_with_template "$backlog_file" "$backlog_template"
+create_file_with_template "$thoughts_file" "$thoughts_template"
+
+# Open neovim with the desired layout:
+# 1. Open daily_file.
+# 2. Vertical split for weekly_file.
+# 3. Vertical split for backlog_file.
+# 4. Move to the backlog window and split horizontally for thoughts_file.
+nvim "$daily_file" \
+    -c "vsplit $weekly_file" \
+    -c "vsplit $backlog_file" \
+    -c "wincmd l" \
+    -c "split $thoughts_file"
+
