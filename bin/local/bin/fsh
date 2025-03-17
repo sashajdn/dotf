@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+function ssh_fzf_config() {
+  if ! command -v fzf &> /dev/null; then
+    echo "🚧 fzf is not installed, install fzf to use this function"
+    return 1
+  fi
+
+  # Check if ~/.ssh/config exists
+  if [ ! -f ~/.ssh/config ]; then
+    echo "🚧 ~/.ssh/config does not exist"
+    return 1
+  fi
+
+  local hosts
+  hosts=$(grep -E '^\s*Host ' ~/.ssh/config | awk '{print $2}' | grep -v '^\*$' | sort -u)
+  if [ -z "$hosts" ]; then
+    echo "🆘 No hosts found in ~/.ssh/config."
+    return 1
+  fi
+
+  local choice
+  choice=$(printf '%s\n' "$hosts" | fzf --prompt="Select SSH Host: ")
+
+  if [ -n "$choice" ]; then
+    local GREEN="\033[0;32m"
+    local NC="\033[0m"
+
+    echo -e "👉 ssh'ing into: ${GREEN}${choice}${NC}"
+    ssh "$choice"
+  else
+    echo "🚨 No host selected"
+  fi
+}
+
+ssh_fzf_config
