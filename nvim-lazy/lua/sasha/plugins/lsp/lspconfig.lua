@@ -143,9 +143,24 @@ return {
           capabilities = capabilities,
           settings = {
             ["rust-analyzer"] = {
+              inlayHints = {
+                enable = true,
+                typeHints = true,
+                parameterHints = true,
+                chainingHints = true,
+                closureReturnTypeHints = true,
+              },
+              procMacro = {
+                enable = true,
+              },
+              checkOnSave = {
+                command = "check", -- cargo check
+              },
               cargo = {
                 extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
                 extraArgs = { "--profile", "rust-analyzer" },
+                loadOutDirsFromCheck = true,
+                allFeatures = true,
               },
               imports = {
                 granularity = {
@@ -155,6 +170,13 @@ return {
               },
               diagnostics = {
                 refreshSupport = false,
+              },
+              lens = {
+                enable = true,
+              },
+              hoverActions = {
+                enable = true,
+                border = "rounded",
               },
               completion = {
                 autoimport = {

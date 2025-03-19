@@ -13,7 +13,7 @@ return {
     require("bufferline").setup({
       highlights = {
         buffer_selected = {
-          fg = "#ff7eb6",
+          fg = "#3ddbd9",
           underline = true,
         },
         fill = {
