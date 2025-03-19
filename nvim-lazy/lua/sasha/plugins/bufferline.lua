@@ -12,6 +12,10 @@ return {
   config = function()
     require("bufferline").setup({
       highlights = {
+        buffer_selected = {
+          fg = "#ff7eb6",
+          underline = true,
+        },
         fill = {
           bg = "none",
         },

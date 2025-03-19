@@ -36,7 +36,6 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 
 -- Tmux.
 keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "Tmux Sessionizer" })
--- keymap.set("n", "<C-t>", "<cmd>silent !tmux neww tmux-lhs-terminal<CR>", { desc = "Tmux Toggle LHS Terminal" })
 keymap.set("n", "<C-t>", "<cmd>silent !bash tmux-lhs-terminal<CR>", { desc = "Tmux Toggle LHS Terminal" })
 
 -- Visual mode.
@@ -44,3 +43,24 @@ keymap.set("v", "<", "<gv") -- keep block selection when indenting
 keymap.set("v", ">", ">gv") -- keep block selecting when indenting
 keymap.set("v", "K", ":m '<-2<CR>gv=gv") -- keep indentation when moving up.
 keymap.set("v", "J", ":m '>+1<CR>gv=gv") -- keep indentation when moving down.
+
+-- Highlights.
+local last_match_id = nil
+
+function ToggleWordHighlight()
+  if last_match_id then
+    vim.fn.matchdelete(last_match_id)
+    last_match_id = nil
+  else
+    local word = vim.fn.expand("<cword>")
+    if word == "" then
+      return
+    end
+    -- Use very nomagic mode (\V) so the word is taken literally.
+    local pattern = "\\V" .. vim.fn.escape(word, "\\")
+    -- Priority of 10 (adjust if needed); using "Search" highlight group.
+    last_match_id = vim.fn.matchadd("StarWordHighlight", pattern, 10)
+  end
+end
+
+keymap.set("n", "*", "<cmd>lua ToggleWordHighlight()<CR>", { desc = "Toggle word highlight" })
