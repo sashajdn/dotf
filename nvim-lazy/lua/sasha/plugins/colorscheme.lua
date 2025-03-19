@@ -86,5 +86,37 @@ return {
     hl("@markup.heading.6", {
       fg = "#ee5396",
     })
+
+    -- Avante
+    hl("AvanteConflictCurrent", {
+      fg = "#ff7eb6",
+      bg = "#393939",
+      bold = true,
+    })
+
+    hl("AvanteConflictIncoming", {
+      fg = "#3ddbd9",
+      bg = "#393939",
+      italic = true,
+    })
+
+    hl("AvanteConflictCurrentLabel", {
+      fg = "#ee5396",
+      bg = "#393939",
+      bold = true,
+    })
+
+    hl("AvanteConflictIncomingLabel", {
+      fg = "#3ddbd9",
+      bg = "#393939",
+      italic = true,
+    })
+
+    -- Selection
+    hl("StarWordHighlight", {
+      bg = "#e66c1f",
+      fg = "#ffffff",
+      bold = true,
+    })
   end,
 }

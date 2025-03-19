@@ -38,7 +38,7 @@ return {
         grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
         qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
 
-        path_display = { "smart" },
+        path_display = { "absolute" },
         prompt_prefix = "λ ",
         mappings = {
           i = {
