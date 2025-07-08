@@ -1,0 +1,54 @@
+###############################################################################
+#  Ghostty config converted from your Alacritty file (macOS)
+###############################################################################
+
+# ── Colours ────────────────────────────────────────────────────────────────
+background         = #1c1c1c
+foreground         = #f2f4f8
+cursor-color       = #82cfff
+bold-is-bright     = true
+background-opacity = 0.80
+background-blur    = 20
+
+# 16-colour palette
+palette = 0=#161616
+palette = 1=#ff7eb6
+palette = 2=#3ddbd9
+palette = 3=#f0b184
+palette = 4=#be95ff
+palette = 5=#ee5396
+palette = 6=#08bdba
+palette = 7=#f2f4f8
+palette = 8=#161616
+palette = 9=#ff7eb6
+palette = 10=#08bdba
+palette = 11=#f0b184
+palette = 12=#be95ff
+palette = 13=#ee5396
+palette = 14=#08bdba
+palette = 15=#f2f4f8
+
+# ── Window layout ──────────────────────────────────────────────────────────
+window-padding-x = 2
+window-padding-y = 2
+macos-titlebar-style = transparent
+
+# ── Scrolling ──────────────────────────────────────────────────────────────
+mouse-scroll-multiplier = 10
+scrollback-limit        = 10000
+
+# ── Fonts ──────────────────────────────────────────────────────────────────
+font-family = "MesloLGS NF"
+font-size   = 14
+
+# ── Selection / clipboard ─────────────────────────────────────────────────
+copy-on-select = clipboard
+
+# ── Keybindings ───────────────────────────────────────────────────────────
+#   Syntax: keybind = <trigger>=<action[:param]>
+keybind = ctrl+n=new_window
+keybind = ctrl+shift+c=copy_to_clipboard
+keybind = ctrl+shift+v=paste_from_clipboard
+keybind = ctrl+plus=increase_font_size:1
+keybind = ctrl+shift+plus=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
