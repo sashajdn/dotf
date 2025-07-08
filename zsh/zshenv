@@ -1,10 +1,11 @@
-### --- DOTF ZSH ENV --- ###
+
+ ### --- DOTF ZSH ENV --- ###
 
 # MacOS
 if [[ "$IS_MACOS" == "1" ]]; then
 	export LSCOLORS="fxgxhxdacxDaDaxbadacex"
 	export CLICOLOR=1
-	export TERMINAL="alacritty" # move to alacritty
+	export TERMINAL="ghostty"
 	export BROWSER="chrome"
 else
 	export OPENER="xdg-open"
