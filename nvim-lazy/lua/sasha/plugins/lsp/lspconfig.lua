@@ -5,6 +5,7 @@ return {
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
+    "hrsh7th/cmp-nvim-lsp",
   },
   config = function()
     --- Mason setup
@@ -21,9 +22,10 @@ return {
       "rust_analyzer",
       "ts_ls",
       "dockerls",
-      "markdown_oxide",
+      -- "markdown_oxide",
       "jsonls",
       "yamlls",
+      -- "bash-language-server",
     }
 
     local tools = {
@@ -73,13 +75,17 @@ return {
     vim.diagnostic.config(diagnostic_config)
 
     --- Capabilities configuration
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument.foldingRange = {
-      dynamicRegistration = true,
-      lineFoldingOnly = true,
-    }
-    capabilities.textDocument.semanticTokens.multilineTokenSupport = true
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+    local capabilities = cmp_nvim_lsp.default_capabilities()
+    -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+    -- capabilities.textDocument.foldingRange = {
+    --   dynamicRegistration = true,
+    --   lineFoldingOnly = true,
+    -- }
+    -- capabilities.textDocument.semanticTokens.multilineTokenSupport = true
     capabilities.textDocument.completion.completionItem.snippetSupport = true
+    capabilities.offsetEncoding = { "utf-16" }
 
     vim.lsp.config("*", {
       capabilities = capabilities,
@@ -101,8 +107,8 @@ return {
         opts.desc = "Go to declaration"
         keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
-        opts.desc = "Show LSP definitions"
-        keymap.set("n", "<leader>gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
+        opts.desc = "Go to LSP definition"
+        keymap.set("n", "<leader>gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- go to lsp definition
 
         opts.desc = "Show LSP implementations"
         keymap.set("n", "<leader>gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
@@ -129,7 +135,7 @@ return {
         keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
         opts.desc = "Restart LSP"
-        keymap.set("n", "<leader>rs", ":LscRestart<CR>", opts) -- mapping to restart lsp if necessary
+        keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
       end,
     })
 
@@ -237,9 +243,7 @@ return {
           procMacro = {
             enable = true,
           },
-          checkOnSave = {
-            command = "check", -- cargo check
-          },
+          checkOnSave = true,
           cargo = {
             extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
             extraArgs = { "--profile", "rust-analyzer" },
@@ -277,7 +281,6 @@ return {
 
     --- Bash
     vim.lsp.config.bashls = {
-      cmd = { "bash-language-server", "start" },
       filetypes = { "bash", "sh", "zsh" },
       root_markers = { ".git", vim.uv.cwd() },
       settings = {
