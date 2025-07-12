@@ -65,4 +65,3 @@ opt.conceallevel = 0 -- such that backticks are visible in MD files
 
 -- Indents and Folds
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-opt.indentexpr = "nvim_treesitter#indent()"
