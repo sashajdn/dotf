@@ -21,23 +21,18 @@ fi
 
 # Planner directory structure for the project
 planner_dir="$WIKI_DIR/projects/planner/$project_name"
-daily_dir="$planner_dir/daily"
 weekly_dir="$planner_dir/weekly"
 
 # Create necessary directories
-mkdir -p "$daily_dir" "$weekly_dir"
+mkdir -p "$weekly_dir"
 
 # Define file names based on current date
-today=$(date +"%d_%m_%Y")
-day_of_week=$(date +"%a" | tr '[:upper:]' '[:lower:]')   # e.g., mon, tue, etc.
-daily_file="$daily_dir/${day_of_week}_${today}.md"
 week_num=$(date +"%V")  # ISO week number, e.g., 09
 weekly_file="$weekly_dir/${week_num}.md"
 backlog_file="$planner_dir/backlog.md"
 thoughts_file="$planner_dir/thoughts.md"
 
 # Template files (optional)
-daily_template="$TEMPLATES_DIR/daily.md"
 weekly_template="$TEMPLATES_DIR/weekly.md"
 backlog_template="$TEMPLATES_DIR/backlog.md"
 thoughts_template="$TEMPLATES_DIR/thoughts.md"
@@ -57,18 +52,15 @@ create_file_with_template() {
 }
 
 # Create the files if they do not exist.
-create_file_with_template "$daily_file" "$daily_template"
 create_file_with_template "$weekly_file" "$weekly_template"
 create_file_with_template "$backlog_file" "$backlog_template"
 create_file_with_template "$thoughts_file" "$thoughts_template"
 
 # Open neovim with the desired layout:
-# 1. Open daily_file.
 # 2. Vertical split for weekly_file.
 # 3. Vertical split for backlog_file.
 # 4. Move to the backlog window and split horizontally for thoughts_file.
-nvim "$daily_file" \
-    -c "vsplit $weekly_file" \
+nvim "$weekly_file" \
     -c "vsplit $backlog_file" \
     -c "wincmd l" \
     -c "split $thoughts_file"

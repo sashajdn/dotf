@@ -34,7 +34,7 @@ window-padding-y = 2
 macos-titlebar-style = transparent
 
 # ── Scrolling ──────────────────────────────────────────────────────────────
-mouse-scroll-multiplier = 10
+mouse-scroll-multiplier = 2
 scrollback-limit        = 10000
 
 # ── Fonts ──────────────────────────────────────────────────────────────────

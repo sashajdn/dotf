@@ -237,6 +237,32 @@ twil()
     $EDITOR $file_path
 }
 
+### --- Retro --- ###
+retro()
+{
+        local template=$WIKI/templates/$WIKI_RETRO_TEMPLATE
+
+        local date_format="%d_%m_%Y"
+        local current_date=$(date +$date_format)
+
+        local year=$(date +%Y)
+        local week_number=$(date +%U)
+
+        local directory_path=$WIKI/retro/$year
+        mkdir -p $directory_path
+        local file_path=$directory_path/$week_number.md
+
+        if [ ! -f $file_path ]; then
+            touch $file_path
+
+            echo "# RETRO: $current_date" >> $file_path
+            echo "" >> $file_path
+            cat $template | envsubst >> $file_path
+        fi
+
+        $EDITOR $file_path
+}
+
 ### --- TODO --- ###
 todo()
 {
@@ -320,7 +346,7 @@ todo()
 
 thoughts()
 {
-    $EDITOR $HOME/wiki/thoughts.md
+    $EDITOR $HOME/wiki/thoughts
 }
 
 goals()
@@ -376,4 +402,16 @@ pb()
 prl()
 {
   proj replog
+}
+
+pi()
+{
+    proj intervention
+
+}
+
+### shortcuts
+blog()
+{
+    $EDITOR $WIKI_BLOG
 }

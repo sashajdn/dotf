@@ -7,11 +7,13 @@ return {
     opts = {
       provider = "openai",
       auto_suggestions_provider = "openai",
-      claude = {
-        model = "claude-3-5-sonnet-20241022",
-      },
-      openai = {
-        model = "o1-mini",
+      providers = {
+        claude = {
+          model = "claude-3-5-sonnet-20241022",
+        },
+        openai = {
+          model = "o1-mini",
+        },
       },
     },
     build = "make",
