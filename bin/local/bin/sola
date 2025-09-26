@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Usage: ./poll-sol-balance.sh <PUBKEY> [RPC_URL]
+# Prints "<timestamp> [<pub8>]: <amount>" every 15 seconds.
+# Default RPC: https://api.mainnet-beta.solana.com (override with arg or SOLANA_RPC_URL).
+# macOS/BSD-compatible timestamp; colors auto-disabled if NO_COLOR is set or output isn't a TTY.
+
+set -euo pipefail
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <PUBKEY> [RPC_URL]" >&2
+  exit 1
+fi
+
+PUBKEY="$1"
+RPC_URL="${2:-${SOLANA_RPC_URL:-https://api.mainnet-beta.solana.com}}"
+INTERVAL="${INTERVAL:-15}"
+
+# Short pubkey (first 8 characters)
+PUB8="${PUBKEY:0:8}"
+
+# Color setup (ANSI fallback). Disable if NO_COLOR is set or not a TTY.
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  if command -v tput >/dev/null 2>&1 && [[ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]]; then
+    C_PUB="$(tput setaf 6)"   # cyan
+    C_AMT="$(tput setaf 2)"   # green
+    C_ERR="$(tput setaf 1)"   # red
+    C_RST="$(tput sgr0)"
+  else
+    C_PUB=$'\033[36m'; C_AMT=$'\033[32m'; C_ERR=$'\033[31m'; C_RST=$'\033[0m'
+  fi
+else
+  C_PUB=""; C_AMT=""; C_ERR=""; C_RST=""
+fi
+
+timestamp() {
+  # macOS/BSD-compatible ISO-8601 UTC
+  date -u +"%Y-%m-%dT%H:%M:%SZ"
+}
+
+while :; do
+  ts="$(timestamp)"
+  out="$(solana balance "$PUBKEY" -u "$RPC_URL" 2>/dev/null || true)"
+  amount="$(printf '%s\n' "$out" | awk '{print $1}')"   # value before "SOL"
+
+  if [[ -z "$amount" ]]; then
+    echo "$ts ${C_PUB}[$PUB8]${C_RST}: ${C_ERR}N/A${C_RST}"
+  else
+    echo "$ts ${C_PUB}[$PUB8]${C_RST}: ${C_AMT}$amount${C_RST}"
+  fi
+
+  sleep "$INTERVAL"
+done
