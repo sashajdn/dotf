@@ -34,6 +34,9 @@ return {
       "eslint_d", -- js linter
     }
 
+    -- Set log level to avoid spam.
+    vim.lsp.set_log_level("ERROR")
+
     local mason = require("mason")
     local mason_lspconfig = require("mason-lspconfig")
 
@@ -77,15 +80,14 @@ return {
     --- Capabilities configuration
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
     local capabilities = cmp_nvim_lsp.default_capabilities()
-    -- local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-    -- capabilities.textDocument.foldingRange = {
-    --   dynamicRegistration = true,
-    --   lineFoldingOnly = true,
-    -- }
-    -- capabilities.textDocument.semanticTokens.multilineTokenSupport = true
     capabilities.textDocument.completion.completionItem.snippetSupport = true
     capabilities.offsetEncoding = { "utf-16" }
+
+    -- Fix broken capabilities between copilot + rust analyzer.
+    capabilities.offsetEncoding = { "utf-16" }
+    capabilities.general = capabilities.general or {}
+    capabilities.general.positionEncodings = { "utf-16" }
 
     vim.lsp.config("*", {
       capabilities = capabilities,
@@ -108,13 +110,15 @@ return {
         keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
         opts.desc = "Go to LSP definition"
-        keymap.set("n", "<leader>gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- go to lsp definition
+        keymap.set("n", "<leader>gd", function()
+          vim.lsp.buf.definition({ reuse_win = true })
+        end, opts)
 
         opts.desc = "Show LSP implementations"
         keymap.set("n", "<leader>gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
 
         opts.desc = "Show LSP type definitions"
-        keymap.set("n", "<leaderr>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
+        keymap.set("n", "<leader>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
         opts.desc = "Show LSP code actions"
         keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
@@ -209,29 +213,28 @@ return {
     vim.lsp.enable("gopls")
 
     --- Rust
+    -- Prefer a single rust-analyzer binary (Mason if available)
+    local ra_cmd = { vim.fn.stdpath("data") .. "/mason/bin/rust-analyzer" }
+    if vim.fn.executable(ra_cmd[1]) == 0 then
+      ra_cmd = { "rust-analyzer" }
+    end
+
     vim.lsp.config.rust_analyzer = {
+      offset_encoding = "utf-16",
       filetypes = { "rust" },
-      cmd = { "rust-analyzer" },
+      cmd = ra_cmd,
+      single_file_support = false,
       workspace_required = true,
       root_dir = function(buf, cb)
-        local root = vim.fs.root(buf, { "Cargo.toml", "rust-project.json" })
-        local out = vim.system({ "cargo", "metadata", "--no-deps", "--format-version", "1" }, { cwd = root }):wait()
-        if out.code ~= 0 then
-          return cb(root)
-        end
-
-        local ok, result = pcall(vim.json.decode, out.stdout)
-        if ok and result.workspace_root then
-          return cb(result.workspace_root)
-        end
-
-        return cb(root)
+        -- Force a single workspace instance: use repo root if present.
+        local root = vim.fs.root(buf, { ".git" }) or vim.fs.root(buf, { "Cargo.toml", "rust-project.json" })
+        return cb(root or vim.uv.cwd())
       end,
       settings = {
         autoformat = false,
         ["rust-analyzer"] = {
           check = {
-            command = "clippy",
+            command = "check",
           },
           inlayHints = {
             enable = true,
@@ -243,12 +246,15 @@ return {
           procMacro = {
             enable = true,
           },
+          files = {
+            excludeDirs = { ".git", "target", "crates/target", "node_modules", "dist", "out" },
+            watcher = "client",
+          },
           checkOnSave = true,
           cargo = {
             extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
-            extraArgs = { "--profile", "rust-analyzer" },
-            loadOutDirsFromCheck = true,
-            allFeatures = true,
+            loadOutDirsFromCheck = false,
+            -- allFeatures = true,
           },
           imports = {
             granularity = {
@@ -260,7 +266,7 @@ return {
             refreshSupport = false,
           },
           lens = {
-            enable = true,
+            enable = false,
           },
           hoverActions = {
             enable = true,
@@ -273,6 +279,9 @@ return {
             postfix = {
               enable = false,
             },
+          },
+          workspace = {
+            symbol = { search = { limit = 2000 } },
           },
         },
       },

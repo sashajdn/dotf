@@ -4,6 +4,7 @@ DOTF_DIR="$HOME/dotf"
 WIKI_DIR="$HOME/wiki"
 REPOS_DIR="$HOME/repos"
 MINIJIRA_CMD=minijira
+LLM_CMD=codex
 
 # Thank you @ThePrimaegen
 if [[ $# -eq 1 ]]; then
@@ -21,6 +22,7 @@ selected_name=$(basename "$selected" | tr . _)
 selected_code_window="${selected_name}_code"
 selected_term_window="${selected_name}_term"
 selected_proj_planner_window="${selected_name}_proj_planner"
+selected_llm_window="${selected_name}_llm"
 
 tmux_running=$(pgrep tmux)
 
@@ -41,6 +43,12 @@ if ! tmux has-session -t="$selected_name" 2> /dev/null; then
         tmux new-window -n "$selected_proj_planner_window" -t "$selected_name" -c "$selected" "minijira $selected_name"
     else
         echo "$MINIJIRA_CMD command not found; cannot create project planner window"
+    fi
+
+    if command -v "$LLM_CMD" >/dev/null 2>&1; then
+        tmux new-window -n "$selected_llm_window" -t "$selected_name" -c "$selected" "$LLM_CMD"
+    else
+        echo "$LLM_CMD command not found; cannot create llm window"
     fi
 fi
 
