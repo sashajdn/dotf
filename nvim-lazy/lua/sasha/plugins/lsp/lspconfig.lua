@@ -110,13 +110,15 @@ return {
         keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
         opts.desc = "Go to LSP definition"
-        keymap.set("n", "<leader>gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- go to lsp definition
+        keymap.set("n", "<leader>gd", function()
+          vim.lsp.buf.definition({ reuse_win = true })
+        end, opts)
 
         opts.desc = "Show LSP implementations"
         keymap.set("n", "<leader>gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
 
         opts.desc = "Show LSP type definitions"
-        keymap.set("n", "<leaderr>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
+        keymap.set("n", "<leader>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
         opts.desc = "Show LSP code actions"
         keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
@@ -232,7 +234,7 @@ return {
         autoformat = false,
         ["rust-analyzer"] = {
           check = {
-            command = "clippy",
+            command = "check",
           },
           inlayHints = {
             enable = true,
@@ -245,13 +247,12 @@ return {
             enable = true,
           },
           files = {
-            excludeDirs = { ".git", "target", "node_modules", "dist", "out" },
-            watcher = "server",
+            excludeDirs = { ".git", "target", "crates/target", "node_modules", "dist", "out" },
+            watcher = "client",
           },
           checkOnSave = true,
           cargo = {
             extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
-            extraArgs = { "--profile", "rust-analyzer" },
             loadOutDirsFromCheck = false,
             -- allFeatures = true,
           },
