@@ -17,12 +17,6 @@ echo "🎋 Installing git..."
 brew install git
 echo "✅ Installed git"
 
-### Alacritty
-brew install alacritty
-
-### Bat
-brew install bat
-
 ### Exa
 brew install eza
 

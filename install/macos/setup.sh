@@ -1,9 +1,10 @@
 #!/bin/bash
 
 ROOT=$HOME
-DIR="dotf"
-DOTF="$ROOT/$DIR"
-
+DOTF_DIR="dotf"
+DOTF="$ROOT/$DOTF_DIR"
+WIKI_DIR="wiki"
+WIKI="$ROOT/$WIKI_DIR"
 REPO_DIR="$ROOT/repos"
 
 function check_or_create_config() {
@@ -34,24 +35,22 @@ check_or_create_repos
 check_or_create_zsh_history
 
 ### Repos
-git clone $HOME git@github.com:alexjperkins/wiki.git
-git clone $HOME git@github.com:sashajdn/dotf.git
-git clone $HOME git@github.com:sashajdn/gogorithms.git
-git clone $HOME git@github.com:sashajdn/rustgorithms.git
-git clone $HOME git@github.com:sashajdn/roml.git
-git clone $HOME git@github.com:sashajdn/pygos.git
-git clone $HOME git@github.com:sashajdn/orderbook.git
+git clone $REPO_DIR git@github.com:alexjperkins/wiki.git
+git clone $REPO_DIR git@github.com:sashajdn/dotf.git
+git clone $REPO_DIR git@github.com:sashajdn/gogorithms.git
+git clone $REPO_DIR git@github.com:sashajdn/rustgorithms.git
+git clone $REPO_DIR git@github.com:sashajdn/roml.git
+git clone $REPO_DIR git@github.com:sashajdn/pygos.git
+git clone $REPO_DIR git@github.com:sashajdn/orderbook.git
+git clone $REPO_DIR git@github.com:sashajdn/intervention.git
+git clone $REPO_DIR git@github.com:sashajdn/sushidog.git
 
 ### Zsh
 ln -sf $DOTF/zsh/zshrc $HOME/.zshrc
 ln -sf $DOTF/zsh/zprofile $HOME/.zprofile
 
-### Alacritty
-ln -sf $DOTF/config/alacritty $ROOT/.config
-
 ### Nvim
-ln -sf $DOTF/nvim-lazy $DOTF/config
-ln -sf $DOTF/config/nvim $ROOT/.config
+ln -sf $DOTF/nvim $DOTF/config
 
 ### Neofetch
-ln -sf $DOTF/config/neofetch $HOME/.config/neofetch
+ln -sf $DOTF/config $HOME/.config

@@ -11,27 +11,27 @@ return {
     --- Mason setup
     local servers = {
       "clangd",
-      "cssls",
+      -- "cssls",
       "gopls",
-      "graphql",
-      "html",
+      -- "graphql",
+      -- "html",
       "lua_ls",
       "marksman",
-      "pyright",
+      -- "pyright",
       "ruff",
       "rust_analyzer",
-      "ts_ls",
-      "dockerls",
+      -- "ts_ls",
+      -- "dockerls",
       -- "markdown_oxide",
-      "jsonls",
-      "yamlls",
+      -- "jsonls",
+      -- "yamlls",
       -- "bash-language-server",
     }
 
     local tools = {
-      "prettier", -- prettier formatter
+      -- "prettier", -- prettier formatter
       "stylua", -- lua formatter
-      "eslint_d", -- js linter
+      -- "eslint_d", -- js linter
     }
 
     -- Set log level to avoid spam.
