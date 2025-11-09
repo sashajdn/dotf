@@ -3,6 +3,7 @@
 DOTF_DIR="$HOME/dotf"
 WIKI_DIR="$HOME/wiki"
 REPOS_DIR="$HOME/repos"
+WORK_DIR="$HOME/work"
 MINIJIRA_CMD=minijira
 LLM_CMD=codex
 
@@ -11,7 +12,8 @@ if [[ $# -eq 1 ]]; then
     selected=$1
 else
     repos_selected=$(find "$REPOS_DIR" -mindepth 1 -maxdepth 1 -type d)
-    selected=$(echo "$WIKI_DIR" "$DOTF_DIR" $repos_selected | tr ' ' '\n' | fzf)
+    work_repos_selected=$(find "$WORK_DIR" -mindepth 2 -maxdepth 2 -type d)
+    selected=$(echo "$WIKI_DIR" "$DOTF_DIR" $repos_selected $work_repos_selected | tr ' ' '\n' | fzf)
 fi
 
 if [[ -z $selected ]]; then

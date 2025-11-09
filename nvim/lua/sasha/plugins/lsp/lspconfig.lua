@@ -224,7 +224,7 @@ return {
       filetypes = { "rust" },
       cmd = ra_cmd,
       single_file_support = false,
-      workspace_required = true,
+      workspace_required = false,
       root_dir = function(buf, cb)
         -- Force a single workspace instance: use repo root if present.
         local root = vim.fs.root(buf, { ".git" }) or vim.fs.root(buf, { "Cargo.toml", "rust-project.json" })
@@ -234,7 +234,7 @@ return {
         autoformat = false,
         ["rust-analyzer"] = {
           check = {
-            command = "check",
+            command = "clippy",
           },
           inlayHints = {
             enable = true,
@@ -253,8 +253,8 @@ return {
           checkOnSave = true,
           cargo = {
             extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
-            loadOutDirsFromCheck = false,
-            -- allFeatures = true,
+            loadOutDirsFromCheck = true,
+            allFeatures = true,
           },
           imports = {
             granularity = {
@@ -281,7 +281,7 @@ return {
             },
           },
           workspace = {
-            symbol = { search = { limit = 2000 } },
+            symbol = { search = { limit = 10000 } },
           },
         },
       },

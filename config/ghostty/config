@@ -7,8 +7,8 @@ background         = #1c1c1c
 foreground         = #f2f4f8
 cursor-color       = #82cfff
 bold-is-bright     = true
-background-opacity = 0.90
-background-blur    = 20
+background-opacity = 0.50
+background-blur    = 15
 
 # 16-colour palette
 palette = 0=#161616

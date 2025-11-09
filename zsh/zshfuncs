@@ -396,7 +396,7 @@ proj()
 
 pb()
 {
-  proj brain
+  proj bpx-backend
 }
 
 prl()

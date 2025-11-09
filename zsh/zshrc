@@ -37,9 +37,14 @@ setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY
 setopt HIST_EXPIRE_DUPS_FIRST
 setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
 setopt HIST_REDUCE_BLANKS
 
+SAVEHIST=10000
+HISTSIZE=100000
+HISTFILE=~/.cache/zsh/history
+export HISTFILE
 
 ### --- Neofetch --- ###
 neofetch
@@ -67,10 +72,6 @@ PROMPT='[%B%F{169}%n%f%b%B%F{38}@%f%b%F{169}%M%f %B%F{38}${PWD/#$HOME/~}%f%b] %B
 
 ### --- History --- ###
 ## History in cache directory
-SAVEHIST=5000
-HISTSIZE=2000
-HISTFILE=~/.cache/zsh/history
-
 
 ### --- Completion --- ###
 
@@ -174,6 +175,8 @@ bindkey -s ^h "fsh\n"
 bindkey -s ^t "tmux-lhs-terminal\n"
 bindkey -s ^g "gbc\n"
 bindkey -s ^u "go-test-runner\n"
+bindkey -s '^r' "fzf-history-finder\n"
+
 
 ### --- External --- ###
 [ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
