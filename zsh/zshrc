@@ -169,13 +169,17 @@ fi
 ### --- Functions --- ###
 [ -f "$HOME/dotf/zsh/zshfuncs" ] && source "$HOME/dotf/zsh/zshfuncs"
 
+### --- Widgets --- ###
+zle -N fzf_history_widget
+
 ### --- Keybindings --- ###
 bindkey -s ^f "tmux-sessionizer\n"
 bindkey -s ^h "fsh\n"
 bindkey -s ^t "tmux-lhs-terminal\n"
 bindkey -s ^g "gbc\n"
 bindkey -s ^u "go-test-runner\n"
-bindkey -s '^r' "fzf-history-finder\n"
+bindkey '^r' fzf_history_widget
+
 
 
 ### --- External --- ###

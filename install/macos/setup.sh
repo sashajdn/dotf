@@ -54,3 +54,21 @@ ln -sf $DOTF/nvim $DOTF/config
 
 ### Neofetch
 ln -sf $DOTF/config $HOME/.config
+
+### Claude
+function check_or_create_claude() {
+	if [ ! -d $HOME/.claude ]; then
+		mkdir $HOME/.claude
+	fi
+}
+
+check_or_create_claude
+ln -sf $DOTF/claude/commands $HOME/.claude/commands
+
+### Sanki (Anki CLI for Claude skill)
+if ! command -v sanki &> /dev/null; then
+	echo "sanki not found, installing..."
+	git clone https://github.com/sashajdn/sanki.git $REPO_DIR/sanki
+	cd $REPO_DIR/sanki && make install
+	cd -
+fi

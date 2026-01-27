@@ -1,5 +1,4 @@
 ### --- *nix --- ###
-
 cd()
 {
 	builtin cd $@
@@ -414,4 +413,35 @@ pi()
 blog()
 {
     $EDITOR $WIKI_BLOG
+}
+
+## History
+fzf_history_widget()
+{
+  local selected
+
+  selected=$(fzf-history-finder "$LBUFFER") || return
+
+  [[ -z "$selected" ]] && zle redisplay && return
+
+  BUFFER="$selected"
+  CURSOR=${#BUFFER}
+  zle redisplay
+}
+
+### AWS
+faws() {
+if ! command -v aws >/dev/null 2>&1; then
+  echo "aws CLI not found" >&2
+  exit 1
+fi
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "🚨 fzf not found" >&2
+  exit 1
+fi
+
+profile=$(aws configure list-profiles | fzf --height 40% --reverse --border) || exit 0
+export AWS_PROFILE="$profile"
+echo "✅🤖 Set AWS_PROFILE to: ${profile}"
 }

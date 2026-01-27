@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v aws >/dev/null 2>&1; then
+  echo "echo 'aws CLI not found in PATH' >&2"
+  exit 1
+fi
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "echo 'fzf not found in PATH' >&2"
+  exit 1
+fi
+
+profile=$(aws configure list-profiles | fzf --height 40% --reverse --border) || exit 0
+
+cat <<EOF
+export AWS_PROFILE=${profile}
+echo "AWS_PROFILE set to: \$AWS_PROFILE"
+fi
+EOF
