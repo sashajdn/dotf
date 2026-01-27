@@ -1,9 +1,0 @@
-XTerm*termname: xterm-256color
-XTerm*foreground: white
-XTerm*background: black
-XTerm*locale: true
-
-! URXVT
-URxvt*buffered: true
-URxvt*termName: rxvt-256color
-URxvt*letterSpace: -1

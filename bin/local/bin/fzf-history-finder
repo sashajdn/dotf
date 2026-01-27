@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+HISTFILE="${HISTFILE:-$HOME/.cache/zsh/history}"
+FZF_CMD="${FZF_CMD:-fzf}"
+HIST_LIMIT="${HIST_LIMIT:-100000}"   # max number of lines from newest backwards
+INITIAL_QUERY="$1"
+
+if [[ ! -f "$HISTFILE" ]]; then
+    echo "History file not found: $HISTFILE" >&2
+    exit 1
+fi
+
+# Read the whole history file, reverse it, strip zsh timestamps,
+# and keep only the newest $HIST_LIMIT commands.
+history_lines=$(
+    awk -v limit="$HIST_LIMIT" '
+        { a[NR]=$0 }
+        END {
+            count = 0
+            for (i = NR; i >= 1 && count < limit; i--) {
+                line = a[i]
+                sub(/^: [0-9]+:[0-9]+;/, "", line)  # strip ": ts:0;" prefix
+                print line
+                count++
+            }
+        }
+    ' "$HISTFILE"
+)
+
+if [[ -z "$history_lines" ]]; then
+    exit 0
+fi
+
+if [[ -n "$INITIAL_QUERY" ]]; then
+    selected=$(printf '%s\n' "$history_lines" \
+        | "$FZF_CMD" --height 40% --reverse --prompt='history> ' --query="$INITIAL_QUERY")
+else
+    selected=$(printf '%s\n' "$history_lines" \
+        | "$FZF_CMD" --height 40% --reverse --prompt='history> ')
+fi
+
+[[ -z "$selected" ]] && exit 0
+
+printf '%s\n' "$selected"

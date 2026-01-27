@@ -11,27 +11,27 @@ return {
     --- Mason setup
     local servers = {
       "clangd",
-      "cssls",
+      -- "cssls",
       "gopls",
-      "graphql",
-      "html",
+      -- "graphql",
+      -- "html",
       "lua_ls",
       "marksman",
-      "pyright",
+      -- "pyright",
       "ruff",
       "rust_analyzer",
-      "ts_ls",
-      "dockerls",
+      -- "ts_ls",
+      -- "dockerls",
       -- "markdown_oxide",
-      "jsonls",
-      "yamlls",
+      -- "jsonls",
+      -- "yamlls",
       -- "bash-language-server",
     }
 
     local tools = {
-      "prettier", -- prettier formatter
+      -- "prettier", -- prettier formatter
       "stylua", -- lua formatter
-      "eslint_d", -- js linter
+      -- "eslint_d", -- js linter
     }
 
     -- Set log level to avoid spam.
@@ -213,6 +213,7 @@ return {
     vim.lsp.enable("gopls")
 
     --- Rust
+    local rust_workspace = require("sasha.rust_workspace")
     -- Prefer a single rust-analyzer binary (Mason if available)
     local ra_cmd = { vim.fn.stdpath("data") .. "/mason/bin/rust-analyzer" }
     if vim.fn.executable(ra_cmd[1]) == 0 then
@@ -220,24 +221,27 @@ return {
     end
 
     vim.lsp.config.rust_analyzer = {
+      on_new_config = rust_workspace.on_new_config,
       offset_encoding = "utf-16",
       filetypes = { "rust" },
       cmd = ra_cmd,
       single_file_support = false,
-      workspace_required = true,
+      workspace_required = false,
       root_dir = function(buf, cb)
         -- Force a single workspace instance: use repo root if present.
-        local root = vim.fs.root(buf, { ".git" }) or vim.fs.root(buf, { "Cargo.toml", "rust-project.json" })
+        local root = vim.fs.root(buf, { "Cargo.toml", "rust-project.json" }) or vim.fs.root(buf, { ".git" })
         return cb(root or vim.uv.cwd())
       end,
       settings = {
         autoformat = false,
         ["rust-analyzer"] = {
           check = {
-            command = "check",
+            command = "clippy",
+            allTargets = false,
+            workspace = false,
           },
           inlayHints = {
-            enable = true,
+            enable = false,
             typeHints = true,
             parameterHints = true,
             chainingHints = true,
@@ -248,13 +252,18 @@ return {
           },
           files = {
             excludeDirs = { ".git", "target", "crates/target", "node_modules", "dist", "out" },
-            watcher = "client",
+            watcher = "notify",
           },
-          checkOnSave = true,
+          checkOnSave = {
+            enable = true,
+            command = "clippy",
+            allTargets = false,
+            features = {},
+          },
           cargo = {
             extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
             loadOutDirsFromCheck = false,
-            -- allFeatures = true,
+            allFeatures = false,
           },
           imports = {
             granularity = {
@@ -281,7 +290,7 @@ return {
             },
           },
           workspace = {
-            symbol = { search = { limit = 2000 } },
+            symbol = { search = { limit = 10000 } },
           },
         },
       },
