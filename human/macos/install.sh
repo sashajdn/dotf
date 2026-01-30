@@ -69,6 +69,7 @@ create_directories() {
     mkdir -p ~/.config
     mkdir -p ~/.cache/zsh
     mkdir -p ~/.claude
+    mkdir -p ~/.local/bin
     mkdir -p "$REPO_DIR"
 
     log_ok "Directories created"
@@ -81,6 +82,7 @@ create_symlinks() {
     ln -sf "$DOTF/zsh/zshrc" ~/.zshrc
     ln -sf "$DOTF/nvim" ~/.config/nvim
     ln -sf "$DOTF/tmux" ~/.config/tmux
+    ln -sf "$DOTF/config/ghostty" ~/.config/ghostty
     ln -sf "$DOTF/claude/commands" ~/.claude/commands
 
     log_ok "Symlinks created"
@@ -116,6 +118,41 @@ clone_repos() {
     log_ok "Repos cloned"
 }
 
+# --- Wiki ---
+setup_wiki() {
+    local wiki_dir="$HOME/wiki"
+
+    if [[ ! -d "$wiki_dir" ]]; then
+        log_info "Cloning wiki..."
+        git clone git@github.com:sashajdn/wiki.git "$wiki_dir" || { log_warn "Failed to clone wiki"; return; }
+    fi
+
+    log_info "Installing wiki..."
+    (cd "$wiki_dir" && ./install.sh)
+    log_ok "Wiki setup complete"
+}
+
+# --- NVM ---
+install_nvm() {
+    if [[ -d "$HOME/.nvm" ]]; then
+        log_ok "NVM already installed"
+        return
+    fi
+
+    log_info "Installing NVM..."
+    local latest
+    latest=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+    curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${latest}/install.sh" | bash
+    log_ok "NVM installed"
+}
+
+# --- Python ---
+install_python() {
+    log_info "Installing Python and Poetry..."
+    "$DOTF/install/macos/python/install.sh"
+    log_ok "Python setup complete"
+}
+
 # --- Sanki ---
 install_sanki() {
     if command -v sanki &>/dev/null; then
@@ -143,6 +180,9 @@ main() {
     create_directories
     create_symlinks
     clone_repos
+    setup_wiki
+    install_nvm
+    install_python
     install_sanki
 
     log_ok "Done! Start a new shell or run: exec zsh"
