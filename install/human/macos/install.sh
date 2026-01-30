@@ -149,7 +149,7 @@ install_nvm() {
 # --- Python ---
 install_python() {
     log_info "Installing Python and Poetry..."
-    "$DOTF/install/macos/python/install.sh"
+    "$DOTF/install/macos/python.sh"
     log_ok "Python setup complete"
 }
 

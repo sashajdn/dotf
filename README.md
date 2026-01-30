@@ -1,38 +1,37 @@
-# Sasha Jordan Dotfiles
+# @sashajdn dotfiles
 
-## Guide
+Personal dotfiles with multi-user support (human + agent profiles).
 
-### Dependencies
+## Structure
 
-- Neovim
-    - Treesitter
-    - Telescope
-    - LSP
-    - CMP
-- Tmux
-- Zsh
+```
+dotf/
+├── install/
+│   ├── human/      # Human install scripts
+│   └── agent/      # Agent install scripts
+├── nvim/           # Neovim configuration
+├── tmux/           # Tmux configuration
+├── zsh/            # Zsh configuration
+├── config/         # App configs (ghostty, etc.)
+├── claude/         # Claude Code commands
+└── bin/            # Custom scripts
+```
 
-### Getting started
+## Install
 
-- IDE: `$ v`
-- Tmux: `$ t`
+```bash
+# Clone
+git clone git@github.com:sashajdn/dotf.git ~/dotf
 
-### Visuals
+# Human setup (interactive use)
+make install-macos
+
+# Agent setup (CI/automated environments)
+make install-macos-agent
+```
+
+## Visuals
 
 ![Golang](./assets/1.png)
 ![Telescope](./assets/2.png)
 ![Python](./assets/3.png)
-
-## Installs
-
-### Arch Linux
-
-```
-$ ./scripts/arch/install.sh && ./scripts/arch/setup.sh
-```
-
-### MacOS Install
-
-```
-$ ./scripts/macos/install.sh && ./scripts/macos/setup.sh
-```

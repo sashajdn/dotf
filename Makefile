@@ -1,5 +1,5 @@
 install-macos:
-	@./human/macos/install.sh
+	@./install/human/macos/install.sh
 
-install-agent-macos:
-	@./agent/macos/install.sh
+install-macos-agent:
+	@./install/agent/macos/install.sh
