@@ -41,12 +41,16 @@ if [[ $NUM_AGENTS -ge 2 ]]; then
         # [1][2]
         # [3][4]
         tmux split-window -t "$TARGET.1" -h -c "$PANE_PATH"
-        tmux select-pane -t "$TARGET.2" -T "${SESSION}:agent-2"
-
         tmux split-window -t "$TARGET.1" -v -c "$PANE_PATH"
-        tmux select-pane -t "$TARGET.3" -T "${SESSION}:agent-3"
-
         tmux split-window -t "$TARGET.2" -v -c "$PANE_PATH"
+
+        # Equal sizing with tiled layout.
+        tmux select-layout -t "$TARGET" tiled
+
+        # Name panes after layout is set.
+        tmux select-pane -t "$TARGET.1" -T "${SESSION}:agent-1"
+        tmux select-pane -t "$TARGET.2" -T "${SESSION}:agent-2"
+        tmux select-pane -t "$TARGET.3" -T "${SESSION}:agent-3"
         tmux select-pane -t "$TARGET.4" -T "${SESSION}:agent-4"
     else
         # Vertical stack for 2-3 agents.

@@ -2,18 +2,37 @@
 #
 # unit-complete: Clean up a worktree after work is complete.
 #
-# Usage: unit-complete [ticket-name]
-#   - If in a worktree, uses current worktree
-#   - Otherwise, requires ticket name
-#   - Removes the worktree and optionally the branch
-#   - Resets tmux pane name
+# Usage: unit-complete [-y|--yes] [ticket-name]
+#   -y, --yes       Auto-confirm branch deletion (non-interactive)
+#   -n, --no        Keep branch (non-interactive)
+#   ticket-name     Required if not in a worktree
 #
 # Example: unit-complete
-#          unit-complete exp-3803-fixup-auth
+#          unit-complete -y GH-123
+#          unit-complete --no GH-123
 
 set -e
 
 DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+AUTO_DELETE=""
+
+# Parse flags.
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -y|--yes)
+            AUTO_DELETE="yes"
+            shift
+            ;;
+        -n|--no)
+            AUTO_DELETE="no"
+            shift
+            ;;
+        *)
+            TICKET="$1"
+            shift
+            ;;
+    esac
+done
 
 # Determine ticket from argument or current directory.
 CURRENT_PATH=$(pwd)
@@ -27,8 +46,7 @@ fi
 REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
 WORKTREE_BASE="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
 
-if [[ -n "$1" ]]; then
-    TICKET="$1"
+if [[ -n "$TICKET" ]]; then
     WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
 elif [[ "$CURRENT_PATH" == "$WORKTREE_BASE"/* ]]; then
     # We're inside a worktree.
@@ -39,7 +57,7 @@ elif [[ "$CURRENT_PATH" == "$WORKTREE_BASE"/* ]]; then
     done
     TICKET=$(basename "$WORKTREE_PATH")
 else
-    echo "Usage: unit-complete [ticket-name]" >&2
+    echo "Usage: unit-complete [-y|--yes] [-n|--no] [ticket-name]" >&2
     echo ""
     echo "Run from within a worktree, or provide ticket name" >&2
     exit 1
@@ -60,7 +78,7 @@ echo ""
 
 # Move out of worktree if we're in it.
 if [[ "$CURRENT_PATH" == "$WORKTREE_PATH"* ]]; then
-    cd "$REPO_ROOT"
+    builtin cd "$REPO_ROOT"
     echo "Changed directory to: $REPO_ROOT"
 fi
 
@@ -68,13 +86,21 @@ fi
 echo "Removing worktree..."
 git worktree remove "$WORKTREE_PATH"
 
-# Ask about branch deletion.
+# Handle branch deletion.
 if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
-    read -p "Delete branch '$BRANCH'? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ "$AUTO_DELETE" == "yes" ]]; then
         git branch -d "$BRANCH" 2>/dev/null || git branch -D "$BRANCH"
         echo "Branch deleted"
+    elif [[ "$AUTO_DELETE" == "no" ]]; then
+        echo "Branch kept"
+    else
+        # Interactive mode.
+        read -p "Delete branch '$BRANCH'? [y/N] " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            git branch -d "$BRANCH" 2>/dev/null || git branch -D "$BRANCH"
+            echo "Branch deleted"
+        fi
     fi
 fi
 

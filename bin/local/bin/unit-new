@@ -62,9 +62,6 @@ fi
 echo "Creating worktree at $WORKTREE_PATH..."
 git worktree add -b "$BRANCH" "$WORKTREE_PATH" "origin/$BASE_BRANCH"
 
-# Change to worktree directory.
-cd "$WORKTREE_PATH"
-
 # Rename tmux pane if in tmux.
 # Format: repo:agent-N:ticket (all lowercase, only : and -)
 if [[ -n "$TMUX" ]]; then

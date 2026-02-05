@@ -53,12 +53,16 @@ if ! tmux has-session -t="$selected_name" 2> /dev/null; then
             # [1][2]
             # [3][4]
             tmux split-window -t "$target.1" -h -c "$selected"
-            tmux select-pane -t "$target.2" -T "${selected_name}:agent-2"
-
             tmux split-window -t "$target.1" -v -c "$selected"
-            tmux select-pane -t "$target.3" -T "${selected_name}:agent-3"
-
             tmux split-window -t "$target.2" -v -c "$selected"
+
+            # Equal sizing with tiled layout.
+            tmux select-layout -t "$target" tiled
+
+            # Name panes after layout is set.
+            tmux select-pane -t "$target.1" -T "${selected_name}:agent-1"
+            tmux select-pane -t "$target.2" -T "${selected_name}:agent-2"
+            tmux select-pane -t "$target.3" -T "${selected_name}:agent-3"
             tmux select-pane -t "$target.4" -T "${selected_name}:agent-4"
         else
             # Vertical stack for 2-3 agents.
