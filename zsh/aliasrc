@@ -76,3 +76,11 @@ alias wiki="nvim $WIKI"
 
 ### Zathura
 alias zath='zathura'
+
+### Agents
+# Naming convention: a<agent-type><subagent>
+#   a  = prefix (agent)
+#   c  = claude (agent type)
+#   u  = units (subagent type)
+# Example: acu = agent + claude + units
+alias acu='claude --agent units-agent'

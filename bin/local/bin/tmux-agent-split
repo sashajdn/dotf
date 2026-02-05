@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# tmux-agent-split: Split current window into N agent panes.
+#
+# Usage: tmux-agent-split [N]
+#   N: number of agents (1-4), defaults to MAX_AGENTS or 4
+#
+# Layout:
+#   1: single pane
+#   2-3: vertical stack
+#   4: 2x2 grid
+
+set -e
+
+MAX_AGENTS="${MAX_AGENTS:-4}"
+NUM_AGENTS="${1:-$MAX_AGENTS}"
+
+# Validate input.
+if [[ ! "$NUM_AGENTS" =~ ^[1-4]$ ]]; then
+    echo "Error: Number of agents must be 1-4, got: $NUM_AGENTS" >&2
+    exit 1
+fi
+
+# Get current context.
+SESSION=$(tmux display-message -p '#{session_name}')
+WINDOW=$(tmux display-message -p '#{window_name}')
+PANE_PATH=$(tmux display-message -p '#{pane_current_path}')
+TARGET="$SESSION:$WINDOW"
+
+# Kill all panes except the first, start fresh.
+while [[ $(tmux list-panes -t "$TARGET" | wc -l) -gt 1 ]]; do
+    tmux kill-pane -t "$TARGET.2"
+done
+
+# Name the first pane.
+tmux select-pane -t "$TARGET.1" -T "${SESSION}:agent-1"
+
+if [[ $NUM_AGENTS -ge 2 ]]; then
+    if [[ $NUM_AGENTS -eq 4 ]]; then
+        # 2x2 grid layout:
+        # [1][2]
+        # [3][4]
+        tmux split-window -t "$TARGET.1" -h -c "$PANE_PATH"
+        tmux select-pane -t "$TARGET.2" -T "${SESSION}:agent-2"
+
+        tmux split-window -t "$TARGET.1" -v -c "$PANE_PATH"
+        tmux select-pane -t "$TARGET.3" -T "${SESSION}:agent-3"
+
+        tmux split-window -t "$TARGET.2" -v -c "$PANE_PATH"
+        tmux select-pane -t "$TARGET.4" -T "${SESSION}:agent-4"
+    else
+        # Vertical stack for 2-3 agents.
+        for i in $(seq 2 $NUM_AGENTS); do
+            tmux split-window -t "$TARGET" -v -c "$PANE_PATH"
+            tmux select-pane -t "$TARGET.$i" -T "${SESSION}:agent-$i"
+        done
+        tmux select-layout -t "$TARGET" even-vertical
+    fi
+fi
+
+# Select first pane.
+tmux select-pane -t "$TARGET.1"

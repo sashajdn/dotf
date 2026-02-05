@@ -4,8 +4,7 @@ DOTF_DIR="$HOME/dotf"
 WIKI_DIR="$HOME/wiki"
 REPOS_DIR="$HOME/repos"
 WORK_DIR="$HOME/work"
-MINIJIRA_CMD=minijira
-LLM_CMD=codex
+MAX_AGENTS="${MAX_AGENTS:-4}"
 
 # Thank you @ThePrimaegen
 if [[ $# -eq 1 ]]; then
@@ -20,11 +19,10 @@ if [[ -z $selected ]]; then
     exit 0
 fi
 
-selected_name=$(basename "$selected" | tr . _)
-selected_code_window="${selected_name}_code"
-selected_term_window="${selected_name}_term"
-selected_proj_planner_window="${selected_name}_proj_planner"
-selected_llm_window="${selected_name}_llm"
+# Normalize name: lowercase, only alphanumeric and -, replace . and _ with -
+selected_name=$(basename "$selected" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+selected_code_window="${selected_name}-code"
+selected_agents_window="${selected_name}-agents"
 
 tmux_running=$(pgrep tmux)
 
@@ -34,23 +32,42 @@ if [[ -z "$TMUX" ]] &&  [[ -z "$tmux_running" ]]; then
 fi
 
 if ! tmux has-session -t="$selected_name" 2> /dev/null; then
-    # Create session.
-    tmux new-session -ds "$selected_name" -c "$selected" -n "$selected_term_window"
+    # Create session with code window (human's terminal at repo root).
+    tmux new-session -ds "$selected_name" -c "$selected" -n "$selected_code_window"
 
-    # Create code window.
-    tmux new-window -n "$selected_code_window" -t "$selected_name" -c "$selected" "$EDITOR" .
+    # Create agents window.
+    tmux new-window -n "$selected_agents_window" -t "$selected_name" -c "$selected"
 
-    # Create adjacent project planner window.
-    if command -v "$MINIJIRA_CMD" >/dev/null 2>&1; then
-        tmux new-window -n "$selected_proj_planner_window" -t "$selected_name" -c "$selected" "minijira $selected_name"
-    else
-        echo "$MINIJIRA_CMD command not found; cannot create project planner window"
-    fi
+    # Split into agent panes based on MAX_AGENTS.
+    # 1: single pane
+    # 2-3: vertical stack
+    # 4: 2x2 grid
+    target="$selected_name:$selected_agents_window"
 
-    if command -v "$LLM_CMD" >/dev/null 2>&1; then
-        tmux new-window -n "$selected_llm_window" -t "$selected_name" -c "$selected" "$LLM_CMD"
-    else
-        echo "$LLM_CMD command not found; cannot create llm window"
+    # Name the first pane.
+    tmux select-pane -t "$target.1" -T "${selected_name}:agent-1"
+
+    if [[ $MAX_AGENTS -ge 2 ]]; then
+        if [[ $MAX_AGENTS -eq 4 ]]; then
+            # 2x2 grid layout:
+            # [1][2]
+            # [3][4]
+            tmux split-window -t "$target.1" -h -c "$selected"
+            tmux select-pane -t "$target.2" -T "${selected_name}:agent-2"
+
+            tmux split-window -t "$target.1" -v -c "$selected"
+            tmux select-pane -t "$target.3" -T "${selected_name}:agent-3"
+
+            tmux split-window -t "$target.2" -v -c "$selected"
+            tmux select-pane -t "$target.4" -T "${selected_name}:agent-4"
+        else
+            # Vertical stack for 2-3 agents.
+            for i in $(seq 2 $MAX_AGENTS); do
+                tmux split-window -t "$target" -v -c "$selected"
+                tmux select-pane -t "$target.$i" -T "${selected_name}:agent-$i"
+            done
+            tmux select-layout -t "$target" even-vertical
+        fi
     fi
 fi
 

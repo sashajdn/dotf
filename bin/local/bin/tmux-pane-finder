@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# tmux-pane-finder: fzf-based pane selector across all sessions.
+#
+# Searchable by: session name, pane title, current path
+#
+# Usage: tmux-pane-finder
+#   - Run from within tmux
+#   - Select a pane via fzf
+#   - Switches to the selected pane
+
+set -e
+
+if [[ -z "$TMUX" ]]; then
+    echo "Error: Must be run from within tmux" >&2
+    exit 1
+fi
+
+# Format: session:window.pane | title | path
+# Example: api-service:agents.1 | api-service_agent-1_JIRA-123 | ~/repos/api-service/.worktrees/JIRA-123
+FORMAT='#{session_name}:#{window_name}.#{pane_index} | #{pane_title} | #{pane_current_path}'
+
+selected=$(tmux list-panes -a -F "$FORMAT" | fzf --height 40% --reverse --border \
+    --header "Select pane (session:window.pane | title | path)" \
+    --preview-window hidden)
+
+if [[ -z "$selected" ]]; then
+    exit 0
+fi
+
+# Extract session:window.pane from selection.
+target=$(echo "$selected" | cut -d'|' -f1 | xargs)
+
+# Switch to the selected pane.
+tmux switch-client -t "$target"

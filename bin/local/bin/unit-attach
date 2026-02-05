@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+#
+# unit-attach: Attach to an existing worktree.
+#
+# Usage: unit-attach <ticket-name>
+#   - Changes directory to the worktree
+#   - Renames tmux pane to include ticket name
+#
+# Example: unit-attach exp-3803-fixup-auth
+
+set -e
+
+DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+
+if [[ -z "$1" ]]; then
+    echo "Usage: unit-attach <ticket-name>" >&2
+    echo ""
+    echo "Available worktrees:"
+    unit-list 2>/dev/null || echo "  (run from a git repository)"
+    exit 1
+fi
+
+TICKET="$1"
+
+# Get repo context.
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [[ -z "$REPO_ROOT" ]]; then
+    echo "Error: Not in a git repository" >&2
+    exit 1
+fi
+
+REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+WORKTREE_PATH="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR/$TICKET"
+
+# Check if worktree exists.
+if [[ ! -d "$WORKTREE_PATH" ]]; then
+    echo "Error: Worktree not found at $WORKTREE_PATH" >&2
+    echo ""
+    echo "Available worktrees:"
+    unit-list 2>/dev/null || true
+    exit 1
+fi
+
+# Check if already occupied (optional warning).
+if [[ -n "$TMUX" ]]; then
+    OCCUPIED=$(tmux list-panes -a -F '#{pane_id}:#{pane_current_path}' | grep ":$WORKTREE_PATH$" | cut -d: -f1 || true)
+    CURRENT_PANE=$(tmux display-message -p '#{pane_id}')
+
+    if [[ -n "$OCCUPIED" ]] && [[ "$OCCUPIED" != "$CURRENT_PANE" ]]; then
+        echo "Warning: This worktree is already occupied by another pane"
+        read -p "Continue anyway? [y/N] " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    fi
+fi
+
+# Rename tmux pane if in tmux.
+# Format: repo:agent-N:ticket (all lowercase, only : and -)
+if [[ -n "$TMUX" ]]; then
+    CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
+    # Normalize ticket: lowercase, replace non-alphanum with -
+    TICKET_NORMALIZED=$(echo "$TICKET" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+
+    # Extract agent part if present.
+    if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+) ]]; then
+        NEW_TITLE="${BASH_REMATCH[1]}:${TICKET_NORMALIZED}"
+    else
+        NEW_TITLE="${REPO_NAME}:${TICKET_NORMALIZED}"
+    fi
+    tmux select-pane -T "$NEW_TITLE"
+fi
+
+echo "Attached to worktree: $TICKET"
+echo "  Path: $WORKTREE_PATH"
+echo ""
+echo "Run: cd $WORKTREE_PATH"

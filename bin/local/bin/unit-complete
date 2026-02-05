@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# unit-complete: Clean up a worktree after work is complete.
+#
+# Usage: unit-complete [ticket-name]
+#   - If in a worktree, uses current worktree
+#   - Otherwise, requires ticket name
+#   - Removes the worktree and optionally the branch
+#   - Resets tmux pane name
+#
+# Example: unit-complete
+#          unit-complete exp-3803-fixup-auth
+
+set -e
+
+DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+
+# Determine ticket from argument or current directory.
+CURRENT_PATH=$(pwd)
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+if [[ -z "$REPO_ROOT" ]]; then
+    echo "Error: Not in a git repository" >&2
+    exit 1
+fi
+
+REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+WORKTREE_BASE="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
+
+if [[ -n "$1" ]]; then
+    TICKET="$1"
+    WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
+elif [[ "$CURRENT_PATH" == "$WORKTREE_BASE"/* ]]; then
+    # We're inside a worktree.
+    WORKTREE_PATH="$CURRENT_PATH"
+    # Handle being in a subdirectory of the worktree.
+    while [[ "$WORKTREE_PATH" != "$WORKTREE_BASE" ]] && [[ ! -f "$WORKTREE_PATH/.git" ]]; do
+        WORKTREE_PATH=$(dirname "$WORKTREE_PATH")
+    done
+    TICKET=$(basename "$WORKTREE_PATH")
+else
+    echo "Usage: unit-complete [ticket-name]" >&2
+    echo ""
+    echo "Run from within a worktree, or provide ticket name" >&2
+    exit 1
+fi
+
+if [[ ! -d "$WORKTREE_PATH" ]]; then
+    echo "Error: Worktree not found at $WORKTREE_PATH" >&2
+    exit 1
+fi
+
+# Get branch name before removal.
+BRANCH=$(git -C "$WORKTREE_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+
+echo "Completing unit: $TICKET"
+echo "  Worktree: $WORKTREE_PATH"
+echo "  Branch: $BRANCH"
+echo ""
+
+# Move out of worktree if we're in it.
+if [[ "$CURRENT_PATH" == "$WORKTREE_PATH"* ]]; then
+    cd "$REPO_ROOT"
+    echo "Changed directory to: $REPO_ROOT"
+fi
+
+# Remove the worktree.
+echo "Removing worktree..."
+git worktree remove "$WORKTREE_PATH"
+
+# Ask about branch deletion.
+if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
+    read -p "Delete branch '$BRANCH'? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        git branch -d "$BRANCH" 2>/dev/null || git branch -D "$BRANCH"
+        echo "Branch deleted"
+    fi
+fi
+
+# Reset tmux pane name if in tmux.
+# Format: repo:agent-N (remove ticket suffix)
+if [[ -n "$TMUX" ]]; then
+    CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
+    # Remove ticket suffix from pane title (repo:agent-N:ticket -> repo:agent-N)
+    if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+):.+ ]]; then
+        NEW_TITLE="${BASH_REMATCH[1]}"
+        tmux select-pane -T "$NEW_TITLE"
+    fi
+fi
+
+echo ""
+echo "Unit $TICKET completed and cleaned up"
