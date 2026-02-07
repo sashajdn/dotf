@@ -47,7 +47,7 @@ HISTFILE=~/.cache/zsh/history
 export HISTFILE
 
 ### --- Neofetch --- ###
-neofetch
+command -v neofetch &>/dev/null && neofetch
 
 ## Enable colours
 autoload -U colors && colors
@@ -161,8 +161,8 @@ export BAT_THEME="ansi-dark"
 if [[ "$IS_MACOS" == 1 ]]; then
 	[ -f "$HOME/.fzf.zsh" ] && source ~/.fzf.zsh
 else
-	source /usr/share/fzf/completion.zsh
-	source /usr/share/fzf/key-bindings.zsh
+	[ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
+	[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
 fi
 
 
@@ -194,11 +194,15 @@ if [[ "$IS_MACOS" == "1" ]]; then
     source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null
     source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null
 else
-	source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null # (ARCH only)
+	source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null # (Linux)
 fi
 
 ### --- Powerlevel10k --- ###
-source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+if [[ "$IS_MACOS" == 1 ]]; then
+    source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+else
+    source /usr/share/powerlevel10k/powerlevel10k.zsh-theme
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
