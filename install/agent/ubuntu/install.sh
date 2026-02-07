@@ -9,7 +9,7 @@
 
 set -e
 
-DOTF="${DOTF:-$HOME/dotf}"
+DOTF="${DOTF:-$HOME/repos/dotf}"
 
 echo "🤖 Agent Ubuntu setup starting..."
 
@@ -22,6 +22,7 @@ apt install -y \
     tmux \
     fzf \
     ripgrep \
+    golang-go \
     zsh-syntax-highlighting
 
 # eza (not in apt, install from GitHub)
@@ -45,6 +46,9 @@ mkdir -p ~/.config ~/.cache/zsh
 
 # --- Symlinks ---
 echo "🤖 Creating symlinks..."
+
+# Dotf convenience symlink (zshrc expects ~/dotf)
+ln -sf "$DOTF" ~/dotf
 
 # Zsh
 ln -sf "$DOTF/zsh/zshrc" ~/.zshrc
