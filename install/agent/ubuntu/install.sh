@@ -10,6 +10,7 @@
 set -e
 
 DOTF="${DOTF:-$HOME/dotf}"
+NVIM_VERSION="${NVIM_VERSION:-0.11.5}"
 
 echo "🤖 Agent Ubuntu setup starting..."
 
@@ -18,14 +19,24 @@ echo "🤖 Installing packages..."
 apt update
 apt install -y \
     zsh \
-    neovim \
     tmux \
     fzf \
     ripgrep \
     golang-go \
     zsh-syntax-highlighting
 
-# eza (not in apt, install from GitHub)
+# --- Neovim (from GitHub releases) ---
+if ! command -v nvim &> /dev/null || [[ "$(nvim --version | head -1)" != *"$NVIM_VERSION"* ]]; then
+    echo "🤖 Installing neovim v${NVIM_VERSION}..."
+    curl -Lo /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/download/v${NVIM_VERSION}/nvim-linux-x86_64.tar.gz"
+    rm -rf /opt/nvim
+    tar -xzf /tmp/nvim.tar.gz -C /opt
+    mv /opt/nvim-linux-x86_64 /opt/nvim
+    ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+    rm /tmp/nvim.tar.gz
+fi
+
+# --- eza (from GitHub releases) ---
 if ! command -v eza &> /dev/null; then
     echo "🤖 Installing eza..."
     EZA_VERSION=$(curl -s https://api.github.com/repos/eza-community/eza/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
@@ -34,7 +45,7 @@ if ! command -v eza &> /dev/null; then
     rm /tmp/eza.tar.gz
 fi
 
-# powerlevel10k (clone to standard location)
+# --- Powerlevel10k ---
 if [[ ! -d /usr/share/powerlevel10k ]]; then
     echo "🤖 Installing powerlevel10k..."
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/powerlevel10k

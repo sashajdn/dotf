@@ -194,7 +194,7 @@ if [[ "$IS_MACOS" == "1" ]]; then
     source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null
     source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null
 else
-	source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null # (ARCH only)
+	source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2> /dev/null # (Linux)
 fi
 
 ### --- Powerlevel10k --- ###
