@@ -9,7 +9,7 @@
 
 set -e
 
-DOTF="${DOTF:-$HOME/repos/dotf}"
+DOTF="${DOTF:-$HOME/dotf}"
 
 echo "🤖 Agent Ubuntu setup starting..."
 
@@ -46,9 +46,6 @@ mkdir -p ~/.config ~/.cache/zsh
 
 # --- Symlinks ---
 echo "🤖 Creating symlinks..."
-
-# Dotf convenience symlink (zshrc expects ~/dotf)
-ln -sf "$DOTF" ~/dotf
 
 # Zsh
 ln -sf "$DOTF/zsh/zshrc" ~/.zshrc
