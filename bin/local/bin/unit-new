@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+# unit-new: Create a new worktree for a ticket/unit of work.
+#
+# Usage: unit-new <ticket-name> [branch-name]
+#   - Creates $DOTF_AGENTS_WORKTREE_DIR/<ticket-name> directory
+#   - Creates and checks out branch (defaults to ticket-name)
+#   - Renames tmux pane to include ticket name
+#
+# Example: unit-new exp-3803-fixup-auth
+#          unit-new exp-3803-fixup-auth feature/add-auth
+
+set -e
+
+DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+
+if [[ -z "$1" ]]; then
+    echo "Usage: unit-new <ticket-name> [branch-name]" >&2
+    exit 1
+fi
+
+TICKET="$1"
+BRANCH="${2:-$TICKET}"
+
+# Get repo context.
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [[ -z "$REPO_ROOT" ]]; then
+    echo "Error: Not in a git repository" >&2
+    exit 1
+fi
+
+# Normalize repo name: lowercase, replace non-alphanum with -
+REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+WORKTREE_PATH="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR/$TICKET"
+
+# Check if worktree already exists.
+if [[ -d "$WORKTREE_PATH" ]]; then
+    echo "Error: Worktree already exists at $WORKTREE_PATH" >&2
+    echo "Use 'unit-attach $TICKET' to attach to it" >&2
+    exit 1
+fi
+
+# Create worktrees directory if needed.
+mkdir -p "$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
+
+# Fetch latest from origin.
+echo "Fetching latest from origin..."
+git fetch origin
+
+# Determine base branch (main or master).
+BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+if [[ -z "$BASE_BRANCH" ]]; then
+    # Fallback: try main, then master.
+    if git show-ref --verify --quiet refs/remotes/origin/main; then
+        BASE_BRANCH="main"
+    else
+        BASE_BRANCH="master"
+    fi
+fi
+
+# Create worktree with new branch from base.
+echo "Creating worktree at $WORKTREE_PATH..."
+git worktree add -b "$BRANCH" "$WORKTREE_PATH" "origin/$BASE_BRANCH"
+
+# Rename tmux pane if in tmux.
+# Format: repo:agent-N:ticket (all lowercase, only : and -)
+if [[ -n "$TMUX" ]]; then
+    CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
+    # Normalize ticket: lowercase, replace non-alphanum with -
+    TICKET_NORMALIZED=$(echo "$TICKET" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+
+    # Extract agent part if present (e.g., repo:agent-1 -> repo:agent-1:ticket)
+    if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+) ]]; then
+        NEW_TITLE="${BASH_REMATCH[1]}:${TICKET_NORMALIZED}"
+    else
+        NEW_TITLE="${REPO_NAME}:${TICKET_NORMALIZED}"
+    fi
+    tmux select-pane -T "$NEW_TITLE"
+fi
+
+echo ""
+echo "Created worktree for $TICKET"
+echo "  Path: $WORKTREE_PATH"
+echo "  Branch: $BRANCH (from $BASE_BRANCH)"
+echo ""
+echo "Run 'cd $WORKTREE_PATH' to enter the worktree"

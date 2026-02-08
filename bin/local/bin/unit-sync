@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# unit-sync: Sync current worktree with latest base branch.
+#
+# Usage: unit-sync
+#   - Fetches latest from origin
+#   - Rebases current branch onto base branch (main/master)
+#
+# Run from within a worktree.
+
+set -e
+
+# Ensure we're in a git repo.
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [[ -z "$REPO_ROOT" ]]; then
+    echo "Error: Not in a git repository" >&2
+    exit 1
+fi
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Determine base branch.
+BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+if [[ -z "$BASE_BRANCH" ]]; then
+    if git show-ref --verify --quiet refs/remotes/origin/main; then
+        BASE_BRANCH="main"
+    else
+        BASE_BRANCH="master"
+    fi
+fi
+
+echo "Syncing with origin/$BASE_BRANCH..."
+echo "  Current branch: $CURRENT_BRANCH"
+echo ""
+
+# Fetch latest.
+echo "Fetching from origin..."
+git fetch origin
+
+# Check for uncommitted changes.
+if ! git diff-index --quiet HEAD --; then
+    echo "Warning: You have uncommitted changes"
+    read -p "Stash changes and continue? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        git stash
+        STASHED=1
+    else
+        echo "Aborting sync"
+        exit 1
+    fi
+fi
+
+# Rebase onto base branch.
+echo "Rebasing onto origin/$BASE_BRANCH..."
+if git rebase "origin/$BASE_BRANCH"; then
+    echo "Rebase successful"
+else
+    echo ""
+    echo "Rebase failed - resolve conflicts and run 'git rebase --continue'"
+    exit 1
+fi
+
+# Restore stashed changes if any.
+if [[ -n "$STASHED" ]]; then
+    echo "Restoring stashed changes..."
+    git stash pop
+fi
+
+echo ""
+echo "Sync complete"

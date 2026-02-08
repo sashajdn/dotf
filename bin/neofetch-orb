@@ -1,0 +1,8 @@
+#!/bin/bash
+# Neofetch with rotating orb ASCII art
+# Rotates through 4 orb frames based on time
+
+dir="${XDG_CONFIG_HOME:-$HOME/.config}/neofetch/ascii"
+frame=$(( ($(date +%S) / 2) % 4 + 1 ))
+
+neofetch --ascii "$(cat "$dir/orb${frame}.txt")" --ascii_colors 2 6 5 "$@"

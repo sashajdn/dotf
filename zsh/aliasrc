@@ -76,3 +76,19 @@ alias wiki="nvim $WIKI"
 
 ### Zathura
 alias zath='zathura'
+
+### Agents
+# Naming convention: a<agent-type><subagent>
+#   a  = prefix (agent)
+#   c  = claude (agent type)
+#   u  = units (subagent type)
+# Example: acu = agent + claude + units
+alias acu='claude --agent units-agent'
+
+### Units (git worktree management)
+# Prefix: u
+alias un='unit-new'       # Create new worktree + cd into it
+alias uc='unit-cd'        # fzf picker to cd into worktree
+alias ur='unit-rm'        # fzf picker to remove worktree
+alias ul='unit-list'      # List all worktrees
+alias us='unit-sync'      # Sync current worktree with main

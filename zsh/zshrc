@@ -47,7 +47,8 @@ HISTFILE=~/.cache/zsh/history
 export HISTFILE
 
 ### --- Neofetch --- ###
-command -v neofetch &>/dev/null && neofetch
+# Only run for interactive terminals with a real TTY (skip for agents/scripts)
+[[ -t 1 ]] && [[ $- == *i* ]] && neofetch
 
 ## Enable colours
 autoload -U colors && colors
@@ -185,7 +186,7 @@ bindkey '^r' fzf_history_widget
 ### --- External --- ###
 [ -f "$HOME/.ezshrc" ] && source "$HOME/.ezshrc"
 [ -f "$HOME/.ealiasrc" ] && source "$HOME/.ealiasrc"
-[ -f "$HOME/.ezshenv" ] && source "$HOME/.ezshenv"
+[ -f "$HOME/.ezshenv" ] && { set -a; source "$HOME/.ezshenv"; set +a; }
 [ -f "$HOME/.ezshfuncs" ] && source "$HOME/.ezshfuncs"
 
 

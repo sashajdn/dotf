@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+# tmux-startup: Ensure persistent sessions exist (wiki, todo).
+#
+# Usage: tmux-startup
+#   - Call on shell login or tmux server start
+#   - Creates wiki and todo sessions if they don't exist
+
+# Only run if tmux is available.
+if ! command -v tmux &>/dev/null; then
+    exit 0
+fi
+
+# Only run if tmux server is running or we can start it.
+if ! tmux list-sessions &>/dev/null; then
+    # No server running, start one detached.
+    tmux start-server
+fi
+
+# Create wiki session if not exists.
+if ! tmux has-session -t wiki 2>/dev/null; then
+    tmux new-session -ds wiki -c "$HOME/wiki"
+fi
+
+# Create todo session if not exists.
+# Opens weekly todo by default (todo -w).
+if ! tmux has-session -t todo 2>/dev/null; then
+    tmux new-session -ds todo -c "$HOME"
+fi
