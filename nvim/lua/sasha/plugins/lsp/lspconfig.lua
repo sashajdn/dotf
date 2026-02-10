@@ -235,62 +235,71 @@ return {
       settings = {
         autoformat = false,
         ["rust-analyzer"] = {
+          -- Use clippy on save, but ONLY for the current package, not workspace.
+          -- "check" is the canonical key (checkOnSave was merged into it).
           check = {
             command = "clippy",
             allTargets = false,
             workspace = false,
+            extraArgs = { "--no-deps" },
+            invocationStrategy = "once",
           },
           inlayHints = {
             enable = false,
-            typeHints = true,
-            parameterHints = true,
-            chainingHints = true,
-            closureReturnTypeHints = true,
           },
           procMacro = {
             enable = true,
+            -- Let RA use cached proc macro artifacts from cargo check.
+            attributes = { enable = true },
           },
           files = {
-            excludeDirs = { ".git", "target", "crates/target", "node_modules", "dist", "out" },
-            watcher = "notify",
-          },
-          checkOnSave = {
-            enable = true,
-            command = "clippy",
-            allTargets = false,
-            features = {},
+            excludeDirs = {
+              ".git", "target", "crates/target", "node_modules",
+              "dist", "out", ".cargo", "vendor",
+            },
+            -- Server-side watching is cheaper than notify on large repos.
+            watcher = "server",
           },
           cargo = {
             extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
-            loadOutDirsFromCheck = false,
+            -- IMPORTANT: true = reuse cargo check output for proc macros + build scripts.
+            -- false forces RA to re-expand everything itself. 
+            buildScripts = { enable = true },
             allFeatures = false,
+            -- Only resolve the current package, not entire workspace.
+            sysrootQueryMetadata = true,
           },
           imports = {
-            granularity = {
-              group = "crate",
-            },
+            granularity = { group = "crate" },
             prefix = "self",
           },
           diagnostics = {
             refreshSupport = false,
+            -- Disable expensive diagnostics that duplicate clippy.
+            disabled = { "unresolved-macro-call" },
           },
           lens = {
             enable = false,
           },
+          -- Limit RA's parallelism to leave headroom for cargo clippy.
+          numThreads = 4,
           hoverActions = {
             enable = true,
             border = "rounded",
           },
           completion = {
-            autoimport = {
-              enable = true,
-            },
-            postfix = {
-              enable = false,
-            },
+            autoimport = { enable = true },
+            postfix = { enable = false },
+            -- Limit completion overhead.
+            limit = 50,
           },
           workspace = {
-            symbol = { search = { limit = 10000 } },
+            symbol = { search = { limit = 5000 } },
+          },
+          -- Throttle to avoid hammering during rapid edits.
+          cachePriming = {
+            enable = true,
+            numThreads = 2,
           },
         },
       },

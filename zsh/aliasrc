@@ -32,6 +32,56 @@ alias gpo='git push origin'
 alias gpoc='gpo $(gbcu)'
 alias gcs='git commit -S'
 
+## Squash all commits on current branch into one against base branch.
+## Usage: gsc -m "commit message" [-b base_branch]
+## Default base: master
+function gsc() {
+  local msg=""
+  local base="master"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -m) msg="$2"; shift 2 ;;
+      -b) base="$2"; shift 2 ;;
+      *) echo "Usage: gsc -m \"commit message\" [-b base_branch]"; return 1 ;;
+    esac
+  done
+
+  if [[ -z "$msg" ]]; then
+    echo "Error: commit message required. Usage: gsc -m \"message\" [-b branch]"
+    return 1
+  fi
+
+  local merge_base=$(git merge-base "$base" HEAD)
+  if [[ -z "$merge_base" ]]; then
+    echo "Error: could not find merge-base with $base"
+    return 1
+  fi
+
+  local ahead=$(git rev-list --count "$merge_base"..HEAD)
+  if [[ "$ahead" -eq 0 ]]; then
+    echo "No commits to squash (already at $base)"
+    return 0
+  fi
+
+  # Stash if dirty
+  local stashed=false
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    git stash
+    stashed=true
+  fi
+
+  git reset --soft "$merge_base"
+  git add -A
+  git commit -m "$msg"
+
+  if $stashed; then
+    git stash pop
+  fi
+
+  echo "Squashed $ahead commits into: $msg"
+}
+
 ## Zettelkasten
 alias o='obsidian &!'
 alias lq='logseq &!'
