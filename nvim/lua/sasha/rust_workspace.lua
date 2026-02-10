@@ -38,7 +38,8 @@ local function generate_linked_project(manifest_path)
     table.insert(cmd, "--filter-platform")
     table.insert(cmd, host_target)
   end
-  table.insert(cmd, "--skip-sysroot-src")
+  -- Include sysroot src so RA resolves std library types fast.
+  -- table.insert(cmd, "--skip-sysroot-src")
   local output = vim.fn.system(cmd)
   if vim.v.shell_error ~= 0 then
     vim.notify("rust-analyzer linked project generation failed: " .. vim.trim(output), vim.log.levels.WARN)
