@@ -101,7 +101,7 @@ ufw delete limit 22/tcp
       "action": "accept",
       "src": ["autogroup:owner"],
       "dst": ["autogroup:self"],
-      "users": ["root", "clank"]
+      "users": ["root", "$USER"]
     }
   ]
 }
