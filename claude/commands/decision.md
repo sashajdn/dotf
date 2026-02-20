@@ -57,8 +57,6 @@ Ask the user to describe the decision in their own words. Then probe:
 - What's at stake if you get this wrong?
 - Who else is affected?
 
-**Persist immediately** — create a plan entry and start logging.
-
 ### Phase 1: Classify
 
 Based on their answers, classify the decision:
@@ -79,7 +77,7 @@ Select 4-8 frameworks based on the decision type. Do NOT mechanically apply all 
 1. **You go first** — apply the framework to the decision as you understand it. Share your reasoning.
 2. **Ask the user** — "How do you see this through the lens of [framework]?" or ask a specific probing question.
 3. **Compare** — Where do you agree? Where do you diverge? Why?
-4. **Record** — Log the insight, disagreement, or decision as an interview entry.
+4. **Record** — Note the insight, disagreement, or decision.
 
 **Probing questions should be sharp:**
 - "What breaks if [variable] goes to zero?"
@@ -153,89 +151,6 @@ Generate a structured decision record:
 
 ---
 
-## Persistence
-
-Use the feynman SQLite database to persist all decision sessions.
-
-**Database location:**
-- Linux: `~/.config/feynman/feynman.db`
-- macOS: `~/Library/Application Support/feynman/feynman.db`
-- Override: `$FEYNMAN_DB`
-
-Detect OS and use the correct path. If the DB doesn't exist, create it by running the schema (see feynman skill for full DDL).
-
-### On Session Start
-
-```sql
-INSERT INTO plans (title, initial_description, status, engineer_level, created_at, updated_at)
-VALUES ('[DECISION] <title>', '<user description>', 'interviewing', 'decision', datetime('now'), datetime('now'));
-```
-
-Note the `[DECISION]` prefix — this distinguishes decision sessions from engineering plans in the DB.
-
-### During Session
-
-Log every meaningful exchange:
-
-```sql
--- Your question
-INSERT INTO plan_interview_entries (plan_id, entry_type, content, category, created_at)
-VALUES (<plan_id>, 'question', '<your question>', '<category>', datetime('now'));
-
--- User's answer
-INSERT INTO plan_interview_entries (plan_id, entry_type, content, category, created_at)
-VALUES (<plan_id>, 'answer', '<their answer>', '<category>', datetime('now'));
-
--- Your analysis/insight
-INSERT INTO plan_interview_entries (plan_id, entry_type, content, category, created_at)
-VALUES (<plan_id>, 'note', '<insight from framework X>', '<category>', datetime('now'));
-
--- Agreed decisions
-INSERT INTO plan_interview_entries (plan_id, entry_type, content, category, created_at)
-VALUES (<plan_id>, 'decision', '<what was decided>', '<category>', datetime('now'));
-```
-
-**Category mapping for decisions:**
-- Problem context → `requirements`
-- Risk analysis → `risks`
-- Trade-offs → `architecture`
-- Scope/boundaries → `scope`
-- Downstream effects → `dependencies`
-- Reversibility/safety → `security`
-- Testing the decision → `testing`
-- General → `other`
-
-### On Session Complete
-
-```sql
-UPDATE plans SET status = 'complete', updated_at = datetime('now') WHERE id = <plan_id>;
-```
-
-If the user writes the decision record to a file:
-
-```sql
-UPDATE plans SET spec_file_path = '<path>', status = 'complete', updated_at = datetime('now')
-WHERE id = <plan_id>;
-```
-
-### Resume a Session
-
-```sql
--- List active decision sessions
-SELECT id, title, initial_description, status, created_at
-FROM plans
-WHERE title LIKE '[DECISION]%' AND status = 'interviewing'
-ORDER BY updated_at DESC;
-
--- Load full history
-SELECT entry_type, content, category, created_at
-FROM plan_interview_entries
-WHERE plan_id = <plan_id>
-ORDER BY created_at ASC;
-```
-
----
-
 ## Interaction Style
 
 - **Direct.** No fluff. No "great question!" — just engage with the substance.
@@ -248,5 +163,5 @@ ORDER BY created_at ASC;
 
 **User says** → **Action**
 - "help me decide X" / "decision: X" → Start decision session
-- "resume decision" → Load last active `[DECISION]` session from DB
-- "list decisions" → Show all decision sessions from DB
+- "resume decision" → Resume from conversation context
+- "list decisions" → Review past decision records
