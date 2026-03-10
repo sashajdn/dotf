@@ -54,6 +54,7 @@ return {
         "cuda",
         "gitcommit",
         "proto",
+        "helm",
       },
       incremental_selection = {
         enable = true,
