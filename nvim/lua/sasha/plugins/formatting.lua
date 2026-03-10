@@ -12,11 +12,17 @@ return {
         json = { "prettier" },
         lua = { "stylua" },
       },
-      format_on_save = {
-        lsp_fallback = true,
-        async = false,
-        timeout_ms = 1000,
-      },
+      format_on_save = function(bufnr)
+        local ft = vim.bo[bufnr].filetype
+        if ft == "helm" then
+          return
+        end
+        return {
+          lsp_fallback = true,
+          async = false,
+          timeout_ms = 1000,
+        }
+      end,
     })
 
     local keymap = vim.keymap

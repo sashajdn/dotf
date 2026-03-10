@@ -18,6 +18,7 @@ return {
       "lua_ls",
       "marksman",
       -- "pyright",
+      "helm_ls",
       "ruff",
       "rust_analyzer",
       -- "ts_ls",
@@ -31,6 +32,7 @@ return {
     local tools = {
       -- "prettier", -- prettier formatter
       "stylua", -- lua formatter
+      "yaml-language-server", -- used by helm_ls
       -- "eslint_d", -- js linter
     }
 
@@ -317,6 +319,22 @@ return {
       },
     }
     vim.lsp.enable("bashls")
+
+    --- Helm
+    vim.lsp.config.helm_ls = {
+      cmd = { "helm_ls", "serve" },
+      filetypes = { "helm" },
+      root_markers = { "Chart.yaml" },
+      settings = {
+        ["helm-ls"] = {
+          yamlls = {
+            enabled = true,
+            path = "yaml-language-server",
+          },
+        },
+      },
+    }
+    vim.lsp.enable("helm_ls")
 
     -- Start, Stop, Restart, Log commands
     vim.api.nvim_create_user_command("LspStart", function()
