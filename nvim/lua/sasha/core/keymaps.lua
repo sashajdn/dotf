@@ -40,6 +40,12 @@ keymap.set("n", "[q", "<cmd>cprev<CR>zz", { desc = "Previous quickfix item" })
 keymap.set("n", "]Q", "<cmd>clast<CR>zz", { desc = "Last quickfix item" })
 keymap.set("n", "[Q", "<cmd>cfirst<CR>zz", { desc = "First quickfix item" })
 
+-- Claude Code.
+keymap.set("n", "<leader>cc", function()
+  local file = vim.fn.expand("%:p")
+  vim.cmd("silent !tmux-claude-toggle " .. vim.fn.shellescape(file))
+end, { desc = "Toggle Claude Code" })
+
 -- Tmux.
 keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "Tmux Sessionizer" })
 keymap.set("n", "<C-t>", "<cmd>silent !bash tmux-lhs-terminal<CR>", { desc = "Tmux Toggle LHS Terminal" })

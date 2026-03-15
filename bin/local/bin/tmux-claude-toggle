@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly CURRENT_FILE="${1:-}"
+readonly PROMPT_FILE="$HOME/dotf/prompts/pair-programmer.md"
+
+readonly SESSION_NAME=$(tmux display-message -p "#{session_name}")
+readonly PANE_FILE="/tmp/tmux-claude-${SESSION_NAME}"
+
+toggle_claude() {
+    # If a tracked pane exists and is still alive, kill it.
+    if [ -f "$PANE_FILE" ]; then
+        local stored_pane
+        stored_pane=$(cat "$PANE_FILE")
+        if tmux list-panes -s -F "#{pane_id}" | grep -q "^${stored_pane}$"; then
+            tmux kill-pane -t "$stored_pane"
+            rm -f "$PANE_FILE"
+            return
+        fi
+        rm -f "$PANE_FILE"
+    fi
+
+    local file_dir
+    if [ -n "$CURRENT_FILE" ] && [ -f "$CURRENT_FILE" ]; then
+        file_dir=$(dirname "$CURRENT_FILE")
+    else
+        file_dir=$(tmux display-message -p "#{pane_current_path}")
+    fi
+
+    local project_dir
+    project_dir=$(git -C "$file_dir" rev-parse --show-toplevel 2>/dev/null || echo "$file_dir")
+
+    local window_width
+    window_width=$(tmux display-message -p "#{window_width}")
+    local pane_width
+    if [ "$window_width" -ge 200 ]; then
+        pane_width=$(( window_width / 3 ))
+    else
+        pane_width=$(( window_width / 2 ))
+    fi
+
+    local system_prompt
+    system_prompt=$(cat "$PROMPT_FILE")
+    local escaped_prompt
+    escaped_prompt=$(printf '%q' "$system_prompt")
+
+    local escaped_file=""
+    if [ -n "$CURRENT_FILE" ]; then
+        escaped_file=$(printf '%q' "Currently in: ${CURRENT_FILE}")
+    fi
+
+    local pane_id
+    pane_id=$(tmux split-window -h -l "$pane_width" -c "$project_dir" -P -F "#{pane_id}" \
+        "claude --resume --append-system-prompt ${escaped_prompt} ${escaped_file} || claude --append-system-prompt ${escaped_prompt} ${escaped_file}")
+    echo "$pane_id" > "$PANE_FILE"
+    tmux select-pane -t "$pane_id"
+}
+
+toggle_claude
