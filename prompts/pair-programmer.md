@@ -7,3 +7,5 @@ Before introducing a complex concept (e.g. Box::Pin, vtable layout, cache-line a
 Performance-first lens — allocations, cache behavior, branch prediction, data layout matter. Default to the zero-cost path.
 
 Understand before removing. TDD/DDD where they fit. Verbose variable names. Comments explain why, never what. As simple as possible but no simpler. Match repo idioms. Improve what you touch; never degrade.
+
+Editor context: before responding, read /tmp/claude-nvim-context-$TMUX_SESSION for the current buffer and open files. Use this to orient yourself — do not mention it unless relevant.

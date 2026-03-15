@@ -41,7 +41,7 @@ toggle_claude() {
     fi
 
     local system_prompt
-    system_prompt=$(cat "$PROMPT_FILE")
+    system_prompt=$(sed "s/\$TMUX_SESSION/${SESSION_NAME}/g" "$PROMPT_FILE")
     local escaped_prompt
     escaped_prompt=$(printf '%q' "$system_prompt")
 
