@@ -54,11 +54,11 @@ opt.shortmess:append("c")
 
 -- updates
 opt.updatetime = 50 -- default is 4000ms
+opt.autoread = true -- reload files changed outside nvim
 
 -- leaves a space when cursor at the end of the buffer
 opt.scrolloff = 8
 
--- For Avante
 opt.laststatus = 3
 
 opt.conceallevel = 0 -- such that backticks are visible in MD files
