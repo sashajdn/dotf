@@ -34,6 +34,12 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" })
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" })
 
+-- Quickfix navigation.
+keymap.set("n", "]q", "<cmd>cnext<CR>zz", { desc = "Next quickfix item" })
+keymap.set("n", "[q", "<cmd>cprev<CR>zz", { desc = "Previous quickfix item" })
+keymap.set("n", "]Q", "<cmd>clast<CR>zz", { desc = "Last quickfix item" })
+keymap.set("n", "[Q", "<cmd>cfirst<CR>zz", { desc = "First quickfix item" })
+
 -- Tmux.
 keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "Tmux Sessionizer" })
 keymap.set("n", "<C-t>", "<cmd>silent !bash tmux-lhs-terminal<CR>", { desc = "Tmux Toggle LHS Terminal" })
