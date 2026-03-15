@@ -54,21 +54,6 @@ export HISTFILE
 autoload -U colors && colors
 
 
-### --- VCS --- ###
-
-## Preload VCS
-autoload -Uz vcs_info
-precmd() { vcs_info }
-
-## Format VCS info
-zstyle ':vcs_info:git:*' formats '%b'
-
-
-### --- Prompt --- ###
-
-setopt PROMPT_SUBST
-NEWLINE=$'\n'
-PROMPT='[%B%F{169}%n%f%b%B%F{38}@%f%b%F{169}%M%f %B%F{38}${PWD/#$HOME/~}%f%b] %B%F{1}${vcs_info_msg_0_}%f%b${NEWLINE}%B%F{38}$%f%b '
 
 
 ### --- History --- ###
