@@ -33,7 +33,7 @@ brew install \
 
 # --- Directories ---
 echo "🤖 Creating directories..."
-mkdir -p ~/.config ~/.cache/zsh
+mkdir -p ~/.config ~/.cache/zsh ~/.claude ~/.codex/skills
 
 # --- Symlinks ---
 echo "🤖 Creating symlinks..."
@@ -46,6 +46,10 @@ ln -sf "$DOTF/nvim" ~/.config/nvim
 
 # Tmux
 ln -sf "$DOTF/tmux" ~/.config/tmux
+
+# Claude/Codex skills
+ln -sf "$DOTF/claude/agents" ~/.claude/agents
+bash "$DOTF/bin/local/bin/agent-skills-sync"
 
 # --- Coding Agents ---
 echo "🤖 Installing coding agents..."

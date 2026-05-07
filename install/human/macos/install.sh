@@ -69,6 +69,8 @@ create_directories() {
     mkdir -p ~/.config
     mkdir -p ~/.cache/zsh
     mkdir -p ~/.claude
+    mkdir -p ~/.agents
+    mkdir -p ~/.codex/skills
     mkdir -p ~/.local/bin
     mkdir -p "$REPO_DIR"
 
@@ -83,7 +85,9 @@ create_symlinks() {
     ln -sf "$DOTF/nvim" ~/.config/nvim
     ln -sf "$DOTF/tmux" ~/.config/tmux
     ln -sf "$DOTF/config/ghostty" ~/.config/ghostty
-    ln -sf "$DOTF/claude/commands" ~/.claude/commands
+    ln -sf "$DOTF/claude/agents" ~/.claude/agents
+
+    bash "$DOTF/bin/local/bin/agent-skills-sync"
 
     log_ok "Symlinks created"
 }

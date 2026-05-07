@@ -448,6 +448,23 @@ echo "✅🤖 Set AWS_PROFILE to: ${profile}"
 
 ### --- Git Worktree Units --- ###
 
+# _unit_worktrees: List worktree tickets as relative paths from the agents dir.
+# Finds actual worktrees (leaf nodes), not intermediate directories.
+# Usage: _unit_worktrees <worktree_base_dir>
+_unit_worktrees() {
+    local base="$1"
+    git worktree list --porcelain | while read -r line; do
+        case "$line" in
+            worktree\ *)
+                local wt_path="${line#worktree }"
+                if [[ "$wt_path" == "$base"/* ]]; then
+                    echo "${wt_path#$base/}"
+                fi
+                ;;
+        esac
+    done
+}
+
 # unit-new: Create a new worktree and cd into it
 # Usage: unit-new <ticket-name> [branch-name]
 unit-new() {
@@ -535,8 +552,8 @@ unit-cd() {
         return 1
     fi
 
-    local tickets=($(ls -1 "$WORKTREE_BASE" 2>/dev/null))
-    if [[ ${#tickets[@]} -eq 0 ]]; then
+    local tickets=("${(@f)$(_unit_worktrees "$WORKTREE_BASE")}")
+    if [[ ${#tickets[@]} -eq 0 ]] || [[ -z "${tickets[1]}" ]]; then
         echo "No worktrees found. Use 'unit-new <ticket>' to create one." >&2
         return 1
     fi
@@ -568,29 +585,104 @@ unit-cd() {
     echo "Now in: $(pwd)"
 }
 
-# unit-rm: fzf picker to remove a worktree (or current if in one)
-# Usage: unit-rm [-y]
+# _unit_rm_one: Remove a single worktree by ticket name.
+# Returns 0 on success, 1 if the user aborts a safety prompt or the path is missing.
+# Args: ticket main_repo worktree_base auto_delete current_path
+_unit_rm_one() {
+    local TICKET="$1"
+    local MAIN_REPO="$2"
+    local WORKTREE_BASE="$3"
+    local AUTO_DELETE="$4"
+    local CURRENT_PATH="$5"
+    local WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
+
+    if [[ ! -d "$WORKTREE_PATH" ]]; then
+        echo "  Skipped: worktree path missing ($WORKTREE_PATH)"
+        return 1
+    fi
+
+    local HAS_CHANGES=$(git -C "$WORKTREE_PATH" status --porcelain 2>/dev/null)
+    if [[ -n "$HAS_CHANGES" ]]; then
+        echo "  Warning: uncommitted changes"
+        git -C "$WORKTREE_PATH" status --short | sed 's/^/    /'
+        echo -n "  Continue anyway? [y/N] "
+        read -r REPLY
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "  Skipped"
+            return 1
+        fi
+    fi
+
+    local BRANCH=$(git -C "$WORKTREE_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+    if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
+        local UNPUSHED=$(git -C "$WORKTREE_PATH" log --oneline "@{upstream}..HEAD" 2>/dev/null)
+        if [[ -n "$UNPUSHED" ]]; then
+            echo "  Warning: unpushed commits"
+            echo "$UNPUSHED" | sed 's/^/    /'
+            echo -n "  Continue anyway? [y/N] "
+            read -r REPLY
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo "  Skipped"
+                return 1
+            fi
+        fi
+    fi
+
+    if [[ "$CURRENT_PATH" == "$WORKTREE_PATH"* ]]; then
+        cd "$MAIN_REPO"
+        echo "  Moved to: $MAIN_REPO"
+    fi
+
+    git worktree remove "$WORKTREE_PATH" --force
+
+    if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
+        if [[ "$AUTO_DELETE" == "yes" ]]; then
+            git -C "$MAIN_REPO" branch -d "$BRANCH" 2>/dev/null || git -C "$MAIN_REPO" branch -D "$BRANCH"
+            echo "  Branch $BRANCH deleted"
+        elif [[ "$AUTO_DELETE" == "no" ]]; then
+            echo "  Branch $BRANCH kept"
+        else
+            echo -n "  Delete branch '$BRANCH'? [y/N] "
+            read -r REPLY
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                git -C "$MAIN_REPO" branch -d "$BRANCH" 2>/dev/null || git -C "$MAIN_REPO" branch -D "$BRANCH"
+                echo "  Branch $BRANCH deleted"
+            fi
+        fi
+    fi
+
+    echo "  Worktree $TICKET removed"
+    return 0
+}
+
+# unit-rm: fzf picker to remove a worktree (or current if in one).
+# Usage: unit-rm [-y] [--all]
+#   -y      Auto-confirm branch deletion
+#   --all   Iterate every worktree and prompt y/N/q per ticket
 unit-rm() {
     local DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
     local AUTO_DELETE=""
+    local ALL=""
 
-    if [[ "$1" == "-y" ]]; then
-        AUTO_DELETE="yes"
-    fi
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -y) AUTO_DELETE="yes"; shift ;;
+            --all) ALL="yes"; shift ;;
+            *) shift ;;
+        esac
+    done
 
     local CURRENT_PATH=$(pwd)
     local WORKTREE_PATH=""
     local TICKET=""
     local MAIN_REPO=""
 
-    # Get main repo root (works from worktree or main repo)
     local GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null)
     if [[ -z "$GIT_COMMON_DIR" ]]; then
         echo "Error: Not in a git repository" >&2
         return 1
     fi
 
-    # Resolve to absolute path and get parent (the main repo)
     if [[ "$GIT_COMMON_DIR" == ".git" ]]; then
         MAIN_REPO=$(git rev-parse --show-toplevel)
     else
@@ -600,26 +692,77 @@ unit-rm() {
     local REPO_NAME=$(basename "$MAIN_REPO" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
     local WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
 
-    # Check if we're inside a worktree (current path contains .agents)
-    if [[ "$CURRENT_PATH" == *"/$DOTF_AGENTS_WORKTREE_DIR/"* ]]; then
-        # Extract worktree path
-        WORKTREE_PATH="${CURRENT_PATH%%/$DOTF_AGENTS_WORKTREE_DIR/*}/$DOTF_AGENTS_WORKTREE_DIR"
-        WORKTREE_PATH="$WORKTREE_PATH/${CURRENT_PATH#*/$DOTF_AGENTS_WORKTREE_DIR/}"
-        WORKTREE_PATH="${WORKTREE_PATH%%/*}"
-        # Rebuild proper path
-        local TEMP="${CURRENT_PATH#*/$DOTF_AGENTS_WORKTREE_DIR/}"
-        TICKET="${TEMP%%/*}"
-        WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
-        echo "Currently in worktree: $TICKET"
-    else
-        # fzf picker
+    if [[ -n "$ALL" ]]; then
         if [[ ! -d "$WORKTREE_BASE" ]]; then
             echo "No worktrees found." >&2
             return 1
         fi
 
-        local tickets=($(ls -1 "$WORKTREE_BASE" 2>/dev/null))
-        if [[ ${#tickets[@]} -eq 0 ]]; then
+        local tickets=("${(@f)$(_unit_worktrees "$WORKTREE_BASE")}")
+        if [[ ${#tickets[@]} -eq 0 ]] || [[ -z "${tickets[1]}" ]]; then
+            echo "No worktrees found." >&2
+            return 1
+        fi
+
+        echo "Found ${#tickets[@]} worktree(s) under $WORKTREE_BASE"
+        echo "Per worktree: y=remove, n=skip, q=quit"
+
+        local removed=0
+        local skipped=0
+        for ticket in "${tickets[@]}"; do
+            [[ -z "$ticket" ]] && continue
+            local wt="$WORKTREE_BASE/$ticket"
+            local branch=$(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?")
+            local dirty=""
+            [[ -n $(git -C "$wt" status --porcelain 2>/dev/null) ]] && dirty=" [dirty]"
+
+            echo ""
+            echo "──── $ticket (${branch})${dirty} ────"
+            echo -n "Remove? [y/N/q] "
+            read -r REPLY
+            case "$REPLY" in
+                [Yy])
+                    if _unit_rm_one "$ticket" "$MAIN_REPO" "$WORKTREE_BASE" "$AUTO_DELETE" "$CURRENT_PATH"; then
+                        removed=$((removed + 1))
+                    else
+                        skipped=$((skipped + 1))
+                    fi
+                    ;;
+                [Qq])
+                    echo "Stopping."
+                    break
+                    ;;
+                *)
+                    echo "  Skipped"
+                    skipped=$((skipped + 1))
+                    ;;
+            esac
+        done
+
+        if [[ -n "$TMUX" ]]; then
+            local CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
+            if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+):.+ ]]; then
+                tmux select-pane -T "${match[1]}"
+            fi
+        fi
+
+        echo ""
+        echo "Done. Removed: $removed, skipped: $skipped"
+        return 0
+    fi
+
+    if [[ "$CURRENT_PATH" == *"/$DOTF_AGENTS_WORKTREE_DIR/"* ]]; then
+        WORKTREE_PATH=$(git rev-parse --show-toplevel 2>/dev/null)
+        TICKET="${WORKTREE_PATH#$WORKTREE_BASE/}"
+        echo "Currently in worktree: $TICKET"
+    else
+        if [[ ! -d "$WORKTREE_BASE" ]]; then
+            echo "No worktrees found." >&2
+            return 1
+        fi
+
+        local tickets=("${(@f)$(_unit_worktrees "$WORKTREE_BASE")}")
+        if [[ ${#tickets[@]} -eq 0 ]] || [[ -z "${tickets[1]}" ]]; then
             echo "No worktrees found." >&2
             return 1
         fi
@@ -633,71 +776,102 @@ unit-rm() {
         WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
     fi
 
-    # Check for uncommitted changes
-    local HAS_CHANGES=$(git -C "$WORKTREE_PATH" status --porcelain 2>/dev/null)
-    if [[ -n "$HAS_CHANGES" ]]; then
-        echo "Warning: Worktree has uncommitted changes!"
-        git -C "$WORKTREE_PATH" status --short
-        echo ""
-        echo -n "Continue anyway? [y/N] "
-        read -r REPLY
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo "Aborted"
-            return 1
-        fi
-    fi
-
-    # Check for unpushed commits
-    local BRANCH=$(git -C "$WORKTREE_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
-    if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
-        local UNPUSHED=$(git -C "$WORKTREE_PATH" log --oneline "@{upstream}..HEAD" 2>/dev/null)
-        if [[ -n "$UNPUSHED" ]]; then
-            echo "Warning: Worktree has unpushed commits!"
-            echo "$UNPUSHED"
-            echo ""
-            echo -n "Continue anyway? [y/N] "
-            read -r REPLY
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                echo "Aborted"
-                return 1
-            fi
-        fi
-    fi
-
     echo "Removing worktree: $TICKET"
     echo "  Path: $WORKTREE_PATH"
-    echo "  Branch: $BRANCH"
+    _unit_rm_one "$TICKET" "$MAIN_REPO" "$WORKTREE_BASE" "$AUTO_DELETE" "$CURRENT_PATH" || return 1
 
-    # Move out if we're in the worktree
-    if [[ "$CURRENT_PATH" == "$WORKTREE_PATH"* ]]; then
-        cd "$MAIN_REPO"
-        echo "Moved to: $MAIN_REPO"
-    fi
-
-    git worktree remove "$WORKTREE_PATH" --force
-
-    # Handle branch deletion
-    if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
-        if [[ "$AUTO_DELETE" == "yes" ]]; then
-            git -C "$MAIN_REPO" branch -d "$BRANCH" 2>/dev/null || git -C "$MAIN_REPO" branch -D "$BRANCH"
-            echo "Branch deleted"
-        else
-            echo -n "Delete branch '$BRANCH'? [y/N] "
-            read -r REPLY
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                git -C "$MAIN_REPO" branch -d "$BRANCH" 2>/dev/null || git -C "$MAIN_REPO" branch -D "$BRANCH"
-                echo "Branch deleted"
-            fi
-        fi
-    fi
-
-    # Reset tmux pane name
     if [[ -n "$TMUX" ]]; then
         local CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
         if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+):.+ ]]; then
             tmux select-pane -T "${match[1]}"
         fi
     fi
+}
 
-    echo "Worktree $TICKET removed"
+# unit-rust-clean: Iterate worktrees and run `cargo clean` per consent.
+# Usage: unit-rust-clean
+#   Per worktree: y=clean, n=skip, q=quit
+unit-rust-clean() {
+    local DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+
+    if ! command -v cargo >/dev/null 2>&1; then
+        echo "Error: cargo not found in PATH" >&2
+        return 1
+    fi
+
+    local GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null)
+    if [[ -z "$GIT_COMMON_DIR" ]]; then
+        echo "Error: Not in a git repository" >&2
+        return 1
+    fi
+
+    local MAIN_REPO
+    if [[ "$GIT_COMMON_DIR" == ".git" ]]; then
+        MAIN_REPO=$(git rev-parse --show-toplevel)
+    else
+        MAIN_REPO=$(dirname "$GIT_COMMON_DIR")
+    fi
+
+    local WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
+
+    if [[ ! -d "$WORKTREE_BASE" ]]; then
+        echo "No worktrees found." >&2
+        return 1
+    fi
+
+    local tickets=("${(@f)$(_unit_worktrees "$WORKTREE_BASE")}")
+    if [[ ${#tickets[@]} -eq 0 ]] || [[ -z "${tickets[1]}" ]]; then
+        echo "No worktrees found." >&2
+        return 1
+    fi
+
+    echo "Found ${#tickets[@]} worktree(s) under $WORKTREE_BASE"
+    echo "Per worktree: y=cargo clean, n=skip, q=quit"
+
+    local cleaned=0
+    local skipped=0
+    for ticket in "${tickets[@]}"; do
+        [[ -z "$ticket" ]] && continue
+        local wt="$WORKTREE_BASE/$ticket"
+
+        echo ""
+        echo "──── $ticket ────"
+
+        if [[ ! -f "$wt/Cargo.toml" ]]; then
+            echo "  No Cargo.toml at root, skipping"
+            skipped=$((skipped + 1))
+            continue
+        fi
+
+        local size="(none)"
+        if [[ -d "$wt/target" ]]; then
+            size=$(du -sh "$wt/target" 2>/dev/null | cut -f1)
+        fi
+        echo "  target/: $size"
+
+        echo -n "  Run 'cargo clean'? [y/N/q] "
+        read -r REPLY
+        case "$REPLY" in
+            [Yy])
+                if (cd "$wt" && cargo clean); then
+                    echo "  Cleaned"
+                    cleaned=$((cleaned + 1))
+                else
+                    echo "  cargo clean failed"
+                    skipped=$((skipped + 1))
+                fi
+                ;;
+            [Qq])
+                echo "  Stopping."
+                break
+                ;;
+            *)
+                echo "  Skipped"
+                skipped=$((skipped + 1))
+                ;;
+        esac
+    done
+
+    echo ""
+    echo "Done. Cleaned: $cleaned, skipped: $skipped"
 }

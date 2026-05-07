@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+#
+# Sync canonical dotf agent skills into Claude and Codex locations.
+#
+# Canonical source:
+#   $DOTF/agents/skills/<name>/SKILL.md
+#
+# Runtime adapters:
+#   Claude: ~/.claude/commands/<name>.md -> $DOTF/agents/skills/<name>/SKILL.md
+#   Codex:  ~/.codex/skills/<name> -> $DOTF/agents/skills/<name>
+
+set -euo pipefail
+
+DOTF="${DOTF:-$HOME/dotf}"
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
+AGENTS_HOME="${AGENTS_HOME:-$HOME/.agents}"
+
+skills_dir="$DOTF/agents/skills"
+
+warn() {
+    printf 'agent-skills-sync: %s\n' "$*" >&2
+}
+
+link_path() {
+    local source="$1"
+    local target="$2"
+
+    if [[ -L "$target" || ! -e "$target" ]]; then
+        ln -sfn "$source" "$target"
+        return 0
+    fi
+
+    warn "$target exists and is not a symlink; leaving it untouched"
+    return 1
+}
+
+prepare_dir() {
+    local dir="$1"
+
+    if [[ -L "$dir" ]]; then
+        rm "$dir"
+    fi
+
+    if [[ -e "$dir" && ! -d "$dir" ]]; then
+        warn "$dir exists and is not a directory; leaving it untouched"
+        return 1
+    fi
+
+    mkdir -p "$dir"
+}
+
+iter_skills() {
+    local found=0
+
+    for skill_dir in "$skills_dir"/*; do
+        [[ -d "$skill_dir" ]] || continue
+        [[ -f "$skill_dir/SKILL.md" ]] || continue
+
+        found=1
+        printf '%s\n' "$skill_dir"
+    done
+
+    if [[ "$found" -eq 0 ]]; then
+        warn "no skills found in $skills_dir"
+    fi
+}
+
+sync_claude() {
+    local commands_dir="$CLAUDE_HOME/commands"
+
+    mkdir -p "$CLAUDE_HOME"
+    prepare_dir "$commands_dir" || return 0
+
+    while IFS= read -r skill_dir; do
+        local skill_name
+        skill_name="$(basename "$skill_dir")"
+        link_path "$skill_dir/SKILL.md" "$commands_dir/$skill_name.md" || true
+    done < <(iter_skills)
+}
+
+sync_codex() {
+    mkdir -p "$CODEX_HOME/skills"
+
+    while IFS= read -r skill_dir; do
+        local skill_name
+        skill_name="$(basename "$skill_dir")"
+
+        local skill_file="$skill_dir/SKILL.md"
+        if [[ "$(sed -n '1p' "$skill_file")" != "---" ]]; then
+            warn "$skill_file is missing Codex YAML frontmatter"
+        fi
+
+        local target_dir="$CODEX_HOME/skills/$skill_name"
+        if [[ -d "$target_dir" && ! -L "$target_dir" ]]; then
+            if [[ -L "$target_dir/SKILL.md" ]]; then
+                rm "$target_dir/SKILL.md"
+                rmdir "$target_dir" 2>/dev/null || {
+                    warn "$target_dir is not empty; leaving it untouched"
+                    continue
+                }
+            else
+                warn "$target_dir exists and is not a symlink; leaving it untouched"
+                continue
+            fi
+        elif [[ -e "$target_dir" && ! -L "$target_dir" ]]; then
+            warn "$target_dir exists and is not a symlink; leaving it untouched"
+            continue
+        fi
+
+        link_path "$skill_dir" "$target_dir" || true
+    done < <(iter_skills)
+}
+
+main() {
+    if [[ ! -d "$skills_dir" ]]; then
+        warn "canonical skills directory does not exist: $skills_dir"
+        exit 1
+    fi
+
+    mkdir -p "$(dirname "$AGENTS_HOME")"
+    link_path "$DOTF/agents" "$AGENTS_HOME" || true
+
+    sync_claude
+    sync_codex
+}
+
+main "$@"

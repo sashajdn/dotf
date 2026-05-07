@@ -6,10 +6,11 @@ Personal dotfiles with multi-user support (human + agent profiles).
 
 ```
 dotf/
+├── agents/
+│   └── skills/          # Canonical Claude/Codex skills
 ├── bin/local/bin/       # Custom scripts & binaries
 ├── claude/
-│   ├── agents/          # Claude Code agents (→ ~/.claude/agents)
-│   └── commands/        # Claude Code skills (→ ~/.claude/commands)
+│   └── agents/          # Claude Code agents (→ ~/.claude/agents)
 ├── config/              # App configs (ghostty, git, etc.)
 ├── install/
 │   ├── human/           # Human install scripts
@@ -147,9 +148,16 @@ Parallel agent workflow using git worktrees. Each ticket gets its own isolated w
 |-------|---------|--------|
 | `un <ticket>` | `unit-new` | Create worktree + cd into it |
 | `uc` | `unit-cd` | fzf picker → cd into worktree |
-| `ur` | `unit-rm` | fzf picker → remove worktree |
+| `ur` | `unit-rm` | fzf picker → remove worktree (or current if inside one) |
+| `ura` | `unit-rm --all` | Iterate every worktree, prompt `y/N/q` per ticket |
+| `urc` | `unit-rust-clean` | Iterate every worktree, prompt + `cargo clean` per ticket |
 | `ul` | `unit-list` | List all worktrees |
 | `us` | `unit-sync` | Sync worktree with main branch |
+
+Flags on `ur` / `ura`:
+
+- `-y` — auto-confirm branch deletion (skip the per-branch prompt)
+- `--all` — iterate every worktree (also accessible via the `ura` alias)
 
 ### Workflow
 
@@ -166,10 +174,22 @@ uc
 # Sync with main
 us
 
-# Remove worktree when done
+# Remove a single worktree
 ur
-# → Warns if uncommitted/unpushed changes
+# → fzf picker (or removes the current worktree if inside one)
+# → Warns on uncommitted/unpushed changes
 # → Prompts to delete branch
+
+# Bulk-remove worktrees
+ura
+# → Walks every worktree under .agents/
+# → Prompts y/N/q per ticket (q quits the loop)
+# → Reuses the dirty/unpushed safeguards before each removal
+
+# Reclaim disk by clearing Rust build artifacts
+urc
+# → Walks every worktree, shows target/ size, prompts y/N/q
+# → Skips worktrees without a root Cargo.toml
 ```
 
 ### Architecture
@@ -252,9 +272,27 @@ claude --agent units-agent
 acu  # claude --agent units-agent
 ```
 
-### Skills
+## Agent Skills
 
-Custom skills in `claude/commands/` (symlinked to `~/.claude/commands`).
+Canonical skills live in `agents/skills/<name>/SKILL.md`. Add one skill directory there with Codex YAML frontmatter:
+
+```markdown
+---
+name: my-skill
+description: Use when the user wants ...
+---
+
+# My Skill
+```
+
+Run `agent-skills-sync` after adding or renaming a skill. The install scripts run it automatically.
+
+Runtime layout:
+
+| Tool | Installed path |
+|------|----------------|
+| Claude | `~/.claude/commands/<name>.md -> ~/dotf/agents/skills/<name>/SKILL.md` |
+| Codex | `~/.codex/skills/<name> -> ~/dotf/agents/skills/<name>` |
 
 ---
 

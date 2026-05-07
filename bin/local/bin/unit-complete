@@ -55,7 +55,7 @@ elif [[ "$CURRENT_PATH" == "$WORKTREE_BASE"/* ]]; then
     while [[ "$WORKTREE_PATH" != "$WORKTREE_BASE" ]] && [[ ! -f "$WORKTREE_PATH/.git" ]]; do
         WORKTREE_PATH=$(dirname "$WORKTREE_PATH")
     done
-    TICKET=$(basename "$WORKTREE_PATH")
+    TICKET="${WORKTREE_PATH#$WORKTREE_BASE/}"
 else
     echo "Usage: unit-complete [-y|--yes] [-n|--no] [ticket-name]" >&2
     echo ""
