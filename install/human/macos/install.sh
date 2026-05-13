@@ -50,16 +50,31 @@ install_packages() {
         # Languages (LSPs handled by Mason)
         go
         golangci-lint
+        node
 
         # Tools
         tree-sitter
         gh
+        imagemagick
     )
 
     brew update
     brew install "${packages[@]}"
 
     log_ok "Packages installed"
+}
+
+# --- Markdown preview tools ---
+install_markdown_preview_tools() {
+    log_info "Installing Markdown preview tools..."
+
+    if command -v mmdc &>/dev/null; then
+        log_ok "Mermaid CLI already installed"
+        return
+    fi
+
+    npm install -g @mermaid-js/mermaid-cli
+    log_ok "Markdown preview tools installed"
 }
 
 # --- Directories ---
@@ -181,6 +196,7 @@ main() {
 
     install_homebrew
     install_packages
+    install_markdown_preview_tools
     create_directories
     create_symlinks
     clone_repos

@@ -118,7 +118,7 @@ Prefix: `<C-a>`
 
 ## Zsh
 
-### Key Files
+m## Key Files
 
 | File | Purpose |
 |------|---------|

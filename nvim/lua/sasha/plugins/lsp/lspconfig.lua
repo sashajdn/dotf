@@ -65,7 +65,9 @@ return {
     --- Diagnostics configuration
     local diagnostic_config = {
       signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " },
-      update_in_insert = true,
+      -- Defer diagnostic refresh to InsertLeave: avoids re-rendering on every keystroke,
+      -- which is the dominant perceived-lag source under rust-analyzer.
+      update_in_insert = false,
       severity_sort = true,
       float = {
         focusable = false,
@@ -307,6 +309,19 @@ return {
       },
     }
     vim.lsp.enable("rust_analyzer")
+
+    vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("UserRustClippyKeymap", { clear = true }),
+      pattern = "rust",
+      callback = function(ev)
+        local rust_clippy = require("sasha.rust_clippy")
+        vim.keymap.set("n", "<leader>cc", rust_clippy.run, {
+          buffer = ev.buf,
+          silent = true,
+          desc = "Cargo clippy (current target + tests) -> quickfix",
+        })
+      end,
+    })
 
     --- Bash
     vim.lsp.config.bashls = {
