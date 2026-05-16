@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-# tmux-startup: Ensure persistent sessions exist (wiki, todo).
+# tmux-startup: Ensure persistent sessions exist (wiki, todo, feynman-japanese).
 #
 # Usage: tmux-startup
 #   - Call on shell login or tmux server start
-#   - Creates wiki and todo sessions if they don't exist
+#   - Creates wiki, todo, and feynman-japanese sessions if they don't exist
 
 # Only run if tmux is available.
 if ! command -v tmux &>/dev/null; then
@@ -26,4 +26,23 @@ fi
 # Opens weekly todo by default (todo -w).
 if ! tmux has-session -t todo 2>/dev/null; then
     tmux new-session -ds todo -c "$HOME"
+fi
+
+# Create feynman-japanese session if not exists.
+# Spins up in $WIKI/lang/japanese and resumes the configured LLM provider.
+# LLM_PROVIDER: claude (default) | codex. Anything else falls back to claude.
+if ! tmux has-session -t feynman-japanese 2>/dev/null; then
+    readonly feynman_dir="${WIKI:-$HOME/wiki}/lang/japanese"
+
+    case "${LLM_PROVIDER:-claude}" in
+        codex)
+            readonly feynman_cmd="codex resume"
+            ;;
+        claude|*)
+            readonly feynman_cmd="claude --resume"
+            ;;
+    esac
+
+    tmux new-session -ds feynman-japanese -c "$feynman_dir"
+    tmux send-keys -t feynman-japanese "$feynman_cmd" C-m
 fi
