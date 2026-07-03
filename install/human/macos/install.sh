@@ -86,6 +86,9 @@ create_directories() {
     mkdir -p ~/.claude
     mkdir -p ~/.agents
     mkdir -p ~/.codex/skills
+    mkdir -p ~/.codex/agents
+    mkdir -p ~/.eskills   # external (untracked) skills, merged in by agent-skills-sync
+    mkdir -p ~/.eagents   # external (untracked) subagents, merged in by agent-skills-sync
     mkdir -p ~/.local/bin
     mkdir -p "$REPO_DIR"
 
@@ -100,8 +103,9 @@ create_symlinks() {
     ln -sf "$DOTF/nvim" ~/.config/nvim
     ln -sf "$DOTF/tmux" ~/.config/tmux
     ln -sf "$DOTF/config/ghostty" ~/.config/ghostty
-    ln -sf "$DOTF/claude/agents" ~/.claude/agents
 
+    # Skills + subagents (canonical + external) are linked per-item, including
+    # ~/.claude/agents, by agent-skills-sync.
     bash "$DOTF/bin/local/bin/agent-skills-sync"
 
     log_ok "Symlinks created"
