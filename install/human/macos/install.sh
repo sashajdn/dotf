@@ -111,6 +111,27 @@ create_symlinks() {
     log_ok "Symlinks created"
 }
 
+# --- Git ---
+configure_git() {
+    log_info "Configuring git..."
+
+    local excludes_file
+    excludes_file=$(git config --global --get core.excludesFile || true)
+    if [[ -z "$excludes_file" ]]; then
+        excludes_file="$HOME/.gitignore_global"
+        git config --global core.excludesFile "$excludes_file"
+    elif [[ "$excludes_file" == "~/"* ]]; then
+        excludes_file="$HOME/${excludes_file#~/}"
+    fi
+
+    touch "$excludes_file"
+    if ! grep -qxF ".agents/" "$excludes_file" && ! grep -qxF ".agents" "$excludes_file"; then
+        printf '.agents/\n' >> "$excludes_file"
+    fi
+
+    log_ok "Git configured"
+}
+
 # --- Repos ---
 clone_repos() {
     log_info "Cloning repos..."
@@ -203,6 +224,7 @@ main() {
     install_markdown_preview_tools
     create_directories
     create_symlinks
+    configure_git
     clone_repos
     setup_wiki
     install_nvm

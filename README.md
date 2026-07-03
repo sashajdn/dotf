@@ -146,8 +146,9 @@ Parallel agent workflow using git worktrees. Each ticket gets its own isolated w
 
 | Alias | Command | Action |
 |-------|---------|--------|
-| `un <ticket>` | `unit-new` | Create worktree + cd into it |
-| `uc` | `unit-cd` | fzf picker → cd into worktree |
+| `un <ticket>` | `unit-new` | Create/open worktree + tmux unit window |
+| `uo <ticket>` | `unit-open` | Create/open worktree + tmux unit window |
+| `uc` | `unit-cd` | fzf picker → open unit window |
 | `ur` | `unit-rm` | fzf picker → remove worktree (or current if inside one) |
 | `ura` | `unit-rm --all` | Iterate every worktree, prompt `y/N/q` per ticket |
 | `urc` | `unit-rust-clean` | Iterate every worktree, prompt + `cargo clean` per ticket |
@@ -165,11 +166,16 @@ Flags on `ur` / `ura`:
 # Create new worktree for a ticket
 un GH-123-add-feature
 # → Creates .agents/GH-123-add-feature/
-# → Auto-cds into it
+# → Opens a 3-pane tmux window for it
+
+# Create or open a worktree
+uo GH-123-add-feature
+# → Idempotent: reuses the existing worktree and tmux window
 
 # Switch between worktrees
 uc
 # → fzf picker shows all worktrees
+# → Opens the selected unit window
 
 # Sync with main
 us
@@ -179,6 +185,7 @@ ur
 # → fzf picker (or removes the current worktree if inside one)
 # → Warns on uncommitted/unpushed changes
 # → Prompts to delete branch
+# → Closes the unit tmux window after cleanup
 
 # Bulk-remove worktrees
 ura
@@ -197,14 +204,15 @@ urc
 ```mermaid
 graph TB
     subgraph "tmux session: api-service"
-        subgraph "window: code"
-            H[Human Terminal]
+        subgraph "window: api-service"
+            H[main pane]
+            B[bottom pane]
+            R[right pane]
         end
-        subgraph "window: agents"
-            A1[agent-1<br/>GH-123-feature]
-            A2[agent-2<br/>GH-456-bugfix]
-            A3[agent-3<br/>idle]
-            A4[agent-4<br/>idle]
+        subgraph "window: GH-123-feature"
+            U1[main pane]
+            U2[bottom pane]
+            U3[right pane]
         end
     end
 
@@ -216,8 +224,7 @@ graph TB
         end
     end
 
-    A1 --> W1
-    A2 --> W2
+    U1 --> W1
     H --> MAIN
 ```
 
@@ -238,23 +245,27 @@ graph TB
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MAX_AGENTS` | `4` | Max agent panes per repo |
 | `DOTF_AGENTS_WORKTREE_DIR` | `.agents` | Worktree directory name |
 
-Add to global gitignore:
-```bash
-echo ".agents" >> ~/.gitignore
-git config --global core.excludesFile ~/.gitignore
-```
+The macOS installer configures `.agents/` in the global git excludes file.
 
 ### Pane Naming
 
-Format: `{repo}:{agent-N}:{ticket}`
+Format: `{repo}:{role}:{ticket}`
 
 ```
-api-service:agent-1                 # idle
-api-service:agent-1:gh-123-feature  # working
+api-service:main
+api-service:main:GH-123-feature
+api-service:right:GH-123-feature
+api-service:bottom:GH-123-feature
 ```
+
+### Tmux Unit Layouts
+
+| Key | Action |
+|-----|--------|
+| `<C-a> + 1` | Collapse current window to the main pane |
+| `<C-a> + 3` | Apply the standard 3-pane unit layout |
 
 ---
 

@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+# unit-open: create or open a unit worktree and its tmux window.
+#
+# Usage: unit-open <ticket-name> [branch-name]
+
+set -euo pipefail
+
+DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+
+if [[ -z "${1:-}" ]]; then
+    echo "Usage: unit-open <ticket-name> [branch-name]" >&2
+    exit 1
+fi
+
+TICKET="$1"
+BRANCH="${2:-$TICKET}"
+
+GIT_COMMON_DIR="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+if [[ -z "$GIT_COMMON_DIR" ]]; then
+    echo "Error: Not in a git repository" >&2
+    exit 1
+fi
+
+MAIN_REPO="$(dirname "$GIT_COMMON_DIR")"
+REPO_NAME="$(basename "$MAIN_REPO" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')"
+WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
+WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
+
+if [[ ! -d "$WORKTREE_PATH" ]]; then
+    mkdir -p "$WORKTREE_BASE"
+
+    BASE_REF="HEAD"
+    BASE_LABEL="HEAD"
+    if git -C "$MAIN_REPO" remote get-url origin >/dev/null 2>&1; then
+        echo "Fetching latest from origin..."
+        git -C "$MAIN_REPO" fetch origin
+
+        BASE_BRANCH="$(git -C "$MAIN_REPO" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || true)"
+        if [[ -z "$BASE_BRANCH" ]]; then
+            if git -C "$MAIN_REPO" show-ref --verify --quiet refs/remotes/origin/main; then
+                BASE_BRANCH="main"
+            else
+                BASE_BRANCH="master"
+            fi
+        fi
+        BASE_REF="origin/$BASE_BRANCH"
+        BASE_LABEL="$BASE_BRANCH"
+    fi
+
+    echo "Creating worktree at $WORKTREE_PATH..."
+    if git -C "$MAIN_REPO" show-ref --verify --quiet "refs/heads/$BRANCH"; then
+        git -C "$MAIN_REPO" worktree add "$WORKTREE_PATH" "$BRANCH"
+    else
+        git -C "$MAIN_REPO" worktree add -b "$BRANCH" "$WORKTREE_PATH" "$BASE_REF"
+    fi
+
+    echo ""
+    echo "Created worktree for $TICKET"
+    echo "  Path: $WORKTREE_PATH"
+    echo "  Branch: $BRANCH (from $BASE_LABEL)"
+else
+    echo "Opening existing worktree for $TICKET"
+    echo "  Path: $WORKTREE_PATH"
+fi
+
+if ! command -v tmux >/dev/null 2>&1; then
+    echo ""
+    echo "tmux not found; run: cd $WORKTREE_PATH"
+    exit 0
+fi
+
+SESSION="$REPO_NAME"
+ROOT_WINDOW="$REPO_NAME"
+WINDOW_NAME="${TICKET//$'\n'/-}"
+WINDOW_NAME="${WINDOW_NAME//:/-}"
+
+if ! tmux has-session -t="$SESSION" 2>/dev/null; then
+    tmux new-session -ds "$SESSION" -n "$ROOT_WINDOW" -c "$MAIN_REPO"
+    root_window_id="$(tmux display-message -p -t "$SESSION:$ROOT_WINDOW" '#{window_id}')"
+    tmux set-option -w -t "$root_window_id" -q @unit_repo_root "$MAIN_REPO"
+    tmux-unit-layout 3 --target "$root_window_id" --cwd "$MAIN_REPO" --title-prefix "$REPO_NAME" --force
+fi
+
+WINDOW_ID=""
+while IFS=$'\t' read -r window_id unit_ticket unit_path; do
+    if [[ "$unit_ticket" == "$TICKET" || "$unit_path" == "$WORKTREE_PATH" ]]; then
+        WINDOW_ID="$window_id"
+        break
+    fi
+done < <(tmux list-windows -t "$SESSION" -F '#{window_id}	#{@unit_ticket}	#{@unit_path}')
+
+if [[ -z "$WINDOW_ID" ]]; then
+    WINDOW_ID="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$WINDOW_NAME" -c "$WORKTREE_PATH")"
+fi
+
+tmux set-option -w -t "$WINDOW_ID" -q @unit_ticket "$TICKET"
+tmux set-option -w -t "$WINDOW_ID" -q @unit_path "$WORKTREE_PATH"
+tmux-unit-layout 3 --target "$WINDOW_ID" --cwd "$WORKTREE_PATH" --title-prefix "$REPO_NAME" --ticket "$TICKET" --force
+
+if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "$SESSION" 2>/dev/null || true
+    tmux select-window -t "$WINDOW_ID"
+else
+    echo ""
+    echo "tmux window ready: $SESSION:$WINDOW_NAME"
+    echo "Attach with: tmux attach -t $SESSION"
+fi

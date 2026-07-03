@@ -105,7 +105,9 @@ return {
         local opts = { buffer = ev.buf, silent = true }
 
         opts.desc = "Show LSP references"
-        keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_references<CR>", opts)
+        keymap.set("n", "<leader>gr", function()
+          require("sasha.telescope_lsp").references()
+        end, opts)
 
         opts.desc = "Show documentation for what is under cursor"
         keymap.set("n", "<leader>gh", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor

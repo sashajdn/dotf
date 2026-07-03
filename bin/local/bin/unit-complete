@@ -36,15 +36,16 @@ done
 
 # Determine ticket from argument or current directory.
 CURRENT_PATH=$(pwd)
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
 
-if [[ -z "$REPO_ROOT" ]]; then
+if [[ -z "$GIT_COMMON_DIR" ]]; then
     echo "Error: Not in a git repository" >&2
     exit 1
 fi
 
-REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-WORKTREE_BASE="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
+MAIN_REPO=$(dirname "$GIT_COMMON_DIR")
+REPO_NAME=$(basename "$MAIN_REPO" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
 
 if [[ -n "$TICKET" ]]; then
     WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
@@ -78,8 +79,8 @@ echo ""
 
 # Move out of worktree if we're in it.
 if [[ "$CURRENT_PATH" == "$WORKTREE_PATH"* ]]; then
-    builtin cd "$REPO_ROOT"
-    echo "Changed directory to: $REPO_ROOT"
+    builtin cd "$MAIN_REPO"
+    echo "Changed directory to: $MAIN_REPO"
 fi
 
 # Remove the worktree.
@@ -104,16 +105,7 @@ if [[ -n "$BRANCH" ]] && [[ "$BRANCH" != "HEAD" ]]; then
     fi
 fi
 
-# Reset tmux pane name if in tmux.
-# Format: repo:agent-N (remove ticket suffix)
-if [[ -n "$TMUX" ]]; then
-    CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
-    # Remove ticket suffix from pane title (repo:agent-N:ticket -> repo:agent-N)
-    if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+):.+ ]]; then
-        NEW_TITLE="${BASH_REMATCH[1]}"
-        tmux select-pane -T "$NEW_TITLE"
-    fi
-fi
+tmux-unit-close --session "$REPO_NAME" --ticket "$TICKET" --path "$WORKTREE_PATH" 2>/dev/null || true
 
 echo ""
 echo "Unit $TICKET completed and cleaned up"

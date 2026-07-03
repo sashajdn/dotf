@@ -16,7 +16,8 @@ When invoked, run the appropriate `unit-*` command and report the result. The us
 | Command | Description |
 |---------|-------------|
 | `/units` or `/units list` | List all worktrees and their occupancy |
-| `/units new <ticket>` | Create new worktree + branch |
+| `/units new <ticket>` | Create/open worktree + tmux unit window |
+| `/units open <ticket>` | Create/open worktree + tmux unit window |
 | `/units attach <ticket>` | Mark attachment to existing worktree |
 | `/units complete <ticket>` | Cleanup worktree after merge |
 | `/units sync` | Rebase current branch on latest base |
@@ -35,11 +36,16 @@ unit-list
 unit-new <ticket-name>
 ```
 
-After running, output the path clearly so the user can cd into it:
+After running, report that the tmux unit window was opened and include the path:
 
 ```
-Worktree created. Run:
-cd /path/to/.agents/<ticket>
+Unit window opened: /path/to/.agents/<ticket>
+```
+
+### `/units open <ticket>`
+
+```bash
+unit-open <ticket-name>
 ```
 
 ### `/units attach <ticket>`
@@ -72,4 +78,4 @@ unit-sync
 
 ## Pane Naming
 
-Format: `{repo}:{agent-N}:{ticket}` (lowercase, `:` and `-` only)
+Format: `{repo}:{role}:{ticket}` where role is `main`, `right`, or `bottom`.

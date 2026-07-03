@@ -465,86 +465,24 @@ _unit_worktrees() {
     done
 }
 
-# unit-new: Create a new worktree and cd into it
+# unit-new: Create/open a worktree and tmux unit window
 # Usage: unit-new <ticket-name> [branch-name]
 unit-new() {
-    local DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
-
-    if [[ -z "$1" ]]; then
-        echo "Usage: unit-new <ticket-name> [branch-name]" >&2
-        return 1
-    fi
-
-    local TICKET="$1"
-    local BRANCH="${2:-$TICKET}"
-
-    local REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-    if [[ -z "$REPO_ROOT" ]]; then
-        echo "Error: Not in a git repository" >&2
-        return 1
-    fi
-
-    local REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-    local WORKTREE_PATH="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR/$TICKET"
-
-    if [[ -d "$WORKTREE_PATH" ]]; then
-        echo "Error: Worktree already exists at $WORKTREE_PATH" >&2
-        echo "Use 'unit-cd' to switch to it" >&2
-        return 1
-    fi
-
-    mkdir -p "$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
-
-    echo "Fetching latest from origin..."
-    git fetch origin
-
-    local BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-    if [[ -z "$BASE_BRANCH" ]]; then
-        if git show-ref --verify --quiet refs/remotes/origin/main; then
-            BASE_BRANCH="main"
-        else
-            BASE_BRANCH="master"
-        fi
-    fi
-
-    echo "Creating worktree at $WORKTREE_PATH..."
-    git worktree add -b "$BRANCH" "$WORKTREE_PATH" "origin/$BASE_BRANCH"
-
-    # Rename tmux pane if in tmux
-    if [[ -n "$TMUX" ]]; then
-        local CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
-        local TICKET_NORMALIZED=$(echo "$TICKET" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-
-        local NEW_TITLE
-        if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+) ]]; then
-            NEW_TITLE="${match[1]}:${TICKET_NORMALIZED}"
-        else
-            NEW_TITLE="${REPO_NAME}:${TICKET_NORMALIZED}"
-        fi
-        tmux select-pane -T "$NEW_TITLE"
-    fi
-
-    echo ""
-    echo "Created worktree for $TICKET"
-    echo "  Branch: $BRANCH (from $BASE_BRANCH)"
-    echo ""
-
-    # Auto-cd into worktree
-    cd "$WORKTREE_PATH"
-    echo "Now in: $(pwd)"
+    command unit-open "$@"
 }
 
-# unit-cd: fzf picker to cd into a worktree
+# unit-cd: fzf picker to open a unit window
 # Usage: unit-cd
 unit-cd() {
     local DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
 
-    local REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-    if [[ -z "$REPO_ROOT" ]]; then
+    local GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+    if [[ -z "$GIT_COMMON_DIR" ]]; then
         echo "Error: Not in a git repository" >&2
         return 1
     fi
 
+    local REPO_ROOT=$(dirname "$GIT_COMMON_DIR")
     local WORKTREE_BASE="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
 
     if [[ ! -d "$WORKTREE_BASE" ]]; then
@@ -564,25 +502,7 @@ unit-cd() {
         return 0
     fi
 
-    local WORKTREE_PATH="$WORKTREE_BASE/$selected"
-
-    # Rename tmux pane if in tmux
-    if [[ -n "$TMUX" ]]; then
-        local REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-        local CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
-        local TICKET_NORMALIZED=$(echo "$selected" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-
-        local NEW_TITLE
-        if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+) ]]; then
-            NEW_TITLE="${match[1]}:${TICKET_NORMALIZED}"
-        else
-            NEW_TITLE="${REPO_NAME}:${TICKET_NORMALIZED}"
-        fi
-        tmux select-pane -T "$NEW_TITLE"
-    fi
-
-    cd "$WORKTREE_PATH"
-    echo "Now in: $(pwd)"
+    command unit-open "$selected"
 }
 
 # _unit_rm_one: Remove a single worktree by ticket name.
@@ -651,6 +571,9 @@ _unit_rm_one() {
         fi
     fi
 
+    local REPO_NAME=$(basename "$MAIN_REPO" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
+    tmux-unit-close --session "$REPO_NAME" --ticket "$TICKET" --path "$WORKTREE_PATH" 2>/dev/null || true
+
     echo "  Worktree $TICKET removed"
     return 0
 }
@@ -677,17 +600,13 @@ unit-rm() {
     local TICKET=""
     local MAIN_REPO=""
 
-    local GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null)
+    local GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
     if [[ -z "$GIT_COMMON_DIR" ]]; then
         echo "Error: Not in a git repository" >&2
         return 1
     fi
 
-    if [[ "$GIT_COMMON_DIR" == ".git" ]]; then
-        MAIN_REPO=$(git rev-parse --show-toplevel)
-    else
-        MAIN_REPO=$(dirname "$GIT_COMMON_DIR")
-    fi
+    MAIN_REPO=$(dirname "$GIT_COMMON_DIR")
 
     local REPO_NAME=$(basename "$MAIN_REPO" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
     local WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
@@ -739,13 +658,6 @@ unit-rm() {
             esac
         done
 
-        if [[ -n "$TMUX" ]]; then
-            local CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
-            if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+):.+ ]]; then
-                tmux select-pane -T "${match[1]}"
-            fi
-        fi
-
         echo ""
         echo "Done. Removed: $removed, skipped: $skipped"
         return 0
@@ -780,12 +692,6 @@ unit-rm() {
     echo "  Path: $WORKTREE_PATH"
     _unit_rm_one "$TICKET" "$MAIN_REPO" "$WORKTREE_BASE" "$AUTO_DELETE" "$CURRENT_PATH" || return 1
 
-    if [[ -n "$TMUX" ]]; then
-        local CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
-        if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+):.+ ]]; then
-            tmux select-pane -T "${match[1]}"
-        fi
-    fi
 }
 
 # unit-rust-clean: Iterate worktrees and run `cargo clean` per consent.
@@ -799,18 +705,14 @@ unit-rust-clean() {
         return 1
     fi
 
-    local GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null)
+    local GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
     if [[ -z "$GIT_COMMON_DIR" ]]; then
         echo "Error: Not in a git repository" >&2
         return 1
     fi
 
     local MAIN_REPO
-    if [[ "$GIT_COMMON_DIR" == ".git" ]]; then
-        MAIN_REPO=$(git rev-parse --show-toplevel)
-    else
-        MAIN_REPO=$(dirname "$GIT_COMMON_DIR")
-    fi
+    MAIN_REPO=$(dirname "$GIT_COMMON_DIR")
 
     local WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
 

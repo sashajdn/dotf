@@ -22,13 +22,13 @@ fi
 
 TICKET="$1"
 
-# Get repo context.
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-if [[ -z "$REPO_ROOT" ]]; then
+GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+if [[ -z "$GIT_COMMON_DIR" ]]; then
     echo "Error: Not in a git repository" >&2
     exit 1
 fi
 
+REPO_ROOT=$(dirname "$GIT_COMMON_DIR")
 REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
 WORKTREE_PATH="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR/$TICKET"
 
@@ -56,23 +56,4 @@ if [[ -n "$TMUX" ]]; then
     fi
 fi
 
-# Rename tmux pane if in tmux.
-# Format: repo:agent-N:ticket (all lowercase, only : and -)
-if [[ -n "$TMUX" ]]; then
-    CURRENT_TITLE=$(tmux display-message -p '#{pane_title}')
-    # Normalize ticket: lowercase, replace non-alphanum with -
-    TICKET_NORMALIZED=$(echo "$TICKET" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-
-    # Extract agent part if present.
-    if [[ "$CURRENT_TITLE" =~ ^(.+:agent-[0-9]+) ]]; then
-        NEW_TITLE="${BASH_REMATCH[1]}:${TICKET_NORMALIZED}"
-    else
-        NEW_TITLE="${REPO_NAME}:${TICKET_NORMALIZED}"
-    fi
-    tmux select-pane -T "$NEW_TITLE"
-fi
-
-echo "Attached to worktree: $TICKET"
-echo "  Path: $WORKTREE_PATH"
-echo ""
-echo "Run: cd $WORKTREE_PATH"
+exec unit-open "$TICKET"
