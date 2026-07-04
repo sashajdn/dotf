@@ -145,17 +145,17 @@ cell_height="$(tmux display-message -p -t "$TARGET" '#{window_cell_height}' 2>/d
 if [[ "$cell_width" =~ ^[1-9][0-9]*$ && "$cell_height" =~ ^[1-9][0-9]*$ ]]; then
     screen_width_px=$((window_width * cell_width))
     screen_height_px=$((window_height * cell_height))
-    right_px="$(clamp $((screen_width_px * 22 / 100)) 360 560)"
-    bottom_px="$(clamp $((screen_height_px * 18 / 100)) 120 240)"
+    right_px="$(clamp $((screen_width_px * 24 / 100)) 396 616)"
+    bottom_px="$(clamp $((screen_height_px * 22 / 100)) 145 290)"
     right_cells=$((right_px / cell_width))
     bottom_cells=$((bottom_px / cell_height))
 else
-    right_cells=$((window_width * 22 / 100))
-    bottom_cells=$((window_height * 18 / 100))
+    right_cells=$((window_width * 24 / 100))
+    bottom_cells=$((window_height * 22 / 100))
 fi
 
-right_cells="$(clamp "$right_cells" 28 72)"
-bottom_cells="$(clamp "$bottom_cells" 8 16)"
+right_cells="$(clamp "$right_cells" 31 79)"
+bottom_cells="$(clamp "$bottom_cells" 10 20)"
 
 if (( window_width - right_cells < 80 )); then
     right_cells=$((window_width - 80))
