@@ -16,6 +16,13 @@ autocmd("TextYankPost", {
   end,
 })
 
+-- Auto-reload buffers changed externally (e.g. Claude Code editing files).
+autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  group = SashaCoreGroup,
+  pattern = "*",
+  command = "silent! checktime",
+})
+
 -- Remove trailing whitespace on save.
 autocmd({ "BufWritePre" }, {
   group = SashaCoreGroup,

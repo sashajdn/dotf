@@ -38,6 +38,11 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 keymap.set("n", "<leader>mr", function()
   require("sasha.markdown_render").toggle()
 end, { desc = "Toggle Markdown render" })
+-- Quickfix navigation.
+keymap.set("n", "]q", "<cmd>cnext<CR>zz", { desc = "Next quickfix item" })
+keymap.set("n", "[q", "<cmd>cprev<CR>zz", { desc = "Previous quickfix item" })
+keymap.set("n", "]Q", "<cmd>clast<CR>zz", { desc = "Last quickfix item" })
+keymap.set("n", "[Q", "<cmd>cfirst<CR>zz", { desc = "First quickfix item" })
 
 -- Tmux.
 keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "Tmux Sessionizer" })

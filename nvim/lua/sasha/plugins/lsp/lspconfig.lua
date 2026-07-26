@@ -120,6 +120,16 @@ return {
           vim.lsp.buf.definition({ reuse_win = true })
         end, opts)
 
+        opts.desc = "LSP references -> quickfix"
+        keymap.set("n", "<leader>gq", function()
+          vim.lsp.buf.references(nil, {
+            on_list = function(options)
+              vim.fn.setqflist({}, " ", options)
+              vim.cmd.copen()
+            end,
+          })
+        end, opts)
+
         opts.desc = "Show LSP implementations"
         keymap.set("n", "<leader>gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
 
@@ -137,6 +147,11 @@ return {
 
         opts.desc = "Show line diagnostics"
         keymap.set("n", "<leader>dl", vim.diagnostic.open_float, opts) -- show diagnostics for line
+
+        opts.desc = "Diagnostics -> quickfix"
+        keymap.set("n", "<leader>dq", function()
+          vim.diagnostic.setqflist({ open = true })
+        end, opts)
 
         opts.desc = "Go to previous diagnostic"
         keymap.set("n", "<leader>dp", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
