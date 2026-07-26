@@ -6,10 +6,11 @@ Personal dotfiles with multi-user support (human + agent profiles).
 
 ```
 dotf/
+├── agents/
+│   └── skills/          # Canonical Claude/Codex skills
 ├── bin/local/bin/       # Custom scripts & binaries
 ├── claude/
-│   ├── agents/          # Claude Code agents (→ ~/.claude/agents)
-│   └── commands/        # Claude Code skills (→ ~/.claude/commands)
+│   └── agents/          # Claude Code agents (→ ~/.claude/agents)
 ├── config/              # App configs (ghostty, git, etc.)
 ├── install/
 │   ├── human/           # Human install scripts
@@ -117,7 +118,7 @@ Prefix: `<C-a>`
 
 ## Zsh
 
-### Key Files
+m## Key Files
 
 | File | Purpose |
 |------|---------|
@@ -145,11 +146,19 @@ Parallel agent workflow using git worktrees. Each ticket gets its own isolated w
 
 | Alias | Command | Action |
 |-------|---------|--------|
-| `un <ticket>` | `unit-new` | Create worktree + cd into it |
-| `uc` | `unit-cd` | fzf picker → cd into worktree |
-| `ur` | `unit-rm` | fzf picker → remove worktree |
+| `un <ticket>` | `unit-new` | Create/open worktree + tmux unit window |
+| `uo <ticket>` | `unit-open` | Create/open worktree + tmux unit window |
+| `uc` | `unit-cd` | fzf picker → open unit window |
+| `ur` | `unit-rm` | fzf picker → remove worktree (or current if inside one) |
+| `ura` | `unit-rm --all` | Iterate every worktree, prompt `y/N/q` per ticket |
+| `urc` | `unit-rust-clean` | Iterate every worktree, prompt + `cargo clean` per ticket |
 | `ul` | `unit-list` | List all worktrees |
 | `us` | `unit-sync` | Sync worktree with main branch |
+
+Flags on `ur` / `ura`:
+
+- `-y` — auto-confirm branch deletion (skip the per-branch prompt)
+- `--all` — iterate every worktree (also accessible via the `ura` alias)
 
 ### Workflow
 
@@ -157,19 +166,37 @@ Parallel agent workflow using git worktrees. Each ticket gets its own isolated w
 # Create new worktree for a ticket
 un GH-123-add-feature
 # → Creates .agents/GH-123-add-feature/
-# → Auto-cds into it
+# → Opens a 3-pane tmux window for it
+
+# Create or open a worktree
+uo GH-123-add-feature
+# → Idempotent: reuses the existing worktree and tmux window
 
 # Switch between worktrees
 uc
 # → fzf picker shows all worktrees
+# → Opens the selected unit window
 
 # Sync with main
 us
 
-# Remove worktree when done
+# Remove a single worktree
 ur
-# → Warns if uncommitted/unpushed changes
+# → fzf picker (or removes the current worktree if inside one)
+# → Warns on uncommitted/unpushed changes
 # → Prompts to delete branch
+# → Closes the unit tmux window after cleanup
+
+# Bulk-remove worktrees
+ura
+# → Walks every worktree under .agents/
+# → Prompts y/N/q per ticket (q quits the loop)
+# → Reuses the dirty/unpushed safeguards before each removal
+
+# Reclaim disk by clearing Rust build artifacts
+urc
+# → Walks every worktree, shows target/ size, prompts y/N/q
+# → Skips worktrees without a root Cargo.toml
 ```
 
 ### Architecture
@@ -177,14 +204,15 @@ ur
 ```mermaid
 graph TB
     subgraph "tmux session: api-service"
-        subgraph "window: code"
-            H[Human Terminal]
+        subgraph "window: api-service"
+            H[main pane]
+            B[bottom pane]
+            R[right pane]
         end
-        subgraph "window: agents"
-            A1[agent-1<br/>GH-123-feature]
-            A2[agent-2<br/>GH-456-bugfix]
-            A3[agent-3<br/>idle]
-            A4[agent-4<br/>idle]
+        subgraph "window: GH-123-feature"
+            U1[main pane]
+            U2[bottom pane]
+            U3[right pane]
         end
     end
 
@@ -196,8 +224,7 @@ graph TB
         end
     end
 
-    A1 --> W1
-    A2 --> W2
+    U1 --> W1
     H --> MAIN
 ```
 
@@ -218,23 +245,27 @@ graph TB
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MAX_AGENTS` | `4` | Max agent panes per repo |
 | `DOTF_AGENTS_WORKTREE_DIR` | `.agents` | Worktree directory name |
 
-Add to global gitignore:
-```bash
-echo ".agents" >> ~/.gitignore
-git config --global core.excludesFile ~/.gitignore
-```
+The macOS installer configures `.agents/` in the global git excludes file.
 
 ### Pane Naming
 
-Format: `{repo}:{agent-N}:{ticket}`
+Format: `{repo}:{role}:{ticket}`
 
 ```
-api-service:agent-1                 # idle
-api-service:agent-1:gh-123-feature  # working
+api-service:main
+api-service:main:GH-123-feature
+api-service:right:GH-123-feature
+api-service:bottom:GH-123-feature
 ```
+
+### Tmux Unit Layouts
+
+| Key | Action |
+|-----|--------|
+| `<C-a> + 1` | Collapse current window to the main pane |
+| `<C-a> + 3` | Apply the standard 3-pane unit layout |
 
 ---
 
@@ -252,9 +283,27 @@ claude --agent units-agent
 acu  # claude --agent units-agent
 ```
 
-### Skills
+## Agent Skills
 
-Custom skills in `claude/commands/` (symlinked to `~/.claude/commands`).
+Canonical skills live in `agents/skills/<name>/SKILL.md`. Add one skill directory there with Codex YAML frontmatter:
+
+```markdown
+---
+name: my-skill
+description: Use when the user wants ...
+---
+
+# My Skill
+```
+
+Run `agent-skills-sync` after adding or renaming a skill. The install scripts run it automatically.
+
+Runtime layout:
+
+| Tool | Installed path |
+|------|----------------|
+| Claude | `~/.claude/commands/<name>.md -> ~/dotf/agents/skills/<name>/SKILL.md` |
+| Codex | `~/.codex/skills/<name> -> ~/dotf/agents/skills/<name>` |
 
 ---
 

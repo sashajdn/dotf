@@ -154,7 +154,7 @@ fi
 
 # --- Symlinks ---
 log "Creating symlinks..."
-sudo -u "$USERNAME" mkdir -p "/home/$USERNAME/.config" "/home/$USERNAME/.cache/zsh"
+sudo -u "$USERNAME" mkdir -p "/home/$USERNAME/.config" "/home/$USERNAME/.cache/zsh" "/home/$USERNAME/.claude" "/home/$USERNAME/.codex/skills"
 
 # Zsh
 sudo -u "$USERNAME" ln -sf "$DOTF_DIR/zsh/zshrc" "/home/$USERNAME/.zshrc"
@@ -165,6 +165,10 @@ sudo -u "$USERNAME" ln -sf "$DOTF_DIR/zsh/zshrc" "/home/$USERNAME/.zshrc"
 
 # Tmux (if exists)
 [[ -d "$DOTF_DIR/tmux" ]] && sudo -u "$USERNAME" ln -sf "$DOTF_DIR/tmux" "/home/$USERNAME/.config/tmux"
+
+# Claude/Codex skills
+[[ -d "$DOTF_DIR/claude/agents" ]] && sudo -u "$USERNAME" ln -sf "$DOTF_DIR/claude/agents" "/home/$USERNAME/.claude/agents"
+[[ -f "$DOTF_DIR/bin/local/bin/agent-skills-sync" ]] && sudo -u "$USERNAME" env DOTF="$DOTF_DIR" HOME="/home/$USERNAME" bash "$DOTF_DIR/bin/local/bin/agent-skills-sync"
 
 # --- UFW Firewall ---
 log "Configuring firewall..."

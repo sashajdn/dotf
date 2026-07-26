@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 DOTF_DIR="$HOME/dotf"
 WIKI_DIR="$HOME/wiki"
 REPOS_DIR="$HOME/repos"
 WORK_DIR="$HOME/work"
-MAX_AGENTS="${MAX_AGENTS:-4}"
 
 # Thank you @ThePrimaegen
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    repos_selected=$(find "$REPOS_DIR" -mindepth 1 -maxdepth 1 -type d)
-    work_repos_selected=$(find "$WORK_DIR" -mindepth 2 -maxdepth 2 -type d)
-    selected=$(echo "$WIKI_DIR" "$DOTF_DIR" $repos_selected $work_repos_selected | tr ' ' '\n' | fzf)
+    selected=$(
+        {
+            printf '%s\n' "$WIKI_DIR" "$DOTF_DIR"
+            [[ -d "$REPOS_DIR" ]] && find "$REPOS_DIR" -mindepth 1 -maxdepth 1 -type d
+            [[ -d "$WORK_DIR" ]] && find "$WORK_DIR" -mindepth 2 -maxdepth 2 -type d
+        } | fzf
+    )
 fi
 
 if [[ -z $selected ]]; then
@@ -21,59 +26,18 @@ fi
 
 # Normalize name: lowercase, only alphanumeric and -, replace . and _ with -
 selected_name=$(basename "$selected" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
-selected_code_window="${selected_name}-code"
-selected_agents_window="${selected_name}-agents"
+selected_window="$selected_name"
 
-tmux_running=$(pgrep tmux)
-
-if [[ -z "$TMUX" ]] &&  [[ -z "$tmux_running" ]]; then
-    tmux new-session -s $selected_name -c $selected
-    exit 0
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+    tmux new-session -ds "$selected_name" -c "$selected" -n "$selected_window"
+    window_id="$(tmux display-message -p -t "$selected_name:$selected_window" '#{window_id}')"
+    tmux set-option -w -t "$window_id" -q @unit_repo_root "$selected"
+    tmux-unit-layout 3 --target "$window_id" --cwd "$selected" --title-prefix "$selected_name" --force
 fi
 
-if ! tmux has-session -t="$selected_name" 2> /dev/null; then
-    # Create session with code window (human's terminal at repo root).
-    tmux new-session -ds "$selected_name" -c "$selected" -n "$selected_code_window"
-
-    # Create agents window.
-    tmux new-window -n "$selected_agents_window" -t "$selected_name" -c "$selected"
-
-    # Split into agent panes based on MAX_AGENTS.
-    # 1: single pane
-    # 2-3: vertical stack
-    # 4: 2x2 grid
-    target="$selected_name:$selected_agents_window"
-
-    # Name the first pane.
-    tmux select-pane -t "$target.1" -T "${selected_name}:agent-1"
-
-    if [[ $MAX_AGENTS -ge 2 ]]; then
-        if [[ $MAX_AGENTS -eq 4 ]]; then
-            # 2x2 grid layout:
-            # [1][2]
-            # [3][4]
-            tmux split-window -t "$target.1" -h -c "$selected"
-            tmux split-window -t "$target.1" -v -c "$selected"
-            tmux split-window -t "$target.2" -v -c "$selected"
-
-            # Equal sizing with tiled layout.
-            tmux select-layout -t "$target" tiled
-
-            # Name panes after layout is set.
-            tmux select-pane -t "$target.1" -T "${selected_name}:agent-1"
-            tmux select-pane -t "$target.2" -T "${selected_name}:agent-2"
-            tmux select-pane -t "$target.3" -T "${selected_name}:agent-3"
-            tmux select-pane -t "$target.4" -T "${selected_name}:agent-4"
-        else
-            # Vertical stack for 2-3 agents.
-            for i in $(seq 2 $MAX_AGENTS); do
-                tmux split-window -t "$target" -v -c "$selected"
-                tmux select-pane -t "$target.$i" -T "${selected_name}:agent-$i"
-            done
-            tmux select-layout -t "$target" even-vertical
-        fi
-    fi
+if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "$selected_name" 2>/dev/null || true
+    tmux select-window -t "$selected_name:$selected_window"
+else
+    tmux attach-session -t "$selected_name"
 fi
-
-tmux switch-client -t "$selected_name"
-tmux select-window -t "$selected_name:$selected_code_window"

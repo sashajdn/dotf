@@ -50,16 +50,31 @@ install_packages() {
         # Languages (LSPs handled by Mason)
         go
         golangci-lint
+        node
 
         # Tools
         tree-sitter
         gh
+        imagemagick
     )
 
     brew update
     brew install "${packages[@]}"
 
     log_ok "Packages installed"
+}
+
+# --- Markdown preview tools ---
+install_markdown_preview_tools() {
+    log_info "Installing Markdown preview tools..."
+
+    if command -v mmdc &>/dev/null; then
+        log_ok "Mermaid CLI already installed"
+        return
+    fi
+
+    npm install -g @mermaid-js/mermaid-cli
+    log_ok "Markdown preview tools installed"
 }
 
 # --- Directories ---
@@ -69,6 +84,11 @@ create_directories() {
     mkdir -p ~/.config
     mkdir -p ~/.cache/zsh
     mkdir -p ~/.claude
+    mkdir -p ~/.agents
+    mkdir -p ~/.codex/skills
+    mkdir -p ~/.codex/agents
+    mkdir -p ~/.eskills   # external (untracked) skills, merged in by agent-skills-sync
+    mkdir -p ~/.eagents   # external (untracked) subagents, merged in by agent-skills-sync
     mkdir -p ~/.local/bin
     mkdir -p "$REPO_DIR"
 
@@ -83,9 +103,33 @@ create_symlinks() {
     ln -sf "$DOTF/nvim" ~/.config/nvim
     ln -sf "$DOTF/tmux" ~/.config/tmux
     ln -sf "$DOTF/config/ghostty" ~/.config/ghostty
-    ln -sf "$DOTF/claude/commands" ~/.claude/commands
+
+    # Skills + subagents (canonical + external) are linked per-item, including
+    # ~/.claude/agents, by agent-skills-sync.
+    bash "$DOTF/bin/local/bin/agent-skills-sync"
 
     log_ok "Symlinks created"
+}
+
+# --- Git ---
+configure_git() {
+    log_info "Configuring git..."
+
+    local excludes_file
+    excludes_file=$(git config --global --get core.excludesFile || true)
+    if [[ -z "$excludes_file" ]]; then
+        excludes_file="$HOME/.gitignore_global"
+        git config --global core.excludesFile "$excludes_file"
+    elif [[ "$excludes_file" == "~/"* ]]; then
+        excludes_file="$HOME/${excludes_file#~/}"
+    fi
+
+    touch "$excludes_file"
+    if ! grep -qxF ".agents/" "$excludes_file" && ! grep -qxF ".agents" "$excludes_file"; then
+        printf '.agents/\n' >> "$excludes_file"
+    fi
+
+    log_ok "Git configured"
 }
 
 # --- Repos ---
@@ -177,8 +221,10 @@ main() {
 
     install_homebrew
     install_packages
+    install_markdown_preview_tools
     create_directories
     create_symlinks
+    configure_git
     clone_repos
     setup_wiki
     install_nvm

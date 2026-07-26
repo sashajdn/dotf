@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+#
+# Sync canonical + external dotf agent skills and subagents into Claude and
+# Codex runtime locations.
+#
+# Sources (canonical = tracked in dotf, external = local & untracked):
+#   Canonical skills:    $DOTF/agents/skills/<name>/SKILL.md
+#   External skills:     $ESKILLS/<name>/SKILL.md
+#   Canonical subagents: $DOTF/claude/agents/<name>.md
+#   External subagents:  $EAGENTS/<name>.md
+#
+# Runtime adapters (per-item symlinks, so canonical + external coexist):
+#   Claude skills:    ~/.claude/commands/<name>.md  -> .../SKILL.md
+#   Codex skills:     ~/.codex/skills/<name>         -> .../<name>
+#   Claude subagents: ~/.claude/agents/<name>.md     -> .../<name>.md
+#   Codex subagents:  ~/.codex/agents/<name>.md      -> .../<name>.md
+#
+# The $ESKILLS / $EAGENTS roots mirror the ~/.ezshrc convention: optional,
+# machine-local, merged in only if present. Canonical sources win on name
+# collisions (the external item is skipped with a warning).
+#
+# Bash 3.2 compatible (macOS default) -- no associative arrays.
+
+set -euo pipefail
+
+readonly DOTF="${DOTF:-$HOME/dotf}"
+readonly CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+readonly CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
+readonly AGENTS_HOME="${AGENTS_HOME:-$HOME/.agents}"
+readonly ESKILLS="${ESKILLS:-$HOME/.eskills}"
+readonly EAGENTS="${EAGENTS:-$HOME/.eagents}"
+
+readonly SKILLS_DIR="$DOTF/agents/skills"
+readonly SUBAGENTS_DIR="$DOTF/claude/agents"
+
+warn() {
+    printf 'agent-skills-sync: %s\n' "$*" >&2
+}
+
+link_path() {
+    local source="$1"
+    local target="$2"
+
+    if [[ -L "$target" || ! -e "$target" ]]; then
+        ln -sfn "$source" "$target"
+        return 0
+    fi
+
+    warn "$target exists and is not a symlink; leaving it untouched"
+    return 1
+}
+
+# Remove symlinks in $1 that this script manages: broken links, plus links
+# whose target lives under one of the given source roots (remaining args).
+# Real files and foreign symlinks are left untouched. This makes sync
+# self-pruning -- delete a skill/subagent at the source and its adapter link
+# disappears on the next run.
+prune_links() {
+    local dir="$1"
+    shift
+    [[ -d "$dir" ]] || return 0
+
+    local entry target root
+    for entry in "$dir"/*; do
+        [[ -L "$entry" ]] || continue
+
+        if [[ ! -e "$entry" ]]; then
+            rm -f "$entry"
+            continue
+        fi
+
+        target="$(readlink "$entry")"
+        for root in "$@"; do
+            case "$target" in
+                "$root"/*)
+                    rm -f "$entry"
+                    break
+                    ;;
+            esac
+        done
+    done
+}
+
+# Reset a runtime directory to a clean state: drop a stale symlink, keep a real
+# directory (so we can re-link its contents idempotently).
+prepare_dir() {
+    local dir="$1"
+
+    if [[ -L "$dir" ]]; then
+        rm "$dir"
+    fi
+
+    if [[ -e "$dir" && ! -d "$dir" ]]; then
+        warn "$dir exists and is not a directory; leaving it untouched"
+        return 1
+    fi
+
+    mkdir -p "$dir"
+}
+
+# Emit "<name>\t<path>" for every skill across the given roots, in precedence
+# order. The first root to define a name wins; later duplicates are skipped.
+iter_skills() {
+    local seen=" "
+    local root skill_dir name
+
+    for root in "$@"; do
+        [[ -d "$root" ]] || continue
+
+        for skill_dir in "$root"/*; do
+            [[ -d "$skill_dir" ]] || continue
+            [[ -f "$skill_dir/SKILL.md" ]] || continue
+
+            name="$(basename "$skill_dir")"
+            case "$seen" in
+                *" $name "*)
+                    warn "skill '$name' from $root shadowed by canonical; skipping"
+                    continue
+                    ;;
+            esac
+            seen="$seen$name "
+
+            printf '%s\t%s\n' "$name" "$skill_dir"
+        done
+    done
+}
+
+# Emit "<name>\t<path>" for every *.md subagent across the given roots.
+iter_subagents() {
+    local seen=" "
+    local root file name
+
+    for root in "$@"; do
+        [[ -d "$root" ]] || continue
+
+        for file in "$root"/*.md; do
+            [[ -f "$file" ]] || continue
+
+            name="$(basename "$file" .md)"
+            case "$seen" in
+                *" $name "*)
+                    warn "subagent '$name' from $root shadowed by canonical; skipping"
+                    continue
+                    ;;
+            esac
+            seen="$seen$name "
+
+            printf '%s\t%s\n' "$name" "$file"
+        done
+    done
+}
+
+sync_claude_skills() {
+    local commands_dir="$CLAUDE_HOME/commands"
+    local name skill_dir
+
+    mkdir -p "$CLAUDE_HOME"
+    prepare_dir "$commands_dir" || return 0
+    prune_links "$commands_dir" "$SKILLS_DIR" "$ESKILLS"
+
+    while IFS=$'\t' read -r name skill_dir; do
+        link_path "$skill_dir/SKILL.md" "$commands_dir/$name.md" || true
+    done < <(iter_skills "$SKILLS_DIR" "$ESKILLS")
+}
+
+# Link every subagent (canonical + external) as <name>.md into the given
+# runtime agents directory. Claude and Codex both read agents this way.
+sync_subagents() {
+    local agents_dir="$1"
+    local name file
+
+    prepare_dir "$agents_dir" || return 0
+    prune_links "$agents_dir" "$SUBAGENTS_DIR" "$EAGENTS"
+
+    while IFS=$'\t' read -r name file; do
+        link_path "$file" "$agents_dir/$name.md" || true
+    done < <(iter_subagents "$SUBAGENTS_DIR" "$EAGENTS")
+}
+
+sync_codex_skills() {
+    local name skill_dir skill_file target_dir
+
+    mkdir -p "$CODEX_HOME/skills"
+    prune_links "$CODEX_HOME/skills" "$SKILLS_DIR" "$ESKILLS"
+
+    while IFS=$'\t' read -r name skill_dir; do
+        skill_file="$skill_dir/SKILL.md"
+        if [[ "$(sed -n '1p' "$skill_file")" != "---" ]]; then
+            warn "$skill_file is missing Codex YAML frontmatter"
+        fi
+
+        target_dir="$CODEX_HOME/skills/$name"
+        if [[ -d "$target_dir" && ! -L "$target_dir" ]]; then
+            if [[ -L "$target_dir/SKILL.md" ]]; then
+                rm "$target_dir/SKILL.md"
+                rmdir "$target_dir" 2>/dev/null || {
+                    warn "$target_dir is not empty; leaving it untouched"
+                    continue
+                }
+            else
+                warn "$target_dir exists and is not a symlink; leaving it untouched"
+                continue
+            fi
+        elif [[ -e "$target_dir" && ! -L "$target_dir" ]]; then
+            warn "$target_dir exists and is not a symlink; leaving it untouched"
+            continue
+        fi
+
+        link_path "$skill_dir" "$target_dir" || true
+    done < <(iter_skills "$SKILLS_DIR" "$ESKILLS")
+}
+
+main() {
+    if [[ ! -d "$SKILLS_DIR" ]]; then
+        warn "canonical skills directory does not exist: $SKILLS_DIR"
+        exit 1
+    fi
+
+    # Optional external roots -- created on demand, mirroring ~/.ezshrc.
+    mkdir -p "$ESKILLS" "$EAGENTS"
+
+    # Generic export of the canonical agents tree.
+    mkdir -p "$(dirname "$AGENTS_HOME")"
+    link_path "$DOTF/agents" "$AGENTS_HOME" || true
+
+    mkdir -p "$CLAUDE_HOME" "$CODEX_HOME"
+
+    sync_claude_skills
+    sync_codex_skills
+    sync_subagents "$CLAUDE_HOME/agents"
+    sync_subagents "$CODEX_HOME/agents"
+}
+
+main "$@"

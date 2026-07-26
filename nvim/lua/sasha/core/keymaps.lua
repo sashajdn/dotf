@@ -34,6 +34,10 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" })
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" })
 
+-- Markdown.
+keymap.set("n", "<leader>mr", function()
+  require("sasha.markdown_render").toggle()
+end, { desc = "Toggle Markdown render" })
 -- Quickfix navigation.
 keymap.set("n", "]q", "<cmd>cnext<CR>zz", { desc = "Next quickfix item" })
 keymap.set("n", "[q", "<cmd>cprev<CR>zz", { desc = "Previous quickfix item" })

@@ -10,13 +10,13 @@ set -e
 
 DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
 
-# Get repo context.
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-if [[ -z "$REPO_ROOT" ]]; then
+GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+if [[ -z "$GIT_COMMON_DIR" ]]; then
     echo "Error: Not in a git repository" >&2
     exit 1
 fi
 
+REPO_ROOT=$(dirname "$GIT_COMMON_DIR")
 REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')
 WORKTREE_BASE="$REPO_ROOT/$DOTF_AGENTS_WORKTREE_DIR"
 
@@ -38,8 +38,8 @@ if [[ -n "$TMUX" ]]; then
 fi
 
 # List worktrees with status.
-printf "  %-25s %-30s %s\n" "TICKET" "BRANCH" "STATUS"
-printf "  %-25s %-30s %s\n" "------" "------" "------"
+printf "  %-40s %-30s %s\n" "TICKET" "BRANCH" "STATUS"
+printf "  %-40s %-30s %s\n" "------" "------" "------"
 
 git worktree list --porcelain | while read -r line; do
     case "$line" in
@@ -50,7 +50,7 @@ git worktree list --porcelain | while read -r line; do
             BRANCH="${line#branch refs/heads/}"
             # Only show worktrees in agents directory.
             if [[ "$WORKTREE_PATH" == "$WORKTREE_BASE"/* ]]; then
-                TICKET=$(basename "$WORKTREE_PATH")
+                TICKET="${WORKTREE_PATH#$WORKTREE_BASE/}"
 
                 # Check if occupied.
                 STATUS="idle"
@@ -58,7 +58,7 @@ git worktree list --porcelain | while read -r line; do
                     STATUS="occupied"
                 fi
 
-                printf "  %-25s %-30s %s\n" "$TICKET" "$BRANCH" "$STATUS"
+                printf "  %-40s %-30s %s\n" "$TICKET" "$BRANCH" "$STATUS"
             fi
             WORKTREE_PATH=""
             BRANCH=""

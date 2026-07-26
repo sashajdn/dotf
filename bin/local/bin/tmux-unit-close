@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+#
+# tmux-unit-close: close tmux windows associated with a unit worktree.
+
+set -euo pipefail
+
+SESSION=""
+TICKET=""
+PATH_MATCH=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --session)
+            SESSION="$2"
+            shift 2
+            ;;
+        --ticket)
+            TICKET="$2"
+            shift 2
+            ;;
+        --path)
+            PATH_MATCH="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if ! command -v tmux >/dev/null 2>&1; then
+    exit 0
+fi
+
+if ! tmux list-sessions >/dev/null 2>&1; then
+    exit 0
+fi
+
+window_name_match="$TICKET"
+matches=()
+
+while IFS=$'\t' read -r session window_id window_name unit_ticket unit_path; do
+    [[ -n "$SESSION" && "$session" != "$SESSION" ]] && continue
+
+    if [[ -n "$PATH_MATCH" && "$unit_path" == "$PATH_MATCH" ]]; then
+        matches+=("$session	$window_id")
+    elif [[ -n "$TICKET" && "$unit_ticket" == "$TICKET" ]]; then
+        matches+=("$session	$window_id")
+    elif [[ -n "$TICKET" && "$window_name" == "$window_name_match" ]]; then
+        matches+=("$session	$window_id")
+    fi
+done < <(tmux list-windows -a -F '#{session_name}	#{window_id}	#{window_name}	#{@unit_ticket}	#{@unit_path}')
+
+if [[ ${#matches[@]} -eq 0 ]]; then
+    exit 0
+fi
+
+current_window=""
+if [[ -n "${TMUX:-}" ]]; then
+    current_window="$(tmux display-message -p '#{window_id}' 2>/dev/null || true)"
+fi
+
+contains_window() {
+    local needle="$1"
+    local item _session window_id
+    for item in "${matches[@]}"; do
+        IFS=$'\t' read -r _session window_id <<< "$item"
+        if [[ "$window_id" == "$needle" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+if [[ -n "$current_window" ]] && contains_window "$current_window"; then
+    current_session="$(tmux display-message -p '#{session_name}')"
+    fallback=""
+    while read -r window_id; do
+        if ! contains_window "$window_id"; then
+            fallback="$window_id"
+            break
+        fi
+    done < <(tmux list-windows -t "$current_session" -F '#{window_id}')
+
+    if [[ -n "$fallback" ]]; then
+        tmux select-window -t "$fallback"
+    fi
+fi
+
+for item in "${matches[@]}"; do
+    IFS=$'\t' read -r _session window_id <<< "$item"
+    tmux kill-window -t "$window_id" 2>/dev/null || true
+done
