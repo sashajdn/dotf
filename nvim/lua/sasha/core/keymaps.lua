@@ -36,15 +36,7 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 
 -- Markdown.
 keymap.set("n", "<leader>mr", function()
-  local ok_actions, markview_actions = pcall(require, "markview.actions")
-  local ok_state, markview_state = pcall(require, "markview.state")
-  local bufnr = vim.api.nvim_get_current_buf()
-
-  if ok_actions and ok_state and markview_state.buf_attached(bufnr) then
-    markview_actions.disable(bufnr)
-  end
-
-  vim.cmd("RenderMarkdown buf_toggle")
+  require("sasha.markdown_render").toggle()
 end, { desc = "Toggle Markdown render" })
 
 -- Tmux.
