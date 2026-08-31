@@ -1,0 +1,4 @@
+interface:
+  display_name: "IBKR Read-Only Portfolio"
+  short_description: "Verify and project IBKR Flex portfolio state"
+  default_prompt: "Use $ibkr to sync and verify my read-only IBKR portfolio snapshot."
