@@ -17,7 +17,7 @@ return {
       -- "html",
       "lua_ls",
       "marksman",
-      -- "pyright",
+      "pyright",
       "helm_ls",
       "ruff",
       "rust_analyzer",
@@ -31,6 +31,7 @@ return {
 
     local tools = {
       -- "prettier", -- prettier formatter
+      "clang-format",
       "stylua", -- lua formatter
       "yaml-language-server", -- used by helm_ls
       -- "eslint_d", -- js linter
@@ -189,18 +190,38 @@ return {
     vim.lsp.enable("lua_lsp")
 
     --- Python
+    local function project_python(root_dir)
+      local candidates = {}
+
+      if vim.env.VIRTUAL_ENV then
+        table.insert(candidates, vim.fs.joinpath(vim.env.VIRTUAL_ENV, "bin", "python"))
+      end
+      if root_dir then
+        table.insert(candidates, vim.fs.joinpath(root_dir, ".venv", "bin", "python"))
+      end
+
+      for _, python in ipairs(candidates) do
+        if vim.fn.executable(python) == 1 then
+          return python
+        end
+      end
+    end
+
     vim.lsp.config.pyright = {
+      before_init = function(_, config)
+        local python = project_python(config.root_dir)
+        if python then
+          config.settings.python.pythonPath = python
+        end
+      end,
       settings = {
         python = {
           pyright = {
             disableOrganizeImports = true,
           },
           analysis = {
-            ignore = { "*" },
+            typeCheckingMode = "basic",
           },
-          pythonPath = "/Users/sasha/Library/Caches/pypoetry/virtualenvs/analysis-QFYxe2qh-py3.13/bin/python",
-          venvPath = "/Users/sasha/Library/Caches/pypoetry/virtualenvs/",
-          venv = "analysis-QFYxe2qh-py3.13",
         },
       },
     }
@@ -208,11 +229,10 @@ return {
     vim.lsp.enable("ruff")
 
     --- Go
-    local go_root = vim.fs.dirname(vim.fs.find({ "go.work", "go.mod", ".git" }, { upward = true })[1])
     vim.lsp.config.gopls = {
       cmd = { "gopls", "serve" },
       filetypes = { "go", "gomod", "gowork", "gotmpl" },
-      root_dir = go_root,
+      root_markers = { "go.work", "go.mod", ".git" },
       settings = {
         gopls = {
           completeUnimported = true,

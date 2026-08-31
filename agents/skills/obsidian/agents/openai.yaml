@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian"
+  short_description: "Operate Obsidian through its local CLI"
+  default_prompt: "Use $obsidian to inspect or operate my Obsidian vault."

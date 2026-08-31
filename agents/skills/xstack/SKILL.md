@@ -1,6 +1,6 @@
 ---
 name: xstack
-description: Use when the user wants Codex to run, extend, or apply the xstack AI-infrastructure investment intelligence workflow, including X post capture, high-precision filtering, AI hardware/semiconductor/power bottleneck research, company or ticker memos, end-of-day reports, scenario-based investment decision support, Codex/Claude LLM harnesses, or wiki report generation under ~/wiki/investments.
+description: Use when the user wants Codex to run, extend, or apply the xstack AI-infrastructure investment intelligence workflow, including market history and calendars, X post capture, high-precision filtering, AI hardware/semiconductor/power bottleneck research, company or ticker memos, end-of-day reports, scenario-based investment decision support, Codex/Claude LLM harnesses, or wiki report generation under ~/wiki/investments.
 ---
 
 # xstack
@@ -80,6 +80,69 @@ Runbooks must always check both the current portfolio and the full active watchl
 
 Runbook outputs must follow the log rules under `~/wiki/investments/log/xstack/.AGENTS.md`: append-only, versioned new entries, and no silent cleanup of prior decisions.
 
+## Backpack Market History And Calendar Fallback
+
+Use the isolated `xstack-backpack` binary for credential-free U.S. security
+history, documented market metadata, and the event feeds used by Backpack's
+public stock-calendar page:
+
+```bash
+XSTACK_BACKPACK_BIN="${XSTACK_BACKPACK_BIN:-$HOME/.local/bin/xstack-backpack}"
+test -x "$XSTACK_BACKPACK_BIN"
+```
+
+For a pre-market, post-market, or daily portfolio report:
+
+1. Build a deduplicated ticker set from the broker-backed current portfolio,
+   full active watchlist, relevant thesis comparisons, and `SPY`. Do not infer
+   portfolio coverage from Backpack.
+2. Capture `universe`, derive the explicitly supported U.S. ticker intersection,
+   and retain unsupported portfolio/watchlist names as named coverage gaps.
+   Never silently drop them.
+3. Run `bundle` for the supported intersection with `1d` history beginning at
+   least five years plus 14 calendar days before the latest required session.
+   Set the history end to the day after the latest required date because the end
+   bound is exclusive.
+4. Request the relevant forward calendar window, no more than 93 days, and keep
+   the default raw artifact persistence enabled.
+5. Require envelope schema `xstack.backpack/v1`, `status: ok`, and a raw artifact
+   for every source receipt before using the result.
+6. Treat `documented_market_api` receipts as fallback market observations, not
+   licensed broker truth. Treat `undocumented_web_calendar` receipts as
+   vendor-estimated discovery and verify material events with issuer IR,
+   SEC/exchange filings, or official macro/central-bank sources.
+7. Never silently substitute Backpack for an unsupported local Asian listing,
+   an unavailable portfolio asset, broker state, FX, rates, credit, options, or
+   corporate-action reconciliation.
+
+Example scheduled input capture:
+
+```bash
+"$XSTACK_BACKPACK_BIN" bundle \
+  --ticker NVDA,MSFT,MU,TSM,SPY \
+  --history-from 2021-07-01 \
+  --history-to 2026-07-30 \
+  --calendar-from 2026-07-29 \
+  --calendar-to 2026-08-05 \
+  --benchmark SPY \
+  --country US \
+  --summary-only \
+  --out "$HOME/.local/share/xstack/public/runs/2026-07-29/backpack.json"
+```
+
+Dates in examples are illustrative; derive session-aware dates for each run.
+Do not use `--no-persist-raw` in a scheduled workflow. If the binary is missing,
+the command fails, any requested endpoint fails, a ticker is unsupported, or
+the result is stale/incomplete, continue producing the daily report and name
+the missing/degraded coverage in the source-quality section and a concise
+footnote. Missing data is unknown, never a neutral market signal.
+
+The full connector contract and installation steps are in:
+
+```text
+~/repos/xstack/docs/market/BACKPACK.md
+```
+
 ## Operating Principles
 
 - Optimize for precision. Noise is worse than missing a marginal signal.
@@ -91,6 +154,41 @@ Runbook outputs must follow the log rules under `~/wiki/investments/log/xstack/.
 - Be aggressive about surfacing asymmetric opportunities, but never hand-wave the thesis.
 - Separate facts, estimates, inferences, and speculation.
 - Frame research across two horizons: `1-2 year` immediate bottlenecks that can drive near-term earnings revisions, and `5-10 year` structural branches such as humanoid robotics, drones, autonomous factories, and edge AI hardware. Do not let long-horizon themes displace near-term capital candidates without strong evidence of revenue materiality or superior expected value.
+
+## Daily capability preflight
+
+For every scheduled pre-market or post-market report, run the canonical prompt's
+preflight before interpreting missing data:
+
+```bash
+"$HOME/repos/xstack/tools/preflight-market-brief" \
+  --expected-cwd /Users/alexjperkins \
+  --output "$HOME/wiki/investments/agent-scratchpad/<session-date>/preflight.json"
+```
+
+Treat the emitted states as authoritative capability evidence, not as investment
+signals. Use only `AVAILABLE`, `AVAILABLE_PARTIAL`, `AVAILABLE_EOD`,
+`NOT_YET_OPEN`, `BLOCKED_BY_POLICY`, `NOT_COLLECTED_OPTIONAL`,
+`FAILED_AFTER_RETRY`, `UNAVAILABLE`, and `CONFIG_MISMATCH`. Never call a source
+unavailable merely because it was not attempted, the requested session is in the
+future, it is optional, policy blocks it, coverage is partial, or the first probe
+failed.
+
+Record a capability matrix with source, policy state, first probe, retry,
+fallback, timestamp, exact safe error, freshest substitute, and decision impact.
+`UNAVAILABLE` is allowed only after discovery, functional probe, one retry, and a
+fallback all fail. Optional uncollected sources and future sessions do not
+degrade a report. Reject an unqualified “unavailable” during validation.
+
+A failed live-quote probe is decision-critical only when the current run window
+or a proposed action requires executable/live pricing. During an Asia-open or
+weekend prior-close carry run, use the timestamped completed close and treat the
+quote failure as non-degrading unless missing extended-hours movement could
+plausibly change the conclusion. A broker guidance gate may independently keep
+the report degraded.
+
+Read [source capabilities](references/source-capabilities.md) before collecting
+X, crypto, FX/rates, options/flows, or live/fallback market data.
 
 ## Research Mode
 
@@ -296,6 +394,21 @@ Write company/ticker report:
 cargo run -p xstack-cli -- report company --company Micron --ticker MU
 ```
 
+Inspect or run the read-only market connector:
+
+```bash
+"${XSTACK_BACKPACK_BIN:-$HOME/.local/bin/xstack-backpack}" capabilities
+"${XSTACK_BACKPACK_BIN:-$HOME/.local/bin/xstack-backpack}" bundle \
+  --ticker NVDA,MSFT,MU,TSM,SPY \
+  --history-from 2021-07-01 \
+  --history-to 2026-07-30 \
+  --calendar-from 2026-07-29 \
+  --calendar-to 2026-08-05 \
+  --benchmark SPY \
+  --country US \
+  --summary-only
+```
+
 Search existing reports before substantial edits:
 
 ```bash
@@ -303,53 +416,11 @@ cargo run -p xstack-cli -- report search "Micron"
 cargo run -p xstack-cli -- report search "HBM"
 ```
 
-Authenticated X search capture:
-
-```bash
-node tools/x/scrape-search.js \
-  --preset ai-stack-priority \
-  --since-hours 12 \
-  --mode live \
-  --limit 250 \
-  --scrolls 6 \
-  --user-data-dir "$HOME/.xstack/chrome-copy" \
-  --output .xstack/12h-x-priority.json
-```
-
-Use `--preset ai-stack-priority` for rolling 12-hour AI vertical-stack discovery. Use narrower presets such as `ls-electric` or `800vdc` for confluence checks. Prefer `--mode live` for rolling loops and `--mode both` when researching a specific ticker or bottleneck.
-
-Authenticated X search capture:
-
-```bash
-cd ~/repos/xstack
-npm --prefix tools/x install
-node tools/x/scrape-search.js \
-  --preset ls-electric \
-  --limit 80 \
-  --scrolls 12 \
-  --mode both \
-  --user-data-dir "$HOME/.xstack/chrome-copy" \
-  --output .xstack/ls-electric-x-confluence.json
-```
-
-Use `--query` repeatedly for ad hoc searches, `--queries-file` for one-query-per-line batches, `--preset 800vdc` for the broader data-center power architecture cluster, and `--limit` to control how many deduped posts are written. Raw captures stay under `.xstack/` and should be summarized into wiki markdown only after source quality and relevance are checked.
-
-Authenticated X single-post capture:
-
-```bash
-cd ~/repos/xstack
-node tools/x/scrape-status.js \
-  --url 'https://x.com/<handle>/status/<id>' \
-  --user-data-dir "$HOME/.xstack/chrome-copy" \
-  --output .xstack/<run-id>.json
-
-node tools/x/scrape-status.js \
-  --id '<id>' \
-  --user-data-dir "$HOME/.xstack/chrome-copy" \
-  --output .xstack/<run-id>.json
-```
-
-Use this when a permalink needs exact post text, timestamp, author, and normalized metadata. If the post is investment-relevant, add the resulting raw JSON path to the relevant watchlist or memo before drawing portfolio implications.
+For authenticated X capture and deterministic source ladders, read
+[source capabilities](references/source-capabilities.md). Scheduled X capture is
+permitted only when the authoritative workflow prompt or owner explicitly
+authorizes the preconfigured connector. That approval never extends to editing a
+scraper to bypass controls or to any mutation on X.
 
 ## Validation
 
@@ -359,6 +430,7 @@ After code changes:
 cargo fmt
 cargo check
 cargo test
+cargo test -p xstack-backpack
 ```
 
 For report path changes:
@@ -370,3 +442,8 @@ cargo run -p xstack-cli -- --db .xstack/dev.sqlite3 report eod
 cargo run -p xstack-cli -- --db .xstack/dev.sqlite3 report company --company "Micron" --ticker MU
 cargo run -p xstack-cli -- report search "Micron"
 ```
+
+For scheduled-report changes, also run the preflight, parse its JSON, verify that
+every report use of “unavailable” has a matching terminal capability record, and
+confirm that `NOT_YET_OPEN` and `NOT_COLLECTED_OPTIONAL` did not cause
+`report_status: DEGRADED`.
