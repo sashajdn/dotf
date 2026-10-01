@@ -100,7 +100,10 @@ Prefix: `<C-a>`
 | `<C-a> + H/J/K/L` | Resize panes |
 | `<C-a> + n/p` | Next/previous window |
 | `<C-a> + o` | Switch to last session |
-| `<C-a> + f` | fzf pane finder |
+| `<C-a> + s/w` | Native tmux session/window chooser |
+| `<C-a> + S` | fzf session finder |
+| `<C-a> + W` | fzf window finder across sessions |
+| `<C-a> + f` | fzf pane finder across sessions |
 | `<C-a> + a` | Split into N agent panes |
 | `<C-a> + r` | Reload config |
 | `ctrl-f` | tmux-sessionizer (from shell) |

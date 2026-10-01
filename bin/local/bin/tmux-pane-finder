@@ -1,35 +1,118 @@
 #!/usr/bin/env bash
 #
-# tmux-pane-finder: fzf-based pane selector across all sessions.
+# tmux-pane-finder: fzf selector for live tmux sessions, windows, or panes.
 #
-# Searchable by: session name, pane title, current path
-#
-# Usage: tmux-pane-finder
-#   - Run from within tmux
-#   - Select a pane via fzf
-#   - Switches to the selected pane
+# Usage: tmux-pane-finder [session|window|pane] [client]
+#   - Defaults to pane mode for backwards compatibility.
+#   - Uses fzf-tmux so interactive selection has a real tmux terminal.
 
-set -e
+set -euo pipefail
 
-if [[ -z "$TMUX" ]]; then
-    echo "Error: Must be run from within tmux" >&2
+readonly MODE="${1:-pane}"
+CLIENT="${2:-}"
+readonly FZF_TMUX_CMD="${FZF_TMUX_CMD:-fzf-tmux}"
+
+usage() {
+    echo "Usage: tmux-pane-finder [session|window|pane] [client]" >&2
+}
+
+fail() {
+    local message="$1"
+    if [[ -n "$CLIENT" ]]; then
+        tmux display-message -c "$CLIENT" "tmux finder: $message" 2>/dev/null || true
+    fi
+    echo "tmux finder: $message" >&2
+    exit 1
+}
+
+case "$MODE" in
+    session|window|pane) ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+
+if [[ -z "${TMUX:-}" ]]; then
+    echo "tmux finder: must be run from within tmux" >&2
     exit 1
 fi
 
-# Format: session:window.pane | title | path
-# Example: api-service:agents.1 | api-service_agent-1_JIRA-123 | ~/repos/api-service/.worktrees/JIRA-123
-FORMAT='#{session_name}:#{window_name}.#{pane_index} | #{pane_title} | #{pane_current_path}'
+if ! command -v tmux >/dev/null 2>&1; then
+    echo "tmux finder: tmux not found in PATH" >&2
+    exit 1
+fi
 
-selected=$(tmux list-panes -a -F "$FORMAT" | fzf --height 40% --reverse --border \
-    --header "Select pane (session:window.pane | title | path)" \
-    --preview-window hidden)
+if ! command -v "$FZF_TMUX_CMD" >/dev/null 2>&1; then
+    fail "fzf-tmux not found in PATH"
+fi
+
+if [[ -z "$CLIENT" ]]; then
+    CLIENT="$(tmux display-message -p '#{client_name}' 2>/dev/null || true)"
+fi
+if [[ -z "$CLIENT" ]]; then
+    fail "could not resolve the invoking client"
+fi
+readonly CLIENT
+
+records=""
+header=""
+
+case "$MODE" in
+    session)
+        header="session | windows | state | active path"
+        if ! records="$(tmux list-sessions -F '#{session_id}	#{session_name}	#{session_windows} windows	#{?session_attached,attached,detached}	#{pane_current_path}')"; then
+            fail "could not list sessions"
+        fi
+        ;;
+    window)
+        header="session | window | panes | unit | active path"
+        if ! records="$(tmux list-windows -a -F '#{session_id}:#{window_id}	#{session_name}	#{window_index}:#{window_name}	#{window_panes} panes	#{?@unit_ticket,#{@unit_ticket},-}	#{?@unit_path,#{@unit_path},#{pane_current_path}}')"; then
+            fail "could not list windows"
+        fi
+        ;;
+    pane)
+        header="session | window.pane | role | command | title | path"
+        if ! records="$(tmux list-panes -a -F '#{pane_id}	#{session_name}	#{window_index}:#{window_name}.#{pane_index}	#{?@unit_role,#{@unit_role},pane}	#{pane_current_command}	#{pane_title}	#{pane_current_path}')"; then
+            fail "could not list panes"
+        fi
+        ;;
+esac
+
+if [[ -z "$records" ]]; then
+    fail "no ${MODE}s found"
+fi
+
+selected=""
+if selected="$(
+    printf '%s\n' "$records" | "$FZF_TMUX_CMD" -p 80%,60% -- \
+        --reverse \
+        --no-multi \
+        --delimiter=$'\t' \
+        --with-nth='2..' \
+        --prompt="${MODE}> " \
+        --header="$header" \
+        --preview-window=hidden
+)"; then
+    :
+else
+    readonly finder_status=$?
+    if [[ "$finder_status" -eq 1 || "$finder_status" -eq 130 ]]; then
+        exit 0
+    fi
+    fail "fzf-tmux exited with status $finder_status"
+fi
 
 if [[ -z "$selected" ]]; then
     exit 0
 fi
 
-# Extract session:window.pane from selection.
-target=$(echo "$selected" | cut -d'|' -f1 | xargs)
+if [[ "$selected" != *$'\t'* ]]; then
+    fail "fzf-tmux returned a malformed selection"
+fi
 
-# Switch to the selected pane.
-tmux switch-client -t "$target"
+readonly target="${selected%%$'\t'*}"
+
+if ! tmux switch-client -c "$CLIENT" -t "$target" 2>/dev/null; then
+    fail "target no longer exists: $target"
+fi

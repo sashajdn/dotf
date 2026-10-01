@@ -345,7 +345,16 @@ todo()
 
 thoughts()
 {
-    $EDITOR $HOME/wiki/thoughts
+    local file
+    local editor="${EDITOR:-nvim}"
+
+    file=$(
+        find "$HOME/wiki/thoughts" -type f -print0 |
+            fzf --read0 --print0 --delimiter / --with-nth -1
+    ) || return
+    file=${file%$'\0'}
+
+    ${(@Q)${(z)editor}} "$file"
 }
 
 goals()
