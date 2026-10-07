@@ -33,11 +33,29 @@ XSTACK_EOD_REPORTS_DIR="${XSTACK_EOD_REPORTS_DIR:-$HOME/wiki/investments/reports
 Expected outputs:
 
 ```text
+~/wiki/investments/daily/<MM>/<YYYY-MM-DD>-pre.md
+~/wiki/investments/daily/assets/<YYYY-MM-DD>/
 ~/wiki/investments/xstack/context-index.md
 ~/wiki/investments/xstack/reports/<company-slug>.<ticker>.md
 ~/wiki/investments/reports/summaries/eod/<YYYY><MM><DD>.md
 ~/wiki/investments/xstack/portfolio/active-top8-plus-hedges.md
+~/wiki/investments/xstack/portfolio/portfolio-decision-policy.md
+~/wiki/investments/log/xstack/YYYYMMDD-vNN-top-k-portfolio-decisions.md
 ```
+
+Daily briefs are grouped by the session date's two-digit month: `07` for July,
+`08` for August, `09` for September, and so on. Keep the full date in the filename;
+do not add a year directory or write new briefs directly under `daily/`.
+For example, the September 22 brief is `daily/09/2026-09-22-pre.md`.
+Derive `<MM>` from the resolved session date, not the current wall-clock month,
+and create the month directory before the early checkpoint. Find prior reports
+across all month directories so month/year boundaries do not hide earlier context.
+Shared visual assets remain under `daily/assets/<YYYY-MM-DD>/`; from a monthly
+report use `../assets/...` or a vault-root wikilink. Inside saved Obsidian notes,
+use note-relative Markdown links or vault-root wikilinks for vault files, not
+absolute filesystem Markdown targets such as `/Users/...`. File existence alone
+does not prove Obsidian can resolve a link. Audit logs, scratchpads,
+and CLI-generated EOD/company reports retain their existing locations.
 
 ## Context Index
 
@@ -46,9 +64,10 @@ Use `~/wiki/investments/xstack/context-index.md` as the first stop when a task d
 Before changing rankings, creating a new memo, interpreting a fresh X capture, or recommending a portfolio action:
 
 1. Open the context index.
-2. Follow its start-here table to the relevant canonical files.
-3. Use its `rg` commands to search the wiki/log/repo context before drawing conclusions.
-4. Update the index when creating a new canonical state file, important research memo, watchlist, signal file, raw capture, or decision-log convention.
+2. Read `~/wiki/investments/xstack/portfolio/portfolio-decision-policy.md` for any portfolio action or daily report.
+3. Follow its start-here table to the relevant canonical files.
+4. Use its `rg` commands to search the wiki/log/repo context before drawing conclusions.
+5. Update the index when creating a new canonical state file, important research memo, watchlist, signal file, raw capture, or decision-log convention.
 
 Useful default searches:
 
@@ -74,7 +93,7 @@ XStack runbooks are harness-agnostic markdown files:
 
 When the user asks to run `xstack runbook pre`, `xstack runbook post`, the pre-market runbook, or the post-market runbook, do not require a CLI command. Open the relevant markdown file, follow its checklist, read the state files it references, and write the requested log/state updates. This must work for Codex, Claude, or any other LLM harness that can read and write markdown.
 
-Runbooks must be aware of the current portfolio: positions, working orders, fills, cash by currency, account value, active alerts, and manual user changes. If the current state is ambiguous, ask concise clarifying questions before making a material recommendation. If the safe action is inaction, say so and record the ambiguity.
+Runbooks must be aware of the current portfolio: positions, working orders, fills, cash by currency, account value, active alerts, and manual user changes. If state is partial, disclose the uncertainty and test whether a recommendation is robust across explicit portfolio assumptions. Broker ambiguity blocks order execution and false precision; it does not automatically erase investment judgment. Use target weights, sell fractions, or scenario notionals when exact NAV or quantities are unavailable, and mark execution `BLOCKED` when required controls do not reconcile.
 
 Runbooks must always check both the current portfolio and the full active watchlist unless the user explicitly narrows the run. Treat ticker-specific prompts as emphasis, not permission to ignore watchlist or portfolio-wide implications.
 
@@ -152,6 +171,9 @@ The full connector contract and installation steps are in:
 - Focus on AI infrastructure bottlenecks: semis, memory, foundry, equipment, packaging, networking/optics, power, energy, cooling, hyperscaler capex, and Japan/Korea supply chain.
 - Store raw captured data before analysis so downstream decisions are replayable.
 - Be aggressive about surfacing asymmetric opportunities, but never hand-wave the thesis.
+- For every daily portfolio report, produce a variable-length top-K of `ADD`, `TRIM`/`EXIT`, or `INITIATE` decisions under the canonical portfolio-decision policy. Do not let `HOLD`, `WAIT`, or `RESEARCH` occupy a top-K action slot and do not pad K when no decision clears the gate.
+- Separate investment judgment from execution state. Every top-K row must include entry/exit, size-to-target, horizon, confidence, dynamic risk posture, utility and factual execution status; xstack never operates the broker.
+- Surface high-confidence non-security portfolio optimizations—such as better data, risk instrumentation, tax/FX structure or research access—separately when they materially improve expected portfolio utility.
 - Separate facts, estimates, inferences, and speculation.
 - Frame research across two horizons: `1-2 year` immediate bottlenecks that can drive near-term earnings revisions, and `5-10 year` structural branches such as humanoid robotics, drones, autonomous factories, and edge AI hardware. Do not let long-horizon themes displace near-term capital candidates without strong evidence of revenue materiality or superior expected value.
 
@@ -220,6 +242,14 @@ Do not allow false positives into research conclusions. If evidence is weak, say
 ## Investment Decision Framework
 
 Use this only after research mode has enough evidence. Produce decision support, not vague bullish/bearish commentary.
+
+For portfolio actions and daily reports, first read and follow:
+
+```text
+~/wiki/investments/xstack/portfolio/portfolio-decision-policy.md
+```
+
+Its robust expected-log-growth objective, dynamic `R0–R5` risk posture, top-K admission gate, portfolio-state uncertainty rules, matrix schema, immutable decision IDs and outcome reward function are authoritative. The owner-approved default posture is `R4 — AGGRESSIVE`, recalculated each run.
 
 ### 1. First Principles
 
@@ -321,27 +351,13 @@ For every prospective price suggestion, state:
 
 Judgment matters. Do not apply the `0.5-1.5%` starter headroom mechanically when spreads are wide, liquidity is poor, the stock is gapping vertically, or the thesis has not cleared. Conversely, do not use an ideal pullback price for a desired starter merely because it looks more disciplined.
 
-### 7. Utility Score
+### 7. Portfolio Utility And Scorecard
 
-Score the signal:
+Use robust expected log growth as the primary objective and fractional Kelly for size, subject to marginal `CVaR95`, concentration, correlation, liquidity, event, cost and uncertainty penalties.
 
-```text
-utility = expected_profit_potential
-        * confidence
-        * novelty
-        * source_quality
-        * market_linkage
-        - risk_penalty
-        - noise_penalty
-```
+For every top-K action report expected CAGR/IRR, expected log growth, upside/downside, probability of permanent loss, marginal portfolio tail risk, concentration/correlation delta, evidence quality, decision confidence, intrinsic risk `1–10`, utility `0–100`, time horizon and why the action dominates the best feasible alternative.
 
-Report:
-
-- utility score;
-- confidence score;
-- risk score;
-- time horizon;
-- why this is worth attention now.
+Only `ADD`, `TRIM`, `EXIT` and `INITIATE` may enter top-K. Require at least `70/100` decision confidence and do not pad K. Create the versioned append-only decision record required by the canonical policy even when execution is blocked or the investor does not act. Grade executed and unexecuted decisions at the policy's review intervals; do not invent a fill when the stated trigger did not occur.
 
 ## Required Output For A Ticker Memo
 
@@ -433,7 +449,7 @@ cargo test
 cargo test -p xstack-backpack
 ```
 
-For report path changes:
+For CLI-generated EOD/company report path changes:
 
 ```bash
 cargo run -p xstack-cli -- --db .xstack/dev.sqlite3 init
@@ -443,7 +459,12 @@ cargo run -p xstack-cli -- --db .xstack/dev.sqlite3 report company --company "Mi
 cargo run -p xstack-cli -- report search "Micron"
 ```
 
-For scheduled-report changes, also run the preflight, parse its JSON, verify that
+For daily-folder reorganizations, verify every report's date matches its month
+directory, repair moved reports' relative links and current navigation links,
+and confirm chart embeds resolve. Preserve historical audit entries and source
+receipts; append relocation links when an immutable record contains an old path.
+
+For scheduled-report collection or decision changes, also run the preflight, parse its JSON, verify that
 every report use of “unavailable” has a matching terminal capability record, and
 confirm that `NOT_YET_OPEN` and `NOT_COLLECTED_OPTIONAL` did not cause
 `report_status: DEGRADED`.
