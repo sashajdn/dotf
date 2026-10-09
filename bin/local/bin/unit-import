@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebase one or all units onto origin/master."""
+"""Create units from open PRs or origin branches."""
 import sys
 from pathlib import Path
 
@@ -8,4 +8,4 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from units import main
 
 if __name__ == "__main__":
-    sys.exit(main("sync"))
+    sys.exit(main("import"))
