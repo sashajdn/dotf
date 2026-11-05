@@ -11,11 +11,14 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 from urllib.parse import urlparse
 
 
 class UnitError(Exception):
-    pass
+    def __init__(self, message, rebased=False):
+        super().__init__(message)
+        self.rebased = rebased
 
 
 class Quit(Exception):
@@ -144,13 +147,19 @@ class Repo:
             raise UnitError(f"Unit path escapes agents directory: {clean(name)}")
         return path
 
-    def blocked(self, wt):
-        if wt.locked or wt.prunable or not wt.path.is_dir():
-            return "locked, prunable or missing worktree"
+    def operation(self, wt):
         for marker in ("rebase-merge", "rebase-apply", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "sequencer", "BISECT_START"):
             path = self.git("rev-parse", "--path-format=absolute", "--git-path", marker, cwd=wt.path).stdout.strip()
             if Path(path).exists():
-                return f"unfinished Git operation ({marker})"
+                return marker
+        return ""
+
+    def blocked(self, wt):
+        if wt.locked or wt.prunable or not wt.path.is_dir():
+            return "locked, prunable or missing worktree"
+        operation = self.operation(wt)
+        if operation:
+            return f"unfinished Git operation ({operation})"
         if not wt.branch:
             return "detached HEAD"
         if self.git("status", "--porcelain", "--untracked-files=normal", cwd=wt.path).stdout:
@@ -189,6 +198,87 @@ def summary(counts):
     line(*parts)
 
 
+def save_changes(repo, wt):
+    if not repo.git("status", "--porcelain", "--untracked-files=normal", cwd=wt.path).stdout:
+        return ""
+    label = "unit-sync-" + uuid.uuid4().hex
+    say("  Saving tracked and untracked changes before rebase", "action")
+    result = repo.git("stash", "push", "--include-untracked", "--message", label,
+                      cwd=wt.path, check=False, capture=False)
+    # Stashes are shared by all worktrees. Find our exact entry rather than
+    # assuming the top stash is ours if another Git process pushed an entry.
+    saved = ""
+    for entry in repo.git("stash", "list", "--format=%H%x00%gs").stdout.splitlines():
+        oid, _, subject = entry.partition("\0")
+        if subject.endswith(": " + label):
+            saved = oid
+            break
+    if result.returncode:
+        recovery = f"; saved backup: {saved}" if saved else ""
+        raise UnitError("Git could not stash the local changes" + recovery)
+    return saved
+
+
+def restore_changes(repo, wt, saved):
+    if not saved:
+        return
+    say("  Restoring local changes and staging state", "action")
+    result = repo.git("stash", "apply", "--index", saved, cwd=wt.path, check=False, capture=False)
+    if result.returncode:
+        raise UnitError(f"Local changes could not be fully restored in {wt.path}; backup retained as {saved}. "
+                        f"Inspect git status and resolve conflicts; recover with git stash apply --index {saved} when appropriate.")
+    for entry in repo.git("stash", "list", "--format=%H%x00%gd").stdout.splitlines():
+        oid, _, selector = entry.partition("\0")
+        if oid == saved:
+            # Drop only the entry we restored, preserving other worktrees' stashes.
+            result = repo.git("stash", "drop", selector, check=False, capture=False)
+            if result.returncode:
+                say(f"  Changes restored; backup retained as {saved}", "warning")
+            break
+    say("  Local changes restored", "success")
+
+
+def rebase_unit(repo, wt, target, save_local):
+    operation = repo.operation(wt)
+    if operation:
+        raise UnitError(f"Git cannot start a new rebase during {operation} in {wt.path}; existing operation left intact.")
+    saved = save_changes(repo, wt) if save_local else ""
+    safe_to_restore = True
+    rebased = False
+    try:
+        result = repo.git("-c", "core.editor=true", "rebase", "--no-autostash", "--no-update-refs",
+                          target, cwd=wt.path, check=False, capture=False)
+        if result.returncode:
+            operation = repo.operation(wt)
+            if operation in ("rebase-merge", "rebase-apply"):
+                abort = repo.git("rebase", "--abort", cwd=wt.path, check=False, capture=False)
+                if abort.returncode:
+                    safe_to_restore = False
+                    raise UnitError(f"Abort failed in {wt.path}; recover with git rebase --abort. "
+                                    f"Local-change backup: {saved or '(none)'}. No stash was applied to the unfinished rebase.")
+            current = repo.git("rev-parse", "HEAD", cwd=wt.path).stdout.strip()
+            if current != wt.head:
+                safe_to_restore = False
+                raise UnitError(f"Rebase failed and HEAD moved from {wt.head}; inspect {wt.path}. "
+                                f"Local-change backup: {saved or '(none)'}.")
+            say(f"  FAILED: rebase aborted; HEAD retained at {wt.head[:8]} ({wt.path})", "error")
+            return False
+        say("  Rebase successful", "success")
+        rebased = True
+        return True
+    finally:
+        if safe_to_restore:
+            # Never apply a stash into an interrupted or unfinished rebase.
+            operation = repo.operation(wt)
+            if saved and operation:
+                say(f"  Backup retained as {saved}; finish or abort {operation} before restoring it.", "warning")
+            else:
+                try:
+                    restore_changes(repo, wt, saved)
+                except UnitError as error:
+                    raise UnitError(str(error), rebased=rebased) from None
+
+
 def sync(repo, opts):
     if not opts.dry_run:
         result = repo.git("fetch", "origin", f"+refs/heads/{opts.base}:refs/remotes/origin/{opts.base}", check=False, capture=False)
@@ -216,14 +306,21 @@ def sync(repo, opts):
             line(("  Branch: ", "muted"), (wt.branch or "(detached)", "branch"))
             repo.warn_name(wt)
             reason = repo.blocked(wt)
-            if reason or wt.branch in (opts.base, "main", "master"):
+            operation = repo.operation(wt) if not opts.all else ""
+            if operation:
+                say(f"  FAILED: Git cannot start another rebase during {operation}; existing operation left intact.", "error")
+                counts["failed"] += 1
+                counts["unprocessed"] -= 1
+                continue
+            if opts.all and (reason or wt.branch in (opts.base, "main", "master")):
                 say(f"  BLOCKED: {reason or 'base branch is not a unit topic branch'}", "warning")
                 counts["blocked"] += 1
                 counts["unprocessed"] -= 1
                 continue
             incoming = int(repo.git("rev-list", "--count", f"{wt.head}..{target}").stdout)
             own = int(repo.git("rev-list", "--count", f"{target}..{wt.head}").stdout)
-            line(("  State: ", "muted"), ("clean", "success"), "; ", (str(own), "action"),
+            state = reason or "clean"
+            line(("  State: ", "muted"), (state, "warning" if reason else "success"), "; ", (str(own), "action"),
                  " branch-only commits; ", (str(incoming), "warning"), " incoming commits")
             if not incoming:
                 say("  Already current", "success")
@@ -237,33 +334,27 @@ def sync(repo, opts):
             if incoming > 5:
                 say(f"    … {incoming - 5} older commits omitted", "muted")
             if opts.dry_run:
+                if not opts.all and reason == "uncommitted or untracked changes":
+                    say("  Would save local changes, rebase, and restore them", "action")
                 counts["planned"] += 1
-            elif not confirm("Rebase?", opts.force):
+            elif not confirm("Rebase?", opts.force or (not opts.all and not opts.ask)):
                 counts["declined"] += 1
             else:
                 branch = repo.git("symbolic-ref", "--quiet", "--short", "HEAD", cwd=wt.path, check=False).stdout.strip()
-                if branch != wt.branch or repo.oid("refs/heads/" + wt.branch) != wt.head or repo.blocked(wt):
-                    say("  BLOCKED: worktree changed since the summary", "warning")
-                    counts["blocked"] += 1
+                head = repo.git("rev-parse", "HEAD", cwd=wt.path).stdout.strip()
+                if branch != wt.branch or head != wt.head or (opts.all and repo.blocked(wt)):
+                    status = "blocked" if opts.all else "failed"
+                    say(f"  {status.upper()}: worktree changed since the summary", "warning")
+                    counts[status] += 1
                 else:
-                    result = repo.git("-c", "core.editor=true", "rebase", "--no-autostash", "--no-update-refs", target, cwd=wt.path, check=False, capture=False)
-                    if result.returncode:
-                        paths = [repo.git("rev-parse", "--path-format=absolute", "--git-path", p, cwd=wt.path).stdout.strip() for p in ("rebase-merge", "rebase-apply")]
-                        if any(Path(p).exists() for p in paths):
-                            abort = repo.git("rebase", "--abort", cwd=wt.path, check=False, capture=False)
-                            if abort.returncode:
-                                counts["failed"] += 1
-                                counts["unprocessed"] -= 1
-                                raise UnitError(f"Abort failed in {wt.path}; recover with git -C '{wt.path}' rebase --abort.")
-                        if repo.oid("refs/heads/" + wt.branch) != wt.head:
-                            counts["failed"] += 1
-                            counts["unprocessed"] -= 1
-                            raise UnitError(f"Rebase failed and {wt.branch} moved from {wt.head}; inspect {wt.path} before retrying.")
-                        say(f"  FAILED: rebase aborted; branch retained at {wt.head[:8]} ({wt.path})", "error")
+                    try:
+                        success = rebase_unit(repo, wt, target, save_local=not opts.all)
+                        counts["rebased" if success else "failed"] += 1
+                    except UnitError as error:
+                        counts["rebased"] += int(error.rebased)
                         counts["failed"] += 1
-                    else:
-                        say("  Rebase successful", "success")
-                        counts["rebased"] += 1
+                        counts["unprocessed"] -= 1
+                        raise
             counts["unprocessed"] -= 1
     except Quit:
         say("Stopping.")
@@ -551,7 +642,7 @@ def import_units(repo, opts):
 
 def parser(mode):
     result = argparse.ArgumentParser(prog="unit-" + mode, description=(
-        "Rebase units onto origin/master. Conflicts are aborted and reported." if mode == "sync" else
+        "Rebase onto origin/master. Single sync saves/restores local edits automatically; batch sync prompts and skips dirty units. Conflicts are aborted and reported." if mode == "sync" else
         "Create missing units from origin PRs or branches; defaults to the Git user."))
     if mode == "import":
         result.add_argument("kind", choices=("prs", "branches"))
@@ -563,7 +654,7 @@ def parser(mode):
     result.add_argument("-b", "--base", default="master" if mode == "sync" else None, help="base branch (default: master)" if mode == "sync" else "filter PR base branch")
     confirmation = result.add_mutually_exclusive_group()
     confirmation.add_argument("-f", "--force", action="store_true", help="skip confirmation prompts; retain failure safeguards")
-    confirmation.add_argument("--ask", action="store_true", help="prompt per action (default)")
+    confirmation.add_argument("--ask", action="store_true", help="confirm single sync (batch prompts by default)" if mode == "sync" else "prompt per action (default)")
     result.add_argument("-n", "--dry-run", action="store_true", help="preview only; no local changes")
     return result
 

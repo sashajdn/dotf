@@ -167,8 +167,16 @@ branch-only commit counts, and up to five incoming commits with author, author
 date and subject. A branch differing from its full ticket path produces a warning.
 On conflict, the command aborts the rebase, reports that unit as failed, and
 continues the batch. Failed or blocked units produce a nonzero exit status.
-Dirty, detached, locked, missing or already-in-progress worktrees are blocked;
-`-f` does not stash changes or override those safeguards.
+Single-worktree `us` proceeds without a confirmation prompt: it automatically
+saves tracked and untracked changes, rebases, and restores them with their staging
+state. It also restores those changes after aborting a conflicting rebase. If
+restoration conflicts, the exact stash backup is retained and printed for recovery.
+Use `us --ask` to request a confirmation prompt explicitly. Existing unfinished
+Git operations are reported as failures and left intact.
+
+Batch `usa` retains its per-worktree prompts and skips dirty, detached, locked,
+missing or already-in-progress worktrees. `usa -f` does not stash changes or
+override those batch safeguards. Naming mismatches are warnings in both modes.
 
 Output uses your terminal's ANSI theme palette: bold headings, accented branches
 and commit hashes, distinct author names, muted dates, success colours for completed
@@ -187,8 +195,8 @@ Fork PRs use tickets/branches such as `pr/4821/alice/feature`.
 Default imports only create missing worktrees and their tmux windows. Existing
 units are left alone, including their commits and panes. Importing never rebases
 or resets existing branches. Multiple PRs sharing a source branch share a unit.
-All actions prompt `y/N/q` unless `-f` is given; noninteractive use requires
-`-f` or `-n`.
+Imports and batch sync prompt `y/N/q` unless `-f` is given; their noninteractive
+use requires `-f` or `-n`. Single-worktree `us` proceeds automatically by default.
 
 | Flag | Applies to | Meaning |
 |------|------------|---------|
@@ -199,7 +207,7 @@ All actions prompt `y/N/q` unless `-f` is given; noninteractive use requires
 | `-b`, `--base BRANCH` | Both | Rebase target / filter PR base branch |
 | `-e`, `--exact` | Imports | Reconcile managed unit windows to the selected set |
 | `-f`, `--force` | Both | Skip confirmation prompts |
-| `--ask` | Both | Explicit default prompting; incompatible with `-f` |
+| `--ask` | Both | Prompt explicitly (default for imports/batch sync); incompatible with `-f` |
 | `-n`, `--dry-run` | Both | Preview without local changes |
 
 For branch imports, `--base` requires `--ready`. With `--ready`, author filtering

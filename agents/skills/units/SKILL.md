@@ -73,12 +73,20 @@ Run from within the worktree:
 unit-sync
 ```
 
+Single-worktree `unit-sync` (`us`) treats invocation as approval: it saves tracked
+and untracked local changes automatically, rebases, then restores them with their
+staging state. On a rebase conflict it aborts and restores the original changes.
+If restoring changes conflicts, retain the exact stash backup and report its SHA
+and recovery instructions. Naming mismatches are warnings. `--ask` explicitly
+requests confirmation. Existing unfinished Git operations are failed, not aborted.
+
 Use `unit-sync --all` (`usa`) to iterate all registered worktrees under the
 configured agents directory. The default target is `origin/master`; use
 `--base main` or another branch explicitly. Summaries show at most five incoming
 commits with author, date and subject, plus branch/worktree naming warnings.
 Conflicts are aborted and reported, then the batch continues. Failed/blocked
-units produce a nonzero exit. Dirty or in-progress worktrees are not stashed.
+units produce a nonzero exit. In batch mode dirty or in-progress worktrees are
+skipped without stashing; detached, locked or missing worktrees are also skipped.
 
 ### `/units import prs` and `/units import branches`
 
@@ -105,12 +113,15 @@ Closures terminate panes and are shown with pane commands before confirmation.
 Failed imports or incomplete discovery prevent closures. An authenticated,
 successful empty result may close all managed unit windows.
 
-Shared flags: `-f/--force` skips prompts; `--ask` explicitly requests the default
-per-action `y/N/q` prompt; `-n/--dry-run` previews without local changes.
+Shared flags: `-f/--force` skips prompts; `--ask` explicitly requests the
+per-action `y/N/q` prompt (default for imports and batch sync); `-n/--dry-run`
+previews without local changes.
 `-a/--all` expands the selection, `-b/--base` selects the rebase target or filters
 PR base, and imports accept `-A/--author`, `-p/--prefix`, `-r/--ready`, `-e/--exact`.
-Noninteractive runs require `-f` or `-n` when an action needs confirmation.
-Force never resets/stashes branches or overrides blocked worktrees.
+Noninteractive imports and batch sync require `-f` or `-n` when an action needs
+confirmation. Single-worktree sync proceeds automatically without `-f`.
+Force does not override batch safeguards; single-worktree sync independently
+stashes local changes as described above.
 
 ## Configuration
 
