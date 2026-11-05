@@ -2,19 +2,40 @@
 #
 # unit-open: create or open a unit worktree and its tmux window.
 #
-# Usage: unit-open <ticket-name> [branch-name]
+# Usage: unit-open [--start-ref <ref>] [--no-fetch] [--background] <ticket-name> [branch-name]
 
 set -euo pipefail
 
 DOTF_AGENTS_WORKTREE_DIR="${DOTF_AGENTS_WORKTREE_DIR:-.agents}"
+START_REF=""
+NO_FETCH=""
+BACKGROUND=""
 
-if [[ -z "${1:-}" ]]; then
-    echo "Usage: unit-open <ticket-name> [branch-name]" >&2
+usage() {
+    echo "Usage: unit-open [--start-ref <ref>] [--no-fetch] [--background] <ticket-name> [branch-name]"
+}
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --start-ref)
+            [[ $# -ge 2 ]] || { usage >&2; exit 1; }
+            START_REF="$2"; shift 2 ;;
+        --no-fetch) NO_FETCH=yes; shift ;;
+        --background) BACKGROUND=yes; shift ;;
+        -h|--help) usage; exit 0 ;;
+        --) shift; break ;;
+        -*) echo "Unknown argument: $1" >&2; exit 1 ;;
+        *) break ;;
+    esac
+done
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+    usage >&2
     exit 1
 fi
 
 TICKET="$1"
 BRANCH="${2:-$TICKET}"
+BRANCH_EXPLICIT=""
+[[ $# -eq 2 ]] && BRANCH_EXPLICIT=yes
 
 GIT_COMMON_DIR="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
 if [[ -z "$GIT_COMMON_DIR" ]]; then
@@ -24,17 +45,30 @@ fi
 
 MAIN_REPO="$(dirname "$GIT_COMMON_DIR")"
 REPO_NAME="$(basename "$MAIN_REPO" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]-' '-' | sed 's/^-//;s/-$//')"
-WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
+if [[ "$DOTF_AGENTS_WORKTREE_DIR" == /* ]]; then
+    WORKTREE_BASE="$DOTF_AGENTS_WORKTREE_DIR"
+else
+    WORKTREE_BASE="$MAIN_REPO/$DOTF_AGENTS_WORKTREE_DIR"
+fi
+# Canonical paths and branch-compatible tickets prevent escaping the agents root.
+WORKTREE_BASE="$(python3 -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve())' "$WORKTREE_BASE")"
+git check-ref-format --branch "$TICKET" >/dev/null
+git check-ref-format --branch "$BRANCH" >/dev/null
 WORKTREE_PATH="$WORKTREE_BASE/$TICKET"
+python3 -c 'import pathlib,sys; base=pathlib.Path(sys.argv[1]); root=pathlib.Path(sys.argv[2]).resolve(); target=pathlib.Path(sys.argv[3]).resolve(); sys.exit(0 if base != root and base not in root.parents and base in target.parents else 1)' "$WORKTREE_BASE" "$MAIN_REPO" "$WORKTREE_PATH" || {
+    echo "Error: Invalid agents directory or unit path" >&2; exit 1;
+}
 
 if [[ ! -d "$WORKTREE_PATH" ]]; then
     mkdir -p "$WORKTREE_BASE"
 
-    BASE_REF="HEAD"
-    BASE_LABEL="HEAD"
-    if git -C "$MAIN_REPO" remote get-url origin >/dev/null 2>&1; then
-        echo "Fetching latest from origin..."
-        git -C "$MAIN_REPO" fetch origin
+    BASE_REF="${START_REF:-HEAD}"
+    BASE_LABEL="$BASE_REF"
+    if [[ -z "$START_REF" ]] && git -C "$MAIN_REPO" remote get-url origin >/dev/null 2>&1; then
+        if [[ -z "$NO_FETCH" ]]; then
+            echo "Fetching latest from origin..."
+            git -C "$MAIN_REPO" fetch origin
+        fi
 
         BASE_BRANCH="$(git -C "$MAIN_REPO" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || true)"
         if [[ -z "$BASE_BRANCH" ]]; then
@@ -60,6 +94,14 @@ if [[ ! -d "$WORKTREE_PATH" ]]; then
     echo "  Path: $WORKTREE_PATH"
     echo "  Branch: $BRANCH (from $BASE_LABEL)"
 else
+    actual_path="$(git -C "$WORKTREE_PATH" rev-parse --show-toplevel 2>/dev/null || true)"
+    actual_branch="$(git -C "$WORKTREE_PATH" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+    actual_common="$(git -C "$WORKTREE_PATH" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+    if [[ "$actual_path" != "$WORKTREE_PATH" || "$actual_common" != "$GIT_COMMON_DIR" || -z "$actual_branch" || ( -n "$BRANCH_EXPLICIT" && "$actual_branch" != "$BRANCH" ) ]]; then
+        echo "Error: Existing path does not contain the requested worktree/branch" >&2
+        exit 1
+    fi
+    BRANCH="$actual_branch"
     echo "Opening existing worktree for $TICKET"
     echo "  Path: $WORKTREE_PATH"
 fi
@@ -80,6 +122,13 @@ if ! tmux has-session -t="$SESSION" 2>/dev/null; then
     root_window_id="$(tmux display-message -p -t "$SESSION:$ROOT_WINDOW" '#{window_id}')"
     tmux set-option -w -t "$root_window_id" -q @unit_repo_root "$MAIN_REPO"
     tmux-unit-layout 3 --target "$root_window_id" --cwd "$MAIN_REPO" --title-prefix "$REPO_NAME" --force
+else
+    while read -r existing_root; do
+        if [[ -n "$existing_root" && "$existing_root" != "$MAIN_REPO" ]]; then
+            echo "Error: tmux session $SESSION belongs to another repository" >&2
+            exit 1
+        fi
+    done < <(tmux list-windows -t "$SESSION" -F '#{@unit_repo_root}')
 fi
 
 WINDOW_ID=""
@@ -92,13 +141,14 @@ done < <(tmux list-windows -t "$SESSION" -F '#{window_id}	#{@unit_ticket}	#{@uni
 
 if [[ -z "$WINDOW_ID" ]]; then
     WINDOW_ID="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$WINDOW_NAME" -c "$WORKTREE_PATH")"
+    tmux-unit-layout 3 --target "$WINDOW_ID" --cwd "$WORKTREE_PATH" --title-prefix "$REPO_NAME" --ticket "$TICKET" --force
 fi
 
 tmux set-option -w -t "$WINDOW_ID" -q @unit_ticket "$TICKET"
 tmux set-option -w -t "$WINDOW_ID" -q @unit_path "$WORKTREE_PATH"
-tmux-unit-layout 3 --target "$WINDOW_ID" --cwd "$WORKTREE_PATH" --title-prefix "$REPO_NAME" --ticket "$TICKET" --force
+tmux set-option -w -t "$WINDOW_ID" -q @unit_repo_root "$MAIN_REPO"
 
-if [[ -n "${TMUX:-}" ]]; then
+if [[ -n "${TMUX:-}" && -z "$BACKGROUND" ]]; then
     tmux switch-client -t "$SESSION" 2>/dev/null || true
     tmux select-window -t "$WINDOW_ID"
 else
