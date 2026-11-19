@@ -35,3 +35,5 @@ Put schemas, code excerpts, edge cases, and secondary flows next to the claim th
 - Bind the server to `127.0.0.1`, verify a GET returns the expected page, and share the URL immediately. Do not make headless-browser inspection a prerequisite for the link. Run visual or interaction checks afterward when they address a concrete risk, with an isolated temporary browser profile; follow any tool or sandbox approval requirement. Keep the server and artifact available while the engineer reviews and corrects it. An attractive diagram is not evidence that its code-path claims are correct.
 
 Use this skill to explain and converge on understanding. Do not start implementation in a standalone explanation task. When called from `$eng-task`, return the agreed model, open decisions, and any approval boundary to that workflow.
+
+The user may provide a location as to where to store the webpage on an already running server, if the that is provided, inspect the README.md or AGENTS.md and adhere to the style accordingly.
