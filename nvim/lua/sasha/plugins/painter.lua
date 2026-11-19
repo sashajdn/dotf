@@ -1,5 +1,6 @@
 return {
-  dir = vim.fn.expand("~/repos/painter.nvim"),
+  "sashajdn/painter.nvim",
+  branch = "master",
   lazy = false,
   config = function()
     require("painter").setup()
