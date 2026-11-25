@@ -124,6 +124,59 @@ journal()
     $EDITOR $FILENAME
 }
 
+### --- Japanese blog --- ###
+_japanese_blog_open()
+{
+    local entry=$1 editor=${EDITOR:-nvim}
+    if (( $+commands[obsidian] )); then
+        obsidian vault=wiki open "path=${entry#"$WIKI"/}"
+    elif [[ -x $editor && -f $editor ]]; then
+        "$editor" "$entry"
+    else
+        ${(@Q)${(z)editor}} "$entry"
+    fi
+}
+
+japanese_blog_today()
+{
+    emulate -L zsh
+    local today entry draft
+    today=$(date +%F) || return
+    entry="$JAPANESE_BLOG/${today[1,4]}/${today[6,7]}/$today.md"
+    if [[ -d $entry ]]; then
+        print -ru2 -- "Expected a Markdown file at $entry, found a directory"
+        return 1
+    fi
+    if [[ ! -f $entry ]]; then
+        mkdir -p -- "${entry:h}" || return
+        draft=$(mktemp "${entry:h}/.jpb.XXXXXXXX") || return
+        {
+            printf '# Japanese Blog: %s\n\n' "$today" >| "$draft" || return
+            # Publish a complete entry even when two shells start it together.
+            if ! ln -- "$draft" "$entry" 2>/dev/null && [[ ! -f $entry ]]; then
+                print -ru2 -- "Could not create blog entry at $entry"
+                return 1
+            fi
+        } always {
+            rm -f -- "$draft"
+        }
+    fi
+    _japanese_blog_open "$entry"
+}
+
+japanese_blog_find()
+{
+    emulate -L zsh
+    local -a entries
+    local selected
+    entries=("$JAPANESE_BLOG"/**/*.md(ND.))
+    (( ${#entries} )) || return 0
+    # ISO year/month paths sort chronologically in zsh's default glob order.
+    selected=$(print -rN -- "${entries[@]#"$JAPANESE_BLOG"/}" |
+        fzf --read0 --print0 --layout=reverse --no-sort --no-tac --no-multi) || return
+    _japanese_blog_open "$JAPANESE_BLOG/${selected%$'\0'}"
+}
+
 ### --- Trips --- ###
 trip()
 {
