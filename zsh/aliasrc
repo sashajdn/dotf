@@ -123,6 +123,8 @@ alias vim2="vim"
 
 ### Wiki.
 alias wiki="nvim $WIKI"
+alias jpb='japanese_blog_today'
+alias jpf='japanese_blog_find'
 
 ### Zathura
 alias zath='zathura'
